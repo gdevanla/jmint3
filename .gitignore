@@ -1,0 +1,6 @@
+*.class
+sootOutput/
+target/
+.idea
+*.iml
+ideSolver*.csv
