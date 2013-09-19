@@ -39,7 +39,8 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
             Unit unit = entry.getRowKey();
             SootMethod method = (SootMethod)icfg.getMethodOf(unit);
 
-            if (!method.getDeclaringClass().getPackageName().contains("TestArtifact"))
+            if (! method.getDeclaringClass().getPackageName().contains("TestArtifact")
+                && !method.getDeclaringClass().getPackageName().contains("MutantInjection"))
                 continue;
 
             for(ValueBox b:unit.getUseBoxes()){

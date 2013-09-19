@@ -4,8 +4,16 @@ public class TestClass10_01 {
 
     public void F1(){
         TestClass10_02 t1_02 = new TestClass10_02();
-        int x = t1_02.member_variable;
-        System.out.println("Local instance `x` was tainted by an external member variable" + x);
+        int y = (int)Math.random();
+        if ( y < 100) {
+            int z = (int)Math.random();
+            t1_02.doSomething(z);
+        }
+        else
+        {
+            int w = (int)Math.random();
+            t1_02.doSomething(w);
+        }
     }
 }
 

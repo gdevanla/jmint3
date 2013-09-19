@@ -21,7 +21,8 @@ import static junit.framework.Assert.assertEquals;
 public class TestCrossBoundaryConditions {
 
     String jcePath = "/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/jce.jar";
-    String appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/ipa/TestIPA/target/classes";
+    String appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/myprojects/jMint_paper/jmint3/ipa/TestIPA/target/classes/";
+    //String appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/ipa/TestIPA/target/classes";
 
     public String[] getSootArgsByTestNum(int testNum, int numTestClasses){
 
@@ -226,7 +227,13 @@ public class TestCrossBoundaryConditions {
         }
     }
 
+    @Test
+    public void Test10(){
+        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA(10,2);
+        //Check if definitions within if conditions are picked up
+        assertEquals(2, solver.udChains.size());
 
+    }
 
     //@Test
     public void template(){
