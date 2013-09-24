@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import soot.*;
+import soot.jimple.AssignStmt;
 import soot.jimple.toolkits.ide.exampleproblems.IFDSReachingDefinitions;
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
 import soot.options.Options;
@@ -56,7 +57,7 @@ public class TestMutationInjection {
 
                 solver.solve();
                 solverRef.add(solver);
-                solver.printFilteredResults();
+                //solver.printFilteredResults();
 
             }
         }));
@@ -124,5 +125,21 @@ public class TestMutationInjection {
         assertEquals(true, mutantInjector.canMutate());
         */
 
+    }
+
+    @Test
+    public void TestRefTypeCanMutate(){
+
+        String[] sootAppFiles = { "MutantInjectionArtifacts.RefType.Main",
+                "MutantInjectionArtifacts.RefType.TestClass3_01",
+                "MutantInjectionArtifacts.RefType.TestClass3_02"};
+        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.RefType.Main", sootAppFiles);
+
+        //solver.printFilteredResults();
+
+        assertEquals(1, solver.udChains.size());
+
+        MutantInjector mutantInjector = new MutantInjector(solver.udChains.get(0).getDefStmt());
+        assertEquals(true, mutantInjector.canMutate());
     }
 }

@@ -2,24 +2,32 @@ import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
 import soot.jimple.DefinitionStmt;
+import soot.toolkits.scalar.Pair;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class UseDefChain {
 
-    private SootMethod useMethod;
-    private Unit useUnit;
-    private Value useValue;
+    final private SootMethod useMethod;
+    final private Unit useUnit;
+    final private Value useValue;
 
-    private SootMethod defMethod;
-    private DefinitionStmt defStmt;
+    final private SootMethod defMethod;
+    final private DefinitionStmt defStmt;
+
+    final private Set<Pair<DefinitionStmt, SootMethod>> allReachingDefs;
 
     public UseDefChain(SootMethod useMethod, Unit useUnit, Value useValue,
-                       SootMethod defMethod, DefinitionStmt defStmt){
+                       SootMethod defMethod, DefinitionStmt defStmt,
+                       Set<Pair<DefinitionStmt, SootMethod>> allReachingDefs){
         this.useMethod = useMethod;
         this.useUnit = useUnit;
         this.useValue = useValue;
 
         this.defMethod = defMethod;
         this.defStmt = defStmt;
+        this.allReachingDefs = allReachingDefs;
     }
 
     public SootMethod getUseMethod(){ return this.useMethod;};

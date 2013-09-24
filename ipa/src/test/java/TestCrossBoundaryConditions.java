@@ -253,7 +253,7 @@ public class TestCrossBoundaryConditions {
                 CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = new CustomIFDSSolver(problem, true);
                 solver.solve();
 
-                solver.printFilteredResults();
+                //solver.printFilteredResults();
                 UseDefChain udChain = solver.udChains.get(0);
 
             }

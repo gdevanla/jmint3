@@ -1,6 +1,9 @@
 import soot.*;
 import soot.JastAddJ.Binary;
 import soot.jimple.*;
+import soot.jimple.internal.JIdentityStmt;
+import soot.jimple.internal.JInstanceFieldRef;
+import soot.jimple.internal.JimpleLocal;
 
 
 public class MutantInjector {
@@ -121,7 +124,6 @@ public class MutantInjector {
                             Jimple.v().newGtExpr(conditionExpr.getOp1(),
                                     conditionExpr.getOp2()), ifStmt.getTarget());
                     break;
-
                 case 4:
                     // <= mutant
                     replaceUnit = Jimple.v().newIfStmt(
@@ -147,18 +149,39 @@ public class MutantInjector {
     }
 
     public boolean canMutate() {
-        if (!(unit instanceof AssignStmt) ||
-                (unit instanceof IfStmt))
+        System.out.println("Can mutate=" + unit.getClass());
+        if (!(unit instanceof AssignStmt)
+                && !(unit instanceof JIdentityStmt))
+                // || (unit instanceof IfStmt))
             return false;
 
         if (unit instanceof AssignStmt)
             return canMutate((AssignStmt) unit);
 
-        if (unit instanceof IfStmt)
-            return canMutate((IfStmt) unit);
+        if (unit instanceof JIdentityStmt)
+            return canMutate((JIdentityStmt)unit);
 
+        //Not going to need this.
+        /*if (unit instanceof IfStmt)
+            return canMutate((IfStmt) unit);*/
         return false;
 
+    }
+
+    private boolean canMutate(JIdentityStmt unit) {
+
+        if ( unit instanceof JIdentityStmt){
+            if ( unit.getRightOp() instanceof ThisRef) {
+                System.out.println("Identity=" + unit + ":" + unit.getRightOp().getClass());
+                return true;
+            }
+            else
+            {
+                System.out.println("Unhandled class=" + unit.getClass() +
+                        " with getRightOp()=" + unit.getRightOp() + ", unit=" + unit);
+            }
+        }
+        return false;
     }
 
 
@@ -172,6 +195,13 @@ public class MutantInjector {
                 return true;
             }
         }
+
+       System.out.println(unit + ":" + (unit.getRightOp().getClass()));
+       if ( unit.getRightOp() instanceof JInstanceFieldRef ){
+           System.out.println(unit + ":" + (unit.getRightOp() instanceof JInstanceFieldRef));
+           return true;
+       }
+
         return false;
     }
 
