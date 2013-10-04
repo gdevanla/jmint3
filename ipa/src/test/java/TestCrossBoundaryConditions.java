@@ -1,13 +1,11 @@
 import heros.IFDSTabulationProblem;
 import heros.InterproceduralCFG;
+import jmint.CustomIFDSSolver;
+import jmint.UseDefChain;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import soot.*;
-import soot.JastAddJ.List;
-import soot.jbco.jimpleTransformations.CollectConstants;
-import soot.jimple.DefinitionStmt;
-import soot.jimple.toolkits.ide.JimpleIFDSSolver;
 import soot.jimple.toolkits.ide.exampleproblems.IFDSReachingDefinitions;
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
 import soot.options.Options;

@@ -1,3 +1,5 @@
+package jmint;
+
 import soot.*;
 import soot.JastAddJ.Binary;
 import soot.jimple.*;

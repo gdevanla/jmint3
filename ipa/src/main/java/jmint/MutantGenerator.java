@@ -1,16 +1,15 @@
+package jmint;
+
+import jmint.IMutantInjector;
+import jmint.UseDefChain;
 import soot.*;
 import soot.jimple.*;
 import soot.options.Options;
-import soot.sootify.TemplatePrinter;
 import soot.util.EscapedWriter;
 import soot.util.JasminOutputStream;
-import soot.xml.XMLPrinter;
 
 import java.io.*;
-import java.security.Signature;
 import java.util.List;
-import java.util.zip.GZIPOutputStream;
-import java.util.zip.ZipEntry;
 
 public class MutantGenerator {
 

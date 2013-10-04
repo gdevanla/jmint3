@@ -1,3 +1,5 @@
+package jmint;
+
 import soot.SootMethod;
 import soot.Unit;
 import soot.Value;

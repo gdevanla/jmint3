@@ -1,10 +1,13 @@
 import heros.IFDSTabulationProblem;
 import heros.InterproceduralCFG;
+import jmint.CustomIFDSSolver;
+import jmint.MutantGenerator;
+import jmint.MutantInjector;
+import jmint.UseDefChain;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import soot.*;
-import soot.jimple.AssignStmt;
 import soot.jimple.toolkits.ide.exampleproblems.IFDSReachingDefinitions;
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
 import soot.options.Options;
@@ -38,6 +41,7 @@ public class TestMutationInjection {
         Options.v().set_whole_program(true);
         Options.v().set_output_format(Options.output_format_J);
         Options.v().set_keep_line_number(true);
+        Options.v().setPhaseOption("jb", "use-original-names");
         Scene.v().setSootClassPath(
                 Scene.v().getSootClassPath() + ":" + appSourcePath + ":" + jcePath);
 
@@ -137,9 +141,9 @@ public class TestMutationInjection {
         //solver.printFilteredResults();
 
         assertEquals(2, solver.udChains.size());
-        /*UseDefChain useDefChain = solver.udChains.get(0);
+        /*jmint.UseDefChain useDefChain = solver.udChains.get(0);
 
-        MutantInjector mutantInjector = new MutantInjector(useDefChain.getDefStmt());
+        jmint.MutantInjector mutantInjector = new jmint.MutantInjector(useDefChain.getDefStmt());
         assertEquals("i1 = 1000000 + i0", useDefChain.getDefStmt().toString());
         assertEquals(true, mutantInjector.canMutate());
         */

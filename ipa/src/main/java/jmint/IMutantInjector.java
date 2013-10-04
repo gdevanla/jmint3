@@ -1,3 +1,5 @@
+package jmint;
+
 import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 import soot.SootClass;
 import soot.jimple.*;
@@ -12,7 +14,7 @@ import soot.jimple.internal.JInstanceFieldRef;
  */
 public interface IMutantInjector {
 
-    //public SootClass generateMutant(UseDefChain udChain);
+    //public SootClass generateMutant(jmint.UseDefChain udChain);
     public SootClass generateMutant( InterfaceInvokeExpr expr);
     public SootClass generateMutant( SpecialInvokeExpr expr);
     public SootClass generateMutant( VirtualInvokeExpr expr);

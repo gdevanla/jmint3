@@ -1,16 +1,14 @@
+package jmint;
+
 import soot.SootClass;
 import soot.jimple.*;
 
-/**
- * Created with IntelliJ IDEA.
- * User: gdevanla
- * Date: 10/4/13
- * Time: 11:11 AM
- * To change this template use File | Settings | File Templates.
+/* This class just fills in the boiler plate code that the child classes
+could choose not to implement.
  */
 public class BaseMutantInjector implements IMutantInjector {
 
-    private final UseDefChain udChain;
+    protected final UseDefChain udChain;
 
     public BaseMutantInjector(UseDefChain udChain){
         this.udChain = udChain;

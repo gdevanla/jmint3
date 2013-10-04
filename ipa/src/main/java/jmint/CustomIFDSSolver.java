@@ -1,3 +1,5 @@
+package jmint;
+
 import com.google.common.collect.Table;
 import heros.IFDSTabulationProblem;
 import heros.InterproceduralCFG;
@@ -131,7 +133,7 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
                        if (calleeMethod.getDeclaringClass().equals(method.getDeclaringClass()))
                            continue;
 
-                      // UseDefChain useDefChain = new UseDefChain(method, unit, b.getValue(), calleeMethod, def);
+                      // jmint.UseDefChain useDefChain = new jmint.UseDefChain(method, unit, b.getValue(), calleeMethod, def);
                        System.out.println("Line Number=" + unit.getTag("LineNumberTag"));
                         System.out.println(b.getValue() + "," + columnKey.getO1() + "," + columnKey.getO2() + "," + unit);
 
