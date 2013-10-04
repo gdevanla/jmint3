@@ -37,9 +37,13 @@ public class UseDefChain {
     public SootMethod getDefMethod() { return defMethod; }
     public DefinitionStmt getDefStmt() { return defStmt; }
 
+
     public void printInfo(){
        System.out.println(String.format("UseMethod: %s, UseUnit: %s, UseValue:%s,\n DefMethod: %s, DefStmt :%s",
                useMethod, useUnit, useValue, defMethod, defStmt));
+       for (Pair<DefinitionStmt, SootMethod> p:allReachingDefs){
+            System.out.println(p.getO1());
+        }
 
     }
 

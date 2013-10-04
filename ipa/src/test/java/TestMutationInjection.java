@@ -10,6 +10,7 @@ import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
 import soot.options.Options;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
@@ -67,6 +68,22 @@ public class TestMutationInjection {
         return solverRef.get(0);
     }
 
+    private void generateMutants(String mainClass, String[] sootAppFiles, final List<UseDefChain> udChains ){
+
+        setSootOptions();
+        Options.v().set_main_class(mainClass);
+
+        PackManager.v().getPack("wjtp").add(new Transform("wjtp.mutantsinjector", new SceneTransformer() {
+            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
+                MutantGenerator generator = new MutantGenerator(udChains);
+                generator.generate();
+            }
+        }));
+        soot.Main.main(sootAppFiles);
+        G.reset();
+
+    }
+
 
     @Test
     public void TestAssignStmtCanMutate(){
@@ -103,6 +120,8 @@ public class TestMutationInjection {
         MutantInjector mutantInjector = new MutantInjector(useDefChain.getDefStmt());
         assertEquals("i1 = 1000000 + i0", useDefChain.getDefStmt().toString());
         Unit newUnit = mutantInjector.injectMutant();
+
+
         System.out.println(newUnit);
 
     }
@@ -141,5 +160,18 @@ public class TestMutationInjection {
 
         MutantInjector mutantInjector = new MutantInjector(solver.udChains.get(0).getDefStmt());
         assertEquals(true, mutantInjector.canMutate());
+    }
+
+    @Test
+    public void TestGeneratedClass(){
+
+        String[] sootAppFiles = { "MutantInjectionArtifacts.AssignStmts.Main",
+                "MutantInjectionArtifacts.AssignStmts.TestClass1_01",
+                "MutantInjectionArtifacts.AssignStmts.TestClass1_02"};
+        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.AssignStmts.Main", sootAppFiles);
+
+        generateMutants("MutantInjectionArtifacts.AssignStmts.Main",sootAppFiles, solver.udChains);
+
+
     }
 }
