@@ -34,6 +34,7 @@ public class TestCrossBoundaryConditions {
         Options.v().set_exclude(exclude_list);
         Options.v().set_whole_program(true);
         Options.v().set_output_format(Options.output_format_J);
+        Options.v().setPhaseOption("jb", "use-original-names");
         Options.v().set_main_class(String.format(mainClass, testNum, testNum));
 
         String[] files = new String[numTestClasses+1];
@@ -230,6 +231,26 @@ public class TestCrossBoundaryConditions {
         CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA(10,2);
         //Check if definitions within if conditions are picked up
         assertEquals(2, solver.udChains.size());
+
+    }
+
+    @Test
+    public void Test11(){
+        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA(11,2);
+        //Check if definitions within if conditions are picked up
+        assertEquals(2, solver.udChains.size());
+        //solver.printFilteredResults();
+        UseDefChain.printInfo(solver.udChains);
+
+    }
+
+    @Test
+    public void Test12(){
+        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA(12,2);
+        //Check if definitions within if conditions are picked up
+        //assertEquals(2, solver.udChains.size());
+        //solver.printFilteredResults();
+        //UseDefChain.printInfo(solver.udChains);
 
     }
 

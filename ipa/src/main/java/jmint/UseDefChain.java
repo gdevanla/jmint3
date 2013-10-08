@@ -7,6 +7,7 @@ import soot.jimple.DefinitionStmt;
 import soot.toolkits.scalar.Pair;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class UseDefChain {
@@ -43,10 +44,15 @@ public class UseDefChain {
     public void printInfo(){
        System.out.println(String.format("UseMethod: %s, UseUnit: %s, UseValue:%s,\n DefMethod: %s, DefStmt :%s",
                useMethod, useUnit, useValue, defMethod, defStmt));
+       System.out.println("All reaching Defs=");
        for (Pair<DefinitionStmt, SootMethod> p:allReachingDefs){
             System.out.println(p.getO1());
         }
 
+    }
+
+    public static void printInfo(List<UseDefChain> useDefChains){
+        for (UseDefChain ud:useDefChains){ ud.printInfo();}
     }
 
 }

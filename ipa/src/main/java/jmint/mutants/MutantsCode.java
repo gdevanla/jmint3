@@ -11,6 +11,7 @@ public enum MutantsCode {
     JDC,
     JID,
     JTD,
+    JSC,
     OAN,
     OAO,
     OMD,

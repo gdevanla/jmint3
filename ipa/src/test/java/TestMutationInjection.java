@@ -4,6 +4,10 @@ import jmint.CustomIFDSSolver;
 import jmint.MutantGenerator;
 import jmint.MutantInjector;
 import jmint.UseDefChain;
+import jmint.mutants.javaish.JID;
+import jmint.mutants.javaish.JSC;
+import jmint.mutants.javaish.JTD;
+import jmint.mutants.progmistakes.EAM;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -88,6 +92,18 @@ public class TestMutationInjection {
 
     }
 
+    private void generateMutants(String mainClass, String[] sootAppFiles, final List<UseDefChain> udChains, Transform transformCallBack ){
+
+        setSootOptions();
+        Options.v().set_main_class(mainClass);
+
+        PackManager.v().getPack("wjtp").add(transformCallBack);
+        soot.Main.main(sootAppFiles);
+        G.reset();
+
+    }
+
+
 
     @Test
     public void TestAssignStmtCanMutate(){
@@ -165,6 +181,110 @@ public class TestMutationInjection {
         MutantInjector mutantInjector = new MutantInjector(solver.udChains.get(0).getDefStmt());
         assertEquals(true, mutantInjector.canMutate());
     }
+
+    @Test
+    public void TestJTD1(){
+
+        String[] sootAppFiles = { "MutantInjectionArtifacts.JTD.JTDTest1",
+                "MutantInjectionArtifacts.JTD.JTD1",
+                "MutantInjectionArtifacts.JTD.JTD2"};
+        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.JTD.JTDTest1", sootAppFiles);
+
+        //solver.printFilteredResults();
+
+        assertEquals(1, solver.udChains.size());
+
+        final JTD jtd = new JTD(solver.udChains.get(0));
+
+        Transform x = (new Transform("wjtp.jtdinjector", new SceneTransformer() {
+            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
+                assertEquals(true, jtd.canInject());
+                System.out.println(jtd.mutantLog());
+            }
+        }));
+
+        generateMutants("MutantInjectionArtifacts.JTD.JTDTest1",sootAppFiles, solver.udChains, x);
+
+
+        }
+
+    @Test
+    public void TestEAM1(){
+
+        String[] sootAppFiles = { "MutantInjectionArtifacts.EAM.EAMTest1",
+                "MutantInjectionArtifacts.EAM.EAM1",
+                "MutantInjectionArtifacts.EAM.EAM2"};
+        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.EAM.EAMTest1", sootAppFiles);
+
+        //solver.printFilteredResults();
+
+        //assertEquals(1, solver.udChains.size());
+
+        final EAM eam = new EAM(solver.udChains.get(0));
+
+        Transform x = (new Transform("wjtp.eaminjector", new SceneTransformer() {
+            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
+                assertEquals(true, eam.canInject());
+                System.out.println(eam.mutantLog());
+            }
+        }));
+
+        generateMutants("MutantInjectionArtifacts.EAM.EAMTest1",sootAppFiles, solver.udChains, x);
+
+
+    }
+
+    @Test
+    public void TestJSC1(){
+
+        String[] sootAppFiles = { "MutantInjectionArtifacts.JSC.JSCTest1",
+                "MutantInjectionArtifacts.JSC.JSC1",
+                "MutantInjectionArtifacts.JSC.JSC2"};
+        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.JSC.JSCTest1", sootAppFiles);
+
+        final JSC jsc1 = new JSC(solver.udChains.get(0));
+
+        Transform x = (new Transform("wjtp.jscinjector", new SceneTransformer() {
+            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
+                assertEquals(true, jsc1.canInject());
+                System.out.println(jsc1.mutantLog());
+            }
+        }));
+
+        generateMutants("MutantInjectionArtifacts.JSC.JSCTest1",sootAppFiles, solver.udChains, x);
+
+        final JSC jsc2 = new JSC(solver.udChains.get(1));
+
+        Transform x2 = (new Transform("wjtp.jscinjector", new SceneTransformer() {
+            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
+                assertEquals(true, jsc2.canInject());
+                System.out.println(jsc2.mutantLog());
+            }
+        }));
+
+        generateMutants("MutantInjectionArtifacts.JSC.JSCTest1",sootAppFiles, solver.udChains, x2);
+    }
+
+    @Test
+    public void TestJID1(){
+
+        String[] sootAppFiles = { "MutantInjectionArtifacts.JID.JIDTest1",
+                "MutantInjectionArtifacts.JID.JID1",
+                "MutantInjectionArtifacts.JID.JID2"};
+        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.JID.JIDTest1", sootAppFiles);
+
+        final JID jid = new JID(solver.udChains.get(0));
+
+        Transform x = (new Transform("wjtp.jidinjector", new SceneTransformer() {
+            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
+                assertEquals(true, jid.canInject());
+                System.out.println(jid.mutantLog());
+            }
+        }));
+
+        generateMutants("MutantInjectionArtifacts.JID.JIDTest1",sootAppFiles, solver.udChains, x);
+    }
+
 
     @Test
     public void TestGeneratedClass(){

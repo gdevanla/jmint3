@@ -129,8 +129,6 @@ public class MutantGenerator {
             throw new CompilationDeathException("Cannot output file " + fileName,e);
         }
 
-
-
         try {
             writerOut.flush();
             streamOut.close();

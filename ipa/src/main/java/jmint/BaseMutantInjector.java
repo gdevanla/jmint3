@@ -15,6 +15,16 @@ public class BaseMutantInjector implements IMutantInjector {
     }
 
     @Override
+    public boolean canInject(){
+        return false;
+    }
+
+    @Override
+    public String mutantLog(){
+        return "";
+    }
+
+    @Override
     public SootClass generateMutant(InterfaceInvokeExpr expr) {
         return udChain.getDefMethod().getDeclaringClass();
     }
@@ -53,4 +63,7 @@ public class BaseMutantInjector implements IMutantInjector {
     public SootClass generateMutant(StaticFieldRef fieldRef) {
         return udChain.getDefMethod().getDeclaringClass();
     }
+
+
+
 }

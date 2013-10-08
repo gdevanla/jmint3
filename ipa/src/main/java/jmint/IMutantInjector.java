@@ -25,4 +25,7 @@ public interface IMutantInjector {
     public SootClass generateMutant( StaticFieldRef fieldRef);
 
 
+    boolean canInject();
+
+    String mutantLog();
 }
