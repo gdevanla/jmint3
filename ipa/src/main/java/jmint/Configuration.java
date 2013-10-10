@@ -10,7 +10,6 @@ package jmint;
 public final class Configuration {
 
     static String sourceFolder = "";
-
-
+    static String[] packageUnderTest = {"TestArtifacts", "MutantInjectionArtifacts"};
 
 }

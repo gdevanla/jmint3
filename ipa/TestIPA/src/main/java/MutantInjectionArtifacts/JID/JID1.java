@@ -4,6 +4,11 @@ package MutantInjectionArtifacts.JID;
 public class JID1 {
 
     int x = 10;
+    String s = "";
+
+    public JID1(){
+        s = "test";
+    }
 
     public void F1(){
         JID2 t1_02 = new JID2();

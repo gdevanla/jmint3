@@ -9,10 +9,7 @@ import soot.toolkits.scalar.Pair;
 import soot.jimple.DefinitionStmt;
 import soot.jimple.toolkits.ide.JimpleIFDSSolver;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /*
 Based on JimpleIFDSSolver
@@ -56,17 +53,20 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
 
     public void saveResults(){
         for (Object o: val.cellSet()){
+
             Table.Cell<Unit, D, ?> entry = (Table.Cell<Unit, D, ?>)o;
             Unit unit = entry.getRowKey();
-            SootMethod method = (SootMethod)icfg.getMethodOf(unit);
+            Pair<Value, Set<DefinitionStmt>> columnKey = (Pair<Value, Set<DefinitionStmt>>)entry.getColumnKey();
+            Set<DefinitionStmt> defs = columnKey.getO2();
+            //Set<Pair<DefinitionStmt, SootMethod>> allReachingDefs = getDefStmtMethodPairs(defs);
 
+            SootMethod method = (SootMethod)icfg.getMethodOf(unit);
             if (! method.getDeclaringClass().getPackageName().contains("TestArtifact")
                 && !method.getDeclaringClass().getPackageName().contains("MutantInjection"))
                 continue;
 
             for(ValueBox b:unit.getUseBoxes()){
-                //System.out.println(b.getValue());
-                Pair<Value, Set<DefinitionStmt>> columnKey = (Pair<Value, Set<DefinitionStmt>>)entry.getColumnKey();
+                //System.out.println("Use Boxes = " +  b.getValue() + ":" + unit);
 
                 Value v = (columnKey.getO1() instanceof EquivalentValue)?
                         ((EquivalentValue)columnKey.getO1()).getDeepestValue():columnKey.getO1();
@@ -74,16 +74,12 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
                 //System.out.println(b.getValue() + "," + columnKey.getO1() + "," + columnKey.getO2() + "," + unit);
 
                 if (v.equivTo(b.getValue())){
-
-                    Set<DefinitionStmt> defs = columnKey.getO2();
-
-                    Set<Pair<DefinitionStmt, SootMethod>> allReachingDefs = getDefStmtMethodPairs(defs);
                     for (DefinitionStmt def:defs){
                         SootMethod defMethod = (SootMethod)icfg.getMethodOf(def);
-
                         if ( isCrossBoundaryDefUse(def,method) ){
+
                             UseDefChain useDefChain = new UseDefChain(method, unit, b.getValue(),
-                                    defMethod,def, allReachingDefs);
+                                    defMethod,def, getDefStmtMethodPairs(def));
                             System.out.println("Line Number Use Unit=" + unit.getTag("LineNumberTag") +
                                     "Line Number of DefStmt=" + def.getTag("LineNumberTag"));
                             useDefChain.printInfo();
@@ -98,48 +94,25 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
         }
     }
 
-    private Set<Pair<DefinitionStmt,SootMethod>> getDefStmtMethodPairs(Set<DefinitionStmt> defs) {
-        Set<Pair<DefinitionStmt, SootMethod>> l = new HashSet<Pair<DefinitionStmt, SootMethod>>();
-        for (DefinitionStmt def:defs){
-            l.add(new Pair<DefinitionStmt, SootMethod>(def, (SootMethod)icfg.getMethodOf(def)));
+    private void printReachingDefs(DefinitionStmt def) {
+        System.out.println("This is the def=" + def);
+        Map cols = val.row(def);
+        for(Object o:cols.keySet()){
+            System.out.println((Pair<Value,DefinitionStmt>)o);
         }
+    }
+
+    private Set getDefStmtMethodPairs(DefinitionStmt def) {
+        Map cols = val.row(def);
+        Set<Pair<Pair<Value, Set<DefinitionStmt>>, SootMethod>> l =
+                new HashSet<Pair<Pair<Value, Set<DefinitionStmt>>, SootMethod>>();
+
+        for(Object o:cols.keySet()){
+            l.add(new Pair<Pair<Value, Set<DefinitionStmt>>, SootMethod>((Pair<Value, Set<DefinitionStmt>>) o,
+                    (SootMethod)icfg.getMethodOf(def)));
+        }
+
         return l;
     }
 
-
-    public void printFilteredResults(){
-
-        for (Object o: val.cellSet()){
-            Table.Cell<Unit, D, ?> entry = (Table.Cell<Unit, D, ?>)o;
-            Unit unit = entry.getRowKey();
-            SootMethod method = (SootMethod)icfg.getMethodOf(unit);
-
-            if (!method.getDeclaringClass().getPackageName().contains("TestArtifact"))
-                continue;
-
-            for(ValueBox b:unit.getUseBoxes()){
-                //System.out.println(b.getValue());
-                Pair<Value, Set<DefinitionStmt>> columnKey = (Pair<Value, Set<DefinitionStmt>>)entry.getColumnKey();
-
-
-                Value v = (columnKey.getO1() instanceof EquivalentValue)?
-                        ((EquivalentValue)columnKey.getO1()).getDeepestValue():columnKey.getO1();
-
-                if (v.equivTo(b.getValue())){
-
-                   Set<DefinitionStmt> defs = columnKey.getO2();
-                   for (DefinitionStmt def:defs){
-                       SootMethod calleeMethod = (SootMethod)icfg.getMethodOf(def);
-                       if (calleeMethod.getDeclaringClass().equals(method.getDeclaringClass()))
-                           continue;
-
-                      // jmint.UseDefChain useDefChain = new jmint.UseDefChain(method, unit, b.getValue(), calleeMethod, def);
-                       System.out.println("Line Number=" + unit.getTag("LineNumberTag"));
-                        System.out.println(b.getValue() + "," + columnKey.getO1() + "," + columnKey.getO2() + "," + unit);
-
-                   }
-                }
-            }
-        }
-    }
 }
