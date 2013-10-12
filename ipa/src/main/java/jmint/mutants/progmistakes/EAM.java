@@ -71,7 +71,8 @@ public class EAM extends BaseMutantInjector {
                 if ( localDefs.hasDefsAt(equivLocal, u)){
                     for (Unit def:localDefs.getDefsOfAt(equivLocal, u)){
                         if (def instanceof JAssignStmt &&
-                                SootUtilities.isThisMethodInvoked((JAssignStmt)def, getterMethod)) {
+                                SootUtilities.isThisMethodInvoked((JAssignStmt)def, getterMethod) &&
+                                SootUtilities.areOtherGetterMethodsAvailable(getterMethod.getDeclaringClass(), getterMethod)) {
                             mutableUnits.add(def);
                         }
                     }

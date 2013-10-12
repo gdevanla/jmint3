@@ -116,4 +116,16 @@ public class SootUtilities {
         return def.containsInvokeExpr() &&
                 ((InvokeExpr)def.getRightOp()).getMethod().getSignature().equals(getterMethod.getSignature());
     }
+
+    public static boolean areOtherGetterMethodsAvailable(SootClass declaringClass, SootMethod excludeMethod) {
+        List<SootMethod> methods = declaringClass.getMethods();
+        for (SootMethod method: methods){
+            if (method.getParameterCount() == 0 &&
+                    method.getName().startsWith("get")
+                    && !method.getName().equals(excludeMethod.getName())
+                    ) return true;
+        }
+
+        return false;
+    }
 }
