@@ -12,6 +12,7 @@ public class EAM2 {
     }
 
     public int getVariable() {
-        return new Base().getVariable();
+        return (int)Math.random();
+        //return new Base().getVariable();
     }
 }

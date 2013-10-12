@@ -58,8 +58,8 @@ public class JTD extends BaseMutantInjector {
     }
 
 
-    @Override
-    public SootClass generateMutant(InstanceFieldRef fieldRef) {
+    //@Override
+    public SootClass generateMutant(InstanceFieldRef fieldRef, Object o) {
 
         String fieldName = fieldRef.getField().getName();
 

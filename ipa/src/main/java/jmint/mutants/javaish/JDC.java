@@ -18,6 +18,23 @@ public class JDC extends BaseMutantInjector {
         super(udChain);
     }
 
+    @Override
+    public SootClass generateMutant(NewExpr expr, Pair<DefinitionStmt, SootMethod> parent) {
+
+        if ( !SootUtilities.isTypeIncludedInAnalysis(
+                expr.getUseBoxes().get(0).getValue())) return null;
+
+        Unit u = SootUtilities.getUnitInvokingDefaultConstructor(
+                parent.getO1().getDefBoxes().get(0).getValue(),
+                parent.getO2());
+
+         //def_use_chain, <original_def_stmt>, mutant_code_no, line_no
+         //SootClass, replacedUnit, replacedMethod
+
+        return null;
+    }
+
+
     public boolean canInject(){
         assert(udChain.getDefStmt() instanceof AssignStmt);
 
@@ -31,8 +48,7 @@ public class JDC extends BaseMutantInjector {
             // $r = new someclass
             if (!(defStmt.getRightOp() instanceof NewExpr)) continue;
 
-            if ( !SootUtilities.isTypeIncludedInAnalysis(
-                    defStmt.getDefBoxes().get(0).getValue())) continue;
+            //missing
 
             //now go find the constructor being invoked and see if it is default constructor.
             Unit u = SootUtilities.getUnitInvokingDefaultConstructor(

@@ -67,21 +67,22 @@ public class TestMutationInjection {
         return solverRef.get(0);
     }
 
-    private void generateMutants(String mainClass, String[] sootAppFiles, final List<UseDefChain> udChains ){
+   /* private void generateMutants(String mainClass, String[] sootAppFiles, final List<UseDefChain> udChains ){
 
         setSootOptions();
         Options.v().set_main_class(mainClass);
 
         PackManager.v().getPack("wjtp").add(new Transform("wjtp.mutantsinjector", new SceneTransformer() {
             protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
-                MutantGenerator generator = new MutantGenerator(udChains);
-                generator.generate();
+               // MutantGenerator generator = new MutantGenerator(udChains);
+               // generator.generate();
             }
         }));
         soot.Main.main(sootAppFiles);
         G.reset();
 
     }
+*/
 
     private void generateMutants(String mainClass, String[] sootAppFiles, final List<UseDefChain> udChains, Transform transformCallBack ){
 
@@ -209,12 +210,13 @@ public class TestMutationInjection {
 
         //assertEquals(1, solver.udChains.size());
 
-        final EAM eam = new EAM(solver.udChains.get(0));
+        //final EAM eam = new EAM(solver.udChains.get(0));
+        final MutantGenerator generator = new MutantGenerator(solver.udChains.get(0), new EAM(solver.udChains.get(0)));
 
         Transform x = (new Transform("wjtp.eaminjector", new SceneTransformer() {
             protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
-                assertEquals(true, eam.canInject());
-                System.out.println(eam.mutantLog());
+                generator.generate();
+                //System.out.println(generator.mutantLog());
             }
         }));
 

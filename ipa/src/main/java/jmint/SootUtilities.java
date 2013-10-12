@@ -2,9 +2,13 @@ package jmint;
 
 
 import soot.*;
+import soot.jimple.InvokeExpr;
 import soot.jimple.InvokeStmt;
 import soot.jimple.SpecialInvokeExpr;
+import soot.jimple.internal.JAssignStmt;
 import soot.util.Chain;
+
+import java.util.List;
 
 public class SootUtilities {
 
@@ -77,5 +81,39 @@ public class SootUtilities {
 
 
         return false;
+    }
+
+    /* This method is used to get around Unit in Soot not implementing hashcode or equals method
+    properly.
+     */
+    public static boolean AreTheseObjectEqualAsStrings(Object o1, Object o2) {
+        if (o1.toString().equals(o2.toString())) return true;
+        else return false;
+    }
+
+    //Careful using this. Use it if you know the calls are scoped to the same methods
+    //where l and u belong to.
+    public static boolean DoesUnitUseThisLocalAsString(Unit u, Local l) {
+        List<ValueBox> boxes = u.getUseBoxes();
+        for (ValueBox b:boxes){
+            if (b.getValue().toString().equals(l.toString())) return true;
+        }
+        return false;
+    }
+
+    public static Local getEquivalentLocal(Unit u, Local l) {
+        List<ValueBox> boxes = u.getUseAndDefBoxes();
+        for (ValueBox b:boxes){
+            if (b.getValue().hashCode() == l.hashCode()){
+                return (Local)b.getValue();
+            }
+        }
+        return null;
+
+    }
+
+    public static boolean isThisMethodInvoked(JAssignStmt def, SootMethod getterMethod) {
+        return def.containsInvokeExpr() &&
+                ((InvokeExpr)def.getRightOp()).getMethod().getSignature().equals(getterMethod.getSignature());
     }
 }

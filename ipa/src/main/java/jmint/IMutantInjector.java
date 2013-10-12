@@ -2,8 +2,10 @@ package jmint;
 
 import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 import soot.SootClass;
+import soot.SootMethod;
 import soot.jimple.*;
 import soot.jimple.internal.JInstanceFieldRef;
+import soot.toolkits.scalar.Pair;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,17 +17,19 @@ import soot.jimple.internal.JInstanceFieldRef;
 public interface IMutantInjector {
 
     //public SootClass generateMutant(jmint.UseDefChain udChain);
-    public SootClass generateMutant( InterfaceInvokeExpr expr);
-    public SootClass generateMutant( SpecialInvokeExpr expr);
-    public SootClass generateMutant( VirtualInvokeExpr expr);
-    public SootClass generateMutant( StaticInvokeExpr expr);
-    public SootClass generateMutant( BinopExpr expr);
-    public SootClass generateMutant( NewExpr expr);
-    public SootClass generateMutant(InstanceFieldRef fieldRef);
-    public SootClass generateMutant( StaticFieldRef fieldRef);
+    public SootClass generateMutant( InterfaceInvokeExpr expr, Pair<DefinitionStmt, SootMethod> parent);
+    public SootClass generateMutant( SpecialInvokeExpr expr, Pair<DefinitionStmt, SootMethod> parent);
+    public SootClass generateMutant( VirtualInvokeExpr expr, Pair<DefinitionStmt, SootMethod> parent);
+    public SootClass generateMutant( StaticInvokeExpr expr, Pair<DefinitionStmt, SootMethod> parent);
+    public SootClass generateMutant( BinopExpr expr, Pair<DefinitionStmt, SootMethod> parent);
+    public SootClass generateMutant( NewExpr expr, Pair<DefinitionStmt, SootMethod> parent);
+    public SootClass generateMutant(InstanceFieldRef fieldRef, Pair<DefinitionStmt, SootMethod> parent);
+    public SootClass generateMutant( StaticFieldRef fieldRef, Pair<DefinitionStmt, SootMethod> parent);
 
 
     boolean canInject();
 
     String mutantLog();
+
+    SootClass generateMutant(AssignStmt stmt, Pair<DefinitionStmt, SootMethod> parent);
 }
