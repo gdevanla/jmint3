@@ -62,7 +62,9 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
 
             SootMethod method = (SootMethod)icfg.getMethodOf(unit);
             if (! method.getDeclaringClass().getPackageName().contains("TestArtifact")
-                && !method.getDeclaringClass().getPackageName().contains("MutantInjection"))
+                    && !method.getDeclaringClass().getPackageName().contains("MutantInjection")
+                    && !method.getDeclaringClass().getPackageName().contains("org.apache.bcel")
+                    )
                 continue;
 
             for(ValueBox b:unit.getUseBoxes()){
@@ -80,8 +82,8 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
 
                             UseDefChain useDefChain = new UseDefChain(method, unit, b.getValue(),
                                     defMethod,def, getDefStmtMethodPairs(def));
-                            System.out.println("Line Number Use Unit=" + unit.getTag("LineNumberTag") +
-                                    "Line Number of DefStmt=" + def.getTag("LineNumberTag"));
+                            //System.out.println("Line Number Use Unit=" + unit.getTag("LineNumberTag") +
+                            //        "Line Number of DefStmt=" + def.getTag("LineNumberTag"));
                             useDefChain.printInfo();
                             udChains.add(useDefChain);
                         }

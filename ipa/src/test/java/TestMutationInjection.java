@@ -1,9 +1,6 @@
 import heros.IFDSTabulationProblem;
 import heros.InterproceduralCFG;
-import jmint.CustomIFDSSolver;
-import jmint.MutantGenerator;
-import jmint.MutantInjector;
-import jmint.UseDefChain;
+import jmint.*;
 import jmint.mutants.javaish.*;
 import jmint.mutants.progmistakes.EAM;
 import org.junit.Test;
@@ -46,7 +43,9 @@ public class TestMutationInjection {
 
         setSootOptions();
 
-        Options.v().set_main_class(mainClass);
+        if (!mainClass.equals("")){
+            Options.v().set_main_class(mainClass);
+        }
 
         final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
         PackManager.v().getPack("wjtp").add(new Transform("wjtp.ifds", new SceneTransformer() {
@@ -61,7 +60,17 @@ public class TestMutationInjection {
 
             }
         }));
-        soot.Main.main(sootAppFiles);
+
+        if ( sootAppFiles.length == 0){
+            String[] sootArguments = new String[]{"-process-dir", appSourcePath};
+            soot.Main.main(sootArguments);
+        }
+        else
+        {
+            soot.Main.main(sootAppFiles);
+        }
+
+        //soot.Main.main(sootAppFiles);
         G.reset();
 
         return solverRef.get(0);
@@ -87,10 +96,20 @@ public class TestMutationInjection {
     private void generateMutants(String mainClass, String[] sootAppFiles, final List<UseDefChain> udChains, Transform transformCallBack ){
 
         setSootOptions();
-        Options.v().set_main_class(mainClass);
+        if (!mainClass.equals("")){
+            Options.v().set_main_class(mainClass);
+        }
 
         PackManager.v().getPack("wjtp").add(transformCallBack);
-        soot.Main.main(sootAppFiles);
+        if ( sootAppFiles.length == 0){
+            String[] sootArguments = new String[]{"-process-dir", appSourcePath};
+            soot.Main.main(sootArguments);
+        }
+        else
+        {
+            soot.Main.main(sootAppFiles);
+        }
+
         G.reset();
 
     }
@@ -207,11 +226,14 @@ public class TestMutationInjection {
         CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.EAM.EAMTest1", sootAppFiles);
 
         //solver.printFilteredResults();
-
         //assertEquals(1, solver.udChains.size());
-
         //final EAM eam = new EAM(solver.udChains.get(0));
-        final MutantGenerator generator = new MutantGenerator(solver.udChains.get(0), new EAM(solver.udChains.get(0)));
+
+        EAM eam = new EAM(solver.udChains.get(0));
+        List<BaseMutantInjector> injectors = new ArrayList<BaseMutantInjector>();
+        injectors.add(eam);
+
+        final MutantGenerator generator = new MutantGenerator(injectors);
 
         Transform x = (new Transform("wjtp.eaminjector", new SceneTransformer() {
             protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
@@ -222,7 +244,9 @@ public class TestMutationInjection {
 
         generateMutants("MutantInjectionArtifacts.EAM.EAMTest1",sootAppFiles, solver.udChains, x);
 
-
+        for (BaseMutantInjector injector:injectors){
+            injector.printInfo();
+        }
     }
 
     @Test
@@ -314,6 +338,48 @@ public class TestMutationInjection {
         }));
 
         generateMutants("MutantInjectionArtifacts.JTI.JTITest1",sootAppFiles, solver.udChains, x);
+    }
+
+    @Test
+    public void TestBCEL(){
+
+        appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+
+        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("", new String[]{});
+
+        //solver.printFilteredResults();
+        //assertEquals(1, solver.udChains.size());
+        //final EAM eam = new EAM(solver.udChains.get(0));
+
+
+        final List<BaseMutantInjector> injectors = new ArrayList<BaseMutantInjector>();
+
+        for ( UseDefChain udChain: solver.udChains){
+            EAM eam = new EAM(udChain);
+            injectors.add(eam);
+        }
+
+        final MutantGenerator generator = new MutantGenerator(injectors);
+
+        Transform x = (new Transform("wjtp.eaminjector", new SceneTransformer() {
+            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
+                generator.generate();
+                //System.out.println(generator.mutantLog());
+                for (BaseMutantInjector injector:injectors){
+                    injector.printInfo();
+                }
+            }
+        }));
+
+        generateMutants("", new String[]{}, solver.udChains, x);
+
+        for (BaseMutantInjector injector:injectors){
+            injector.printInfo();
+        }
+
+
+
+
     }
 
 

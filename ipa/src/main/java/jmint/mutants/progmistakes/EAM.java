@@ -42,7 +42,7 @@ public class EAM extends BaseMutantInjector {
           for(Unit u:units){
               generatedMutants.put(new Pair<DefinitionStmt, UseDefChain>(parent.getO1(), udChain),
                       new Pair<DefinitionStmt, Host>(stmt, parent.getO2()),
-                      new MutantInfo(new Pair<DefinitionStmt, Host>((DefinitionStmt)u, udChain.getUseMethod()), null, MutantsCode.EAM));
+                      new MutantInfo(new Pair<DefinitionStmt, Host>((DefinitionStmt)u, udChain.getUseMethod()), udChain.getUseMethod().getDeclaringClass(), MutantsCode.EAM));
           }
 
       }
@@ -50,9 +50,14 @@ public class EAM extends BaseMutantInjector {
     }
 
     public List<Unit> findStatementsInvokingGetter(SootMethod getterMethod){
-        assert(udChain.useValue instanceof Local);
-
         List<Unit> mutableUnits = new ArrayList<Unit>();
+        //assert(udChain.useValue instanceof Local);
+        if (!(udChain.useValue instanceof Local)){
+            System.out.println("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
+            return mutableUnits;
+        }
+
+
         Local l = (Local) udChain.useValue;
         PatchingChain<Unit> units = SootUtilities.getResolvedMethod(
                 udChain.getUseMethod()).getActiveBody().getUnits();

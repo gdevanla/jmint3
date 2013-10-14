@@ -6,6 +6,7 @@ import soot.jimple.InvokeExpr;
 import soot.jimple.InvokeStmt;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.internal.JAssignStmt;
+import soot.tagkit.Tag;
 import soot.util.Chain;
 
 import java.util.List;
@@ -53,7 +54,8 @@ public class SootUtilities {
         //Assume Soot scene is currently active
         SootClass klass = Scene.v().forceResolve(method.getDeclaringClass().getName(),
                 SootClass.SIGNATURES);
-        return klass.getMethodByName(method.getName());
+        //System.out.println(method.getName() + ":" + method.getSignature() + ":" + method.getSubSignature());
+        return klass.getMethod(method.getSubSignature());
     }
 
     public static SootClass getResolvedClass(String className) {
@@ -123,9 +125,20 @@ public class SootUtilities {
             if (method.getParameterCount() == 0 &&
                     method.getName().startsWith("get")
                     && !method.getName().equals(excludeMethod.getName())
-                    ) return true;
+                    && method.getReturnType().toString().equals(excludeMethod.getReturnType().toString())){
+                return true;
+            }
         }
 
         return false;
     }
+
+    public static String getTagOrDefaultValue(Tag tag, String defaultValue){
+        if (tag == null)
+            return defaultValue;
+        else
+            return tag.toString();
+    }
+
+
 }

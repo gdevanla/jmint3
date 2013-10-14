@@ -32,4 +32,5 @@ public interface IMutantInjector {
     String mutantLog();
 
     SootClass generateMutant(AssignStmt stmt, Pair<DefinitionStmt, SootMethod> parent);
+
 }

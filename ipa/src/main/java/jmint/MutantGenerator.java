@@ -16,103 +16,38 @@ import java.util.Set;
 
 public class MutantGenerator {
 
-    private final List<UseDefChain> udChains;
+    private List<UseDefChain> udChains;
     private IMutantInjector injector;
+    public final List<BaseMutantInjector> injectors;
 
-    public MutantGenerator(List<UseDefChain> udChains, IMutantInjector injector) {
+    public MutantGenerator(List<UseDefChain> udChains, IMutantInjector injector, List<BaseMutantInjector> injectors) {
         this.udChains = udChains;
         this.injector = injector;
+        this.injectors = injectors;
     }
 
-    public MutantGenerator(UseDefChain udChain, IMutantInjector injector){
+    public MutantGenerator(UseDefChain udChain, IMutantInjector injector, List<BaseMutantInjector> injectors){
+        this.injectors = injectors;
         this.udChains = new ArrayList<UseDefChain>();
         this.udChains.add(udChain);
         this.injector = injector;
     }
 
+    public MutantGenerator(List<BaseMutantInjector> injectors) {
+        this.injectors = injectors;
+    }
+
     public void generate() {
-        for (UseDefChain udChain: udChains){
+        /*for (UseDefChain udChain: udChains){
             generate(udChain);
+        } */
+
+        for (BaseMutantInjector injector:injectors) {
+            injector.generate(injector.udChain);
         }
     }
 
-    public void generate(InvokeExpr expr, Pair<DefinitionStmt, SootMethod> parent){
-        if (expr instanceof InterfaceInvokeExpr){
-            injector.generateMutant((InterfaceInvokeExpr)expr, parent);
-        }
-        else if( expr instanceof SpecialInvokeExpr){
-            injector.generateMutant((SpecialInvokeExpr)expr, parent);
-        }
-        else if (expr instanceof StaticInvokeExpr){
-            injector.generateMutant((StaticInvokeExpr)expr, parent);
-        }
-        else if (expr instanceof VirtualInvokeExpr){
-            injector.generateMutant((VirtualInvokeExpr)expr, parent);
-        }
-        else if (expr instanceof NewExpr){
-            injector.generateMutant((NewExpr)expr, parent);
-        }
-        else
-        {
-            System.out.println("Not supported:" + expr.getClass());
-        }
-    }
 
-    public void generate(Expr expr, Pair<DefinitionStmt, SootMethod> parent){
-        if ( expr instanceof BinopExpr) {
-            injector.generateMutant((BinopExpr)expr, parent);
-        }
-        else if (expr instanceof InvokeExpr)
-        {
-            generate((InvokeExpr)expr, parent);
-        }
-        else
-        {
-            System.out.println("Not supported:" + expr.getClass());
-        }
-    }
-
-    private void generate(AssignStmt stmt, Pair<DefinitionStmt, SootMethod> parent){
-
-        //call once for whole statement: for mutants like EAM
-        injector.generateMutant(stmt, parent);
-
-        Value v = stmt.getRightOp();
-        if ( v instanceof  Expr){
-            generate((Expr)v, parent);
-        }
-        else if (v instanceof InstanceFieldRef){
-            injector.generateMutant((InstanceFieldRef)v, parent);
-        }
-        else if (v instanceof StaticFieldRef){
-            injector.generateMutant((StaticFieldRef)v, parent);
-        }
-        else{
-            System.out.println("Not supported:" + v.getClass());
-        }
-    }
-
-    private void generate(UseDefChain udChain) {
-
-        Set<Pair<DefinitionStmt, SootMethod>> stmts = udChain.getAllDefStmts();
-
-        for(Pair<DefinitionStmt, SootMethod> stmt:stmts){
-            if (stmt.getO1() instanceof  AssignStmt){
-                generate((AssignStmt)stmt.getO1(), stmt);
-            }
-            else
-            {
-                System.out.println("Ignoring DefStmt = " + stmt.getO1() + "of type" + stmt.getO1().getClass());
-            }
-
-        }
-    }
-
-    private void generateTraditionalMutants(UseDefChain udChain) {
-        SootClass klass = Scene.v().forceResolve(udChain.getDefMethod().getDeclaringClass().getName(),
-                SootClass.SIGNATURES);
-        writeClass(klass);
-    }
 
     public void writeClass(SootClass c) {
         //final int format = Options.v().output_format_class;
