@@ -6,22 +6,8 @@ import jmint.mutants.MutantsCode;
 import soot.SootClass;
 import soot.SootMethod;
 import soot.jimple.*;
-import soot.tagkit.Host;
-import soot.tagkit.Tag;
 import soot.toolkits.scalar.Pair;
-import jmint.IMutantInjector;
-import jmint.UseDefChain;
 import soot.*;
-import soot.jimple.*;
-import soot.options.Options;
-import soot.toolkits.scalar.Pair;
-import soot.util.EscapedWriter;
-import soot.util.JasminOutputStream;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 import java.util.List;
 import java.util.Set;
@@ -29,13 +15,15 @@ import java.util.Set;
 /* This class just fills in the boiler plate code that the child classes
 could choose not to implement.
  */
+
 public class BaseMutantInjector implements IMutantInjector {
 
     public UseDefChain udChain;
     public final Table<SootClass, MutantsCode, Integer> mutantMap = HashBasedTable.create();
+    static int injectorCount = 0;
 
     // defstmt in ud-chain, original_statement with Host=SootClass|SootMethod being mutated, actual mutants.
-    public final Table<Pair<DefinitionStmt, UseDefChain>, Pair<DefinitionStmt, Host>, MutantInfo> generatedMutants
+    public final Table<MutantHeader, MutantsCode, List<MutantInfo>> generatedMutants
             = HashBasedTable.create();
 
     public BaseMutantInjector(UseDefChain udChain){
@@ -178,20 +166,15 @@ public class BaseMutantInjector implements IMutantInjector {
 
     public void printInfo() {
 
-        for (Table.Cell<Pair<DefinitionStmt, UseDefChain>,
-                Pair<DefinitionStmt, Host>, MutantInfo> m:generatedMutants.cellSet()){
+        injectorCount++;
 
-            String klassName = m.getRowKey().getO2().getDefMethod().getDeclaringClass().getName();
+        for (Table.Cell<MutantHeader, MutantsCode, List<MutantInfo>> m:generatedMutants.cellSet()){
 
-            String udDefStmt = m.getRowKey().getO2().getDefMethod().getDeclaringClass() + ":" + m.getRowKey().getO2().getDefStmt();
-            String udDefStmtLineNo =  SootUtilities.getTagOrDefaultValue(m.getRowKey().getO1().getTag("LineNumberTag"), "-1");
-
-            String originallDefStmt = m.getColumnKey().getO1().toString() + ":" + m.getColumnKey().getO2().toString();
-            String originalDefStmtLineNo =  SootUtilities.getTagOrDefaultValue(m.getColumnKey().getO1().getTag("LineNumberTag"), "-1");
-
-            String template = String.format("%s:%s:%s:%s:%s", udDefStmt, udDefStmtLineNo,
-                    originallDefStmt, originalDefStmtLineNo, m.getValue().mutantCode
-                    );
+            String useStmt = m.getRowKey().udChain.useMethod + ":" + m.getRowKey().udChain.useUnit + ":" +  SootUtilities.getTagOrDefaultValue(m.getRowKey().udChain.useUnit.getTag("LineNumberTag"), "-1");
+            String originalStmt = m.getRowKey().originalDefStmt.getO2() + ":" + m.getRowKey().originalDefStmt.getO1();
+            //String triggerStmt =  m.getRowKey(). .getO2() + ":" + m.getRowKey().originalDefStmt.getO1();
+            String template = String.format("[%s]:[%s]:[%s]:[%s]:[%s]",injectorCount, useStmt, originalStmt, m.getColumnKey(),
+                    SootUtilities.getTagOrDefaultValue(m.getRowKey().originalDefStmt.getO1().getTag("LineNumberTag"), "-1"));
 
             System.out.println(template);
 

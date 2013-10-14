@@ -1,9 +1,6 @@
 package jmint.mutants.progmistakes;
 
-import jmint.BaseMutantInjector;
-import jmint.MutantInfo;
-import jmint.SootUtilities;
-import jmint.UseDefChain;
+import jmint.*;
 import jmint.mutants.MutantsCode;
 import soot.*;
 import soot.jimple.*;
@@ -22,9 +19,7 @@ import soot.toolkits.scalar.SimpleLocalDefs;
 import soot.toolkits.scalar.SmartLocalDefs;
 import soot.util.Chain;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 
 /* For a given def-use chain see if the definition is in a method different from current method,
@@ -35,22 +30,46 @@ public class EAM extends BaseMutantInjector {
         super(udChain);
     }
 
+    private boolean keyPresent(Unit u) {
+        for (MutantHeader header:generatedMutants.rowKeySet()){
+            if (header.originalDefStmt.getO1().toString().equals(u.toString())
+                    && header.originalDefStmt.getO2().toString().equals(udChain.getUseMethod().toString())){
+
+                System.out.println(generatedMutants.containsRow(new Pair<DefinitionStmt, Host>((DefinitionStmt)u, udChain.getUseMethod())));
+                System.out.println(header.originalDefStmt.getO1().equals(u));
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     @Override
     public SootClass generateMutant(AssignStmt stmt, Pair<DefinitionStmt, SootMethod> parent) {
+
+      List<MutantInfo> mutants = new ArrayList<MutantInfo>();
       if ( parent.getO2().getName().matches("get.*")){
-          List<Unit> units = findStatementsInvokingGetter(parent.getO2());
+          Set<Unit> units = findStatementsInvokingGetter(parent.getO2());
+
+          //TODO: Generate the actual mutants
           for(Unit u:units){
-              generatedMutants.put(new Pair<DefinitionStmt, UseDefChain>(parent.getO1(), udChain),
-                      new Pair<DefinitionStmt, Host>(stmt, parent.getO2()),
-                      new MutantInfo(new Pair<DefinitionStmt, Host>((DefinitionStmt)u, udChain.getUseMethod()), udChain.getUseMethod().getDeclaringClass(), MutantsCode.EAM));
+              MutantHeader header = new MutantHeader(udChain, new Pair<DefinitionStmt, Host>((DefinitionStmt)u, udChain.getUseMethod()));
+
+              if (!keyPresent(u)){
+                  generatedMutants.put(header, MutantsCode.EAM, mutants);
+              }
+
+
+
           }
 
       }
       return null;
     }
 
-    public List<Unit> findStatementsInvokingGetter(SootMethod getterMethod){
-        List<Unit> mutableUnits = new ArrayList<Unit>();
+    public Set<Unit> findStatementsInvokingGetter(SootMethod getterMethod){
+        Set<Unit> mutableUnits = new HashSet<Unit>();
         //assert(udChain.useValue instanceof Local);
         if (!(udChain.useValue instanceof Local)){
             System.out.println("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
@@ -62,9 +81,13 @@ public class EAM extends BaseMutantInjector {
         PatchingChain<Unit> units = SootUtilities.getResolvedMethod(
                 udChain.getUseMethod()).getActiveBody().getUnits();
 
+        PatchingChain<Unit> units2 = SootUtilities.getResolvedMethod(
+                udChain.getUseMethod()).getActiveBody().getUnits();
+
         SimpleLocalDefs localDefs = new SimpleLocalDefs(
                 new ExceptionalUnitGraph(SootUtilities.getResolvedMethod(
                         udChain.getUseMethod()).getActiveBody()));
+
 
         //Soot JimpleLocal.equals method is not implemented, and I got grief with this.
         //Plus LocalDefs does not work well with Units since Units does not implement hashCode.
@@ -78,7 +101,15 @@ public class EAM extends BaseMutantInjector {
                         if (def instanceof JAssignStmt &&
                                 SootUtilities.isThisMethodInvoked((JAssignStmt)def, getterMethod) &&
                                 SootUtilities.areOtherGetterMethodsAvailable(getterMethod.getDeclaringClass(), getterMethod)) {
-                            mutableUnits.add(def);
+
+
+                            if (! mutableUnits.contains(def)){
+                                mutableUnits.add(def);
+                            }
+                            else
+                            {
+                                //System.out.println(def);
+                            }
                         }
                     }
                 }

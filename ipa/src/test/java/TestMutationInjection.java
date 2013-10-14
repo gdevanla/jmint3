@@ -11,9 +11,7 @@ import soot.jimple.toolkits.ide.exampleproblems.IFDSReachingDefinitions;
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
 import soot.options.Options;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -354,7 +352,12 @@ public class TestMutationInjection {
 
         final List<BaseMutantInjector> injectors = new ArrayList<BaseMutantInjector>();
 
+        Set<UseDefChain> uniqueUDChain = new HashSet<UseDefChain>();
+
         for ( UseDefChain udChain: solver.udChains){
+
+            assertEquals(udChain.useUnit + ":" + "is duplicated", false, uniqueUDChain.contains(udChain));
+            uniqueUDChain.add(udChain);
             EAM eam = new EAM(udChain);
             injectors.add(eam);
         }
@@ -365,7 +368,9 @@ public class TestMutationInjection {
             protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
                 generator.generate();
                 //System.out.println(generator.mutantLog());
+
                 for (BaseMutantInjector injector:injectors){
+                  //  System.out.println("Next");
                     injector.printInfo();
                 }
             }
@@ -374,7 +379,7 @@ public class TestMutationInjection {
         generateMutants("", new String[]{}, solver.udChains, x);
 
         for (BaseMutantInjector injector:injectors){
-            injector.printInfo();
+            //injector.printInfo();
         }
 
 
