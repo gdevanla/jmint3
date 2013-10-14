@@ -368,11 +368,9 @@ public class TestMutationInjection {
             protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
                 generator.generate();
                 //System.out.println(generator.mutantLog());
+               injectors.get(0).printMutantKeys();
+                System.out.println(BaseMutantInjector.allMutants.size());
 
-                for (BaseMutantInjector injector:injectors){
-                  //  System.out.println("Next");
-                    injector.printInfo();
-                }
             }
         }));
 

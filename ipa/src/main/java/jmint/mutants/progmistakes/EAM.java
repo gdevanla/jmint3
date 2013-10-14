@@ -5,19 +5,10 @@ import jmint.mutants.MutantsCode;
 import soot.*;
 import soot.jimple.*;
 import soot.jimple.internal.JAssignStmt;
-import soot.jimple.internal.JInstanceFieldRef;
-import soot.jimple.spark.ondemand.pautil.SootUtil;
-import soot.jimple.toolkits.callgraph.CallGraph;
-import soot.jimple.toolkits.callgraph.CallGraphBuilder;
-import soot.jimple.toolkits.callgraph.Edge;
-import soot.jimple.toolkits.callgraph.Units;
-import soot.jimple.toolkits.pointer.DumbPointerAnalysis;
 import soot.tagkit.Host;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.scalar.Pair;
 import soot.toolkits.scalar.SimpleLocalDefs;
-import soot.toolkits.scalar.SmartLocalDefs;
-import soot.util.Chain;
 
 import java.util.*;
 
@@ -52,16 +43,14 @@ public class EAM extends BaseMutantInjector {
       if ( parent.getO2().getName().matches("get.*")){
           Set<Unit> units = findStatementsInvokingGetter(parent.getO2());
 
+          //generating mutants
+
           //TODO: Generate the actual mutants
           for(Unit u:units){
-              MutantHeader header = new MutantHeader(udChain, new Pair<DefinitionStmt, Host>((DefinitionStmt)u, udChain.getUseMethod()));
-
-              if (!keyPresent(u)){
-                  generatedMutants.put(header, MutantsCode.EAM, mutants);
+              MutantHeader header = new MutantHeader(udChain, new Pair<DefinitionStmt, Host>((DefinitionStmt)u, udChain.getUseMethod()), MutantsCode.EAM);
+              if (!allMutants.containsKey(header.getKey())){
+                  allMutants.put(header.getKey(), header);
               }
-
-
-
           }
 
       }
@@ -75,7 +64,6 @@ public class EAM extends BaseMutantInjector {
             System.out.println("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
             return mutableUnits;
         }
-
 
         Local l = (Local) udChain.useValue;
         PatchingChain<Unit> units = SootUtilities.getResolvedMethod(

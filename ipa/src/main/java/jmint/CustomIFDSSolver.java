@@ -79,14 +79,8 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
                 if (v.equivTo(b.getValue())){
 
                     for (DefinitionStmt def:defs){
-                        int i = 0;
                         SootMethod defMethod = (SootMethod)icfg.getMethodOf(def);
                         if ( isCrossBoundaryDefUse(def,method) ){
-
-                            if ( i > 0){
-                                System.out.println(unit);
-                                assert(i<=0)  ;
-                            }
 
                             UseDefChain useDefChain = new UseDefChain(method, unit, b.getValue(),
                                     defMethod,def, getDefStmtMethodPairs(def));
@@ -94,7 +88,7 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
                             //        "Line Number of DefStmt=" + def.getTag("LineNumberTag"));
                             //useDefChain.printInfo();
                             udChains.add(useDefChain);
-                            i++;
+
                         }
                         //System.out.println("Size = " + udChains.size());
                         //System.out.println(b.getValue() + "," + columnKey.getO1() + "," + columnKey.getO2() + "," + unit);

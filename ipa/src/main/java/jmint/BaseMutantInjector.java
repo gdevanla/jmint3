@@ -9,7 +9,9 @@ import soot.jimple.*;
 import soot.toolkits.scalar.Pair;
 import soot.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /* This class just fills in the boiler plate code that the child classes
@@ -25,6 +27,8 @@ public class BaseMutantInjector implements IMutantInjector {
     // defstmt in ud-chain, original_statement with Host=SootClass|SootMethod being mutated, actual mutants.
     public final Table<MutantHeader, MutantsCode, List<MutantInfo>> generatedMutants
             = HashBasedTable.create();
+
+    public static final Map<String, MutantHeader> allMutants = new HashMap<String, MutantHeader>();
 
     public BaseMutantInjector(UseDefChain udChain){
         this.udChain = udChain;
@@ -164,21 +168,38 @@ public class BaseMutantInjector implements IMutantInjector {
         return udChain.getDefMethod().getDeclaringClass();
     }
 
+    @Deprecated
     public void printInfo() {
 
         injectorCount++;
-
         for (Table.Cell<MutantHeader, MutantsCode, List<MutantInfo>> m:generatedMutants.cellSet()){
 
             String useStmt = m.getRowKey().udChain.useMethod + ":" + m.getRowKey().udChain.useUnit + ":" +  SootUtilities.getTagOrDefaultValue(m.getRowKey().udChain.useUnit.getTag("LineNumberTag"), "-1");
             String originalStmt = m.getRowKey().originalDefStmt.getO2() + ":" + m.getRowKey().originalDefStmt.getO1();
             //String triggerStmt =  m.getRowKey(). .getO2() + ":" + m.getRowKey().originalDefStmt.getO1();
-            String template = String.format("[%s]:[%s]:[%s]:[%s]:[%s]",injectorCount, useStmt, originalStmt, m.getColumnKey(),
+            String template = String.format("[%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]",injectorCount, udChain.useValue, udChain.defStmt, useStmt, originalStmt, m.getColumnKey(),
                     SootUtilities.getTagOrDefaultValue(m.getRowKey().originalDefStmt.getO1().getTag("LineNumberTag"), "-1"));
-
             System.out.println(template);
+        }
+
+    }
+
+    public void printMutantKeys(){
+        for (String m:allMutants.keySet()){
+            if (m.equals("SootClass=[org.apache.bcel.verifier.structurals.InstConstraintVisitor]:SootMethod=[<org.apache.bcel.verifier.structurals.InstConstraintVisitor: void visitCASTORE(org.apache.bcel.generic.CASTORE)>]:MutantCode=[EAM]:LineNo=[639]")){
+
+                System.out.println(allMutants.get(m).originalDefStmt);
+                System.out.println(allMutants.get(m).udChain.useValue);
+                System.out.println(allMutants.get(m).udChain.defStmt);
+                System.out.println(allMutants.get(m).udChain.useUnit);
+            }
+            System.out.println(m);
 
         }
 
     }
+
+
+
+
 }
