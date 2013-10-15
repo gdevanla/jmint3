@@ -39,6 +39,10 @@ public class EAM extends BaseMutantInjector {
     @Override
     public SootClass generateMutant(AssignStmt stmt, Pair<DefinitionStmt, SootMethod> parent) {
 
+     if (! SootUtilities.isClassIncludedInAnalysis(parent.getO2().getDeclaringClass())){
+         return null;
+        }
+
       List<MutantInfo> mutants = new ArrayList<MutantInfo>();
       if ( parent.getO2().getName().matches("get.*")){
           Set<Unit> units = findStatementsInvokingGetter(parent.getO2());
@@ -87,6 +91,7 @@ public class EAM extends BaseMutantInjector {
                 if ( localDefs.hasDefsAt(equivLocal, u)){
                     for (Unit def:localDefs.getDefsOfAt(equivLocal, u)){
                         if (def instanceof JAssignStmt &&
+
                                 SootUtilities.isThisMethodInvoked((JAssignStmt)def, getterMethod) &&
                                 SootUtilities.areOtherGetterMethodsAvailable(getterMethod.getDeclaringClass(), getterMethod)) {
 

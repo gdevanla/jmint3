@@ -21,6 +21,16 @@ public class SootUtilities {
         return false;
     }
 
+    public static boolean isClassIncludedInAnalysis(SootClass r){
+        for ( String s:Configuration.packageUnderTest){
+            if (r.getPackageName().startsWith(s)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public static boolean isSpecialInvokeExprOnValue(Value r, Unit u){
         if ( (u instanceof InvokeStmt))
         {

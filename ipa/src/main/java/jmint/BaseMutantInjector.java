@@ -193,7 +193,14 @@ public class BaseMutantInjector implements IMutantInjector {
                 System.out.println(allMutants.get(m).udChain.defStmt);
                 System.out.println(allMutants.get(m).udChain.useUnit);
             }
-            System.out.println(m);
+            MutantHeader mutant = allMutants.get(m);
+
+            //String template = "[%s]:[%s]";
+            //System.out.println(String.format(template, m, mutant.originalDefStmt));
+            //System.out.println(m);
+
+            System.out.println(mutant.getMuJavaFormatKey());
+
 
         }
 

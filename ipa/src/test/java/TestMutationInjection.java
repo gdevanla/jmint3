@@ -7,6 +7,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import soot.*;
+import soot.jimple.Jimple;
+import soot.jimple.ReturnStmt;
+import soot.jimple.Stmt;
+import soot.jimple.internal.JimpleLocal;
 import soot.jimple.toolkits.ide.exampleproblems.IFDSReachingDefinitions;
 import soot.jimple.toolkits.ide.icfg.JimpleBasedInterproceduralCFG;
 import soot.options.Options;
@@ -369,6 +373,7 @@ public class TestMutationInjection {
                 generator.generate();
                 //System.out.println(generator.mutantLog());
                injectors.get(0).printMutantKeys();
+
                 System.out.println(BaseMutantInjector.allMutants.size());
 
             }
@@ -379,9 +384,45 @@ public class TestMutationInjection {
         for (BaseMutantInjector injector:injectors){
             //injector.printInfo();
         }
+    }
 
 
+    @Test
+    public void TestTryCatch(){
 
+        Transform x = (new Transform("jtp.transformer", new BodyTransformer() {
+            @Override
+            protected void internalTransform(Body body, String s, Map map) {
+                SootClass thrwCls = Scene.v().getSootClass("java.lang.Throwable");
+                PatchingChain<Unit> pchain = body.getUnits();
+
+                Stmt sFirstNonId = (Stmt)pchain.getFirst();
+                Stmt sLast = (Stmt) pchain.getLast();
+                Stmt sGotoLast = Jimple.v().newGotoStmt(sLast);
+
+                Local lException1 = new JimpleLocal("ex1", RefType.v(thrwCls));
+                Stmt sCatch = Jimple.v().newIdentityStmt(lException1, Jimple.v().newCaughtExceptionRef());
+
+                pchain.add(sGotoLast);
+                pchain.add(sCatch);
+
+                // insert trap (catch)
+                body.getTraps().add(Jimple.v().newTrap(thrwCls, sFirstNonId, sGotoLast, sCatch));
+
+            }
+        } ));
+
+        PackManager.v().getPack("jtp").add(x);
+
+
+        setSootOptions();
+        Options.v().set_output_format(Options.output_format_j);
+
+
+        Options.v().set_main_class("TestIPA.A");
+
+
+        soot.Main.main(new String[]{"TestIPA.A"});
 
     }
 

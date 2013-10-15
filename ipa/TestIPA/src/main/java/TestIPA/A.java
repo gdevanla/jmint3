@@ -21,6 +21,21 @@ public class A {
         return result;
     }
 
+    public void testTryCatch(){
+        int x = (int)Math.random();
+        try {
+            int y = (int)Math.random();
+            System.out.print(y+x);
+        }
+        catch(Exception ex){
+            System.out.println("Exception");
+        }
+        finally {
+            System.out.println("Finally");
+        }
+
+    }
+
 
     public static void main(String[] s){
         A a = new A();
