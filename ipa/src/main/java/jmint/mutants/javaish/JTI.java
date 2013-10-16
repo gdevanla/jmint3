@@ -8,7 +8,9 @@ import soot.*;
 import soot.jimple.AssignStmt;
 import soot.jimple.DefinitionStmt;
 import soot.jimple.InstanceFieldRef;
+import soot.jimple.Stmt;
 import soot.jimple.internal.JimpleLocal;
+import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
 import soot.util.Chain;
 
@@ -38,9 +40,9 @@ public class JTI extends BaseMutantInjector {
        // if (!(udChain.getDefStmt().getRightOp() instanceof JimpleLocal)) return false;
 
 
-        for(Pair<DefinitionStmt, SootMethod> o :udChain.getAllDefStmts()){
-            DefinitionStmt defStmt = o.getO1();
-            SootMethod method = o.getO2();
+        for(Pair<Stmt, Host> o :udChain.getAllDefStmts()){
+            DefinitionStmt defStmt = (DefinitionStmt)o.getO1();
+            SootMethod method = (SootMethod)o.getO2();
 
             if (!(defStmt.getRightOp() instanceof JimpleLocal )) continue;
             Unit u = canInject((JimpleLocal)defStmt.getRightOp(), defStmt, method);

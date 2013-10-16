@@ -291,15 +291,28 @@ public class TestMutationInjection {
         CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.JID.JIDTest1", sootAppFiles);
 
         final JID jid = new JID(solver.udChains.get(0));
+        final List<BaseMutantInjector> injectors = new ArrayList<BaseMutantInjector>();
+
+        Set<UseDefChain> uniqueUDChain = new HashSet<UseDefChain>();
+        injectors.add(jid);
+
+        final MutantGenerator generator = new MutantGenerator(injectors);
 
         Transform x = (new Transform("wjtp.jidinjector", new SceneTransformer() {
             protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
-                assertEquals(true, jid.canInject());
-                System.out.println(jid.mutantLog());
+                generator.generate();
+                injectors.get(0).printMutantKeys();
+                System.out.println(BaseMutantInjector.allMutants.size());
             }
         }));
 
         generateMutants("MutantInjectionArtifacts.JID.JIDTest1",sootAppFiles, solver.udChains, x);
+
+        assertEquals(1, BaseMutantInjector.allMutants.size());
+        MutantHeader header =  BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next());
+        assertEquals("6", SootUtilities.getTagOrDefaultValue(header.originalDefStmt.getO1().getTag("LineNumberTag"), "-1"));
+
+
     }
 
     @Test
@@ -311,15 +324,28 @@ public class TestMutationInjection {
         CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.JDC.JDCTest1", sootAppFiles);
 
         final JDC jdc = new JDC(solver.udChains.get(0));
+        final List<BaseMutantInjector> injectors = new ArrayList<BaseMutantInjector>();
+
+        Set<UseDefChain> uniqueUDChain = new HashSet<UseDefChain>();
+        injectors.add(jdc);
+
+        final MutantGenerator generator = new MutantGenerator(injectors);
 
         Transform x = (new Transform("wjtp.jdcinjector", new SceneTransformer() {
             protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
-                assertEquals(true, jdc.canInject());
-                System.out.println(jdc.mutantLog());
+                generator.generate();
+                injectors.get(0).printMutantKeys();
+                System.out.println(BaseMutantInjector.allMutants.size());
             }
         }));
 
         generateMutants("MutantInjectionArtifacts.JDC.JDCTest1",sootAppFiles, solver.udChains, x);
+
+        assertEquals(1, BaseMutantInjector.allMutants.size());
+        MutantHeader header =  BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next());
+        assertEquals("6", SootUtilities.getTagOrDefaultValue(header.originalDefStmt.getO1().getTag("LineNumberTag"), "-1"));
+
+
     }
 
     @Test
@@ -362,8 +388,11 @@ public class TestMutationInjection {
 
             assertEquals(udChain.useUnit + ":" + "is duplicated", false, uniqueUDChain.contains(udChain));
             uniqueUDChain.add(udChain);
-            EAM eam = new EAM(udChain);
-            injectors.add(eam);
+            //EAM eam = new EAM(udChain);
+            //injectors.add(eam);
+
+            JDC jdc = new JDC(udChain);
+            injectors.add(jdc);
         }
 
         final MutantGenerator generator = new MutantGenerator(injectors);
@@ -373,8 +402,7 @@ public class TestMutationInjection {
                 generator.generate();
                 //System.out.println(generator.mutantLog());
                injectors.get(0).printMutantKeys();
-
-                System.out.println(BaseMutantInjector.allMutants.size());
+               System.out.println(BaseMutantInjector.allMutants.size());
 
             }
         }));
@@ -393,6 +421,10 @@ public class TestMutationInjection {
         Transform x = (new Transform("jtp.transformer", new BodyTransformer() {
             @Override
             protected void internalTransform(Body body, String s, Map map) {
+
+               // if (!body.getMethod().getName().equals("testTryCatch1"))
+               //     return;
+
                 SootClass thrwCls = Scene.v().getSootClass("java.lang.Throwable");
                 PatchingChain<Unit> pchain = body.getUnits();
 
@@ -401,10 +433,12 @@ public class TestMutationInjection {
                 Stmt sGotoLast = Jimple.v().newGotoStmt(sLast);
 
                 Local lException1 = new JimpleLocal("ex1", RefType.v(thrwCls));
+                body.getLocals().add(lException1);
                 Stmt sCatch = Jimple.v().newIdentityStmt(lException1, Jimple.v().newCaughtExceptionRef());
 
-                pchain.add(sGotoLast);
                 pchain.add(sCatch);
+                pchain.add(sGotoLast);
+
 
                 // insert trap (catch)
                 body.getTraps().add(Jimple.v().newTrap(thrwCls, sFirstNonId, sGotoLast, sCatch));
@@ -416,13 +450,19 @@ public class TestMutationInjection {
 
 
         setSootOptions();
-        Options.v().set_output_format(Options.output_format_j);
-
-
+        Options.v().set_output_format(Options.output_format_J);
         Options.v().set_main_class("TestIPA.A");
-
-
         soot.Main.main(new String[]{"TestIPA.A"});
+        G.reset();
+
+
+        setSootOptions();
+        Options.v().set_output_format(Options.output_format_c);
+        Options.v().set_main_class("TestIPA.A");
+        soot.Main.main(new String[]{"TestIPA.A"});
+        G.reset();
+
+
 
     }
 

@@ -6,6 +6,7 @@ import jmint.mutants.MutantsCode;
 import soot.SootClass;
 import soot.SootMethod;
 import soot.jimple.*;
+import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
 import soot.*;
 
@@ -45,15 +46,15 @@ public class BaseMutantInjector implements IMutantInjector {
     }
 
     @Override
-    public SootClass generateMutant(AssignStmt stmt, Pair<DefinitionStmt, SootMethod> parent) {
+    public SootClass generateMutant(AssignStmt stmt, Pair<Stmt, Host> parent) {
         return udChain.getDefMethod().getDeclaringClass();
     }
 
     public void generate(UseDefChain udChain) {
 
-        Set<Pair<DefinitionStmt, SootMethod>> stmts = udChain.getAllDefStmts();
+        Set<Pair<Stmt, Host>> stmts = udChain.getAllDefStmts();
 
-        for(Pair<DefinitionStmt, SootMethod> stmt:stmts){
+        for(Pair<Stmt, Host> stmt:stmts){
             if (stmt.getO1() instanceof  AssignStmt){
                 generate((AssignStmt)stmt.getO1(), stmt);
             }
@@ -64,7 +65,7 @@ public class BaseMutantInjector implements IMutantInjector {
         }
     }
 
-    private void generate(AssignStmt stmt, Pair<DefinitionStmt, SootMethod> parent){
+    private void generate(AssignStmt stmt, Pair<Stmt, Host> parent){
 
         //call once for whole statement: for mutants like EAM
         generateMutant(stmt, parent);
@@ -80,11 +81,11 @@ public class BaseMutantInjector implements IMutantInjector {
             generateMutant((StaticFieldRef) v, parent);
         }
         else{
-            System.out.println("Not supported:" + v.getClass());
+            System.out.println("Not supported :" + v.getClass() + ":" + parent.getO1());
         }
     }
 
-    public void generate(InvokeExpr expr, Pair<DefinitionStmt, SootMethod> parent){
+    public void generate(InvokeExpr expr, Pair<Stmt, Host> parent){
         if (expr instanceof InterfaceInvokeExpr){
             generateMutant((InterfaceInvokeExpr) expr, parent);
         }
@@ -97,16 +98,13 @@ public class BaseMutantInjector implements IMutantInjector {
         else if (expr instanceof VirtualInvokeExpr){
             generateMutant((VirtualInvokeExpr) expr, parent);
         }
-        else if (expr instanceof NewExpr){
-            generateMutant((NewExpr) expr, parent);
-        }
         else
         {
-            System.out.println("Not supported:" + expr.getClass());
+            System.out.println("Not supported:" + expr.getClass() + ":" + parent.getO1());
         }
     }
 
-    public void generate(Expr expr, Pair<DefinitionStmt, SootMethod> parent){
+    public void generate(Expr expr, Pair<Stmt, Host> parent){
         if ( expr instanceof BinopExpr) {
             generateMutant((BinopExpr) expr, parent);
         }
@@ -114,9 +112,12 @@ public class BaseMutantInjector implements IMutantInjector {
         {
             generate((InvokeExpr)expr, parent);
         }
+        else if (expr instanceof NewExpr){
+            generateMutant((NewExpr) expr, parent);
+        }
         else
         {
-            System.out.println("Not supported:" + expr.getClass());
+            System.out.println("Not supported:" + expr.getClass() + ":" + parent.getO1() + ":" + expr);
         }
     }
 
@@ -129,42 +130,42 @@ public class BaseMutantInjector implements IMutantInjector {
 
     //Methods implementing IMutantInjector
     @Override
-    public SootClass generateMutant(InterfaceInvokeExpr expr, Pair<DefinitionStmt, SootMethod> parent) {
+    public SootClass generateMutant(InterfaceInvokeExpr expr, Pair<Stmt, Host> parent) {
         return udChain.getDefMethod().getDeclaringClass();
     }
 
     @Override
-    public SootClass generateMutant(SpecialInvokeExpr expr,Pair<DefinitionStmt, SootMethod> parent) {
+    public SootClass generateMutant(SpecialInvokeExpr expr,Pair<Stmt, Host> parent) {
         return udChain.getDefMethod().getDeclaringClass();
     }
 
     @Override
-    public SootClass generateMutant(VirtualInvokeExpr expr,Pair<DefinitionStmt, SootMethod> parent) {
+    public SootClass generateMutant(VirtualInvokeExpr expr,Pair<Stmt, Host> parent) {
         return udChain.getDefMethod().getDeclaringClass();
     }
 
     @Override
-    public SootClass generateMutant(StaticInvokeExpr expr, Pair<DefinitionStmt, SootMethod> parent) {
+    public SootClass generateMutant(StaticInvokeExpr expr, Pair<Stmt, Host> parent) {
         return udChain.getDefMethod().getDeclaringClass();
     }
 
     @Override
-    public SootClass generateMutant(BinopExpr expr, Pair<DefinitionStmt, SootMethod> parent) {
+    public SootClass generateMutant(BinopExpr expr, Pair<Stmt, Host> parent) {
         return udChain.getDefMethod().getDeclaringClass();
     }
 
     @Override
-    public SootClass generateMutant(NewExpr expr, Pair<DefinitionStmt, SootMethod> parent) {
+    public SootClass generateMutant(NewExpr expr, Pair<Stmt, Host> parent) {
         return udChain.getDefMethod().getDeclaringClass();
     }
 
     @Override
-    public SootClass generateMutant(InstanceFieldRef fieldRef, Pair<DefinitionStmt, SootMethod> parent) {
+    public SootClass generateMutant(InstanceFieldRef fieldRef, Pair<Stmt, Host> parent) {
         return udChain.getDefMethod().getDeclaringClass();
     }
 
     @Override
-    public SootClass generateMutant(StaticFieldRef fieldRef, Pair<DefinitionStmt, SootMethod> parent) {
+    public SootClass generateMutant(StaticFieldRef fieldRef, Pair<Stmt, Host> parent) {
         return udChain.getDefMethod().getDeclaringClass();
     }
 
@@ -195,11 +196,11 @@ public class BaseMutantInjector implements IMutantInjector {
             }
             MutantHeader mutant = allMutants.get(m);
 
-            //String template = "[%s]:[%s]";
-            //System.out.println(String.format(template, m, mutant.originalDefStmt));
-            //System.out.println(m);
+            String template = "[%s]:[%s]";
+            System.out.println(String.format(template, m, mutant.originalDefStmt));
+            System.out.println(m);
 
-            System.out.println(mutant.getMuJavaFormatKey());
+            //System.out.println(mutant.getMuJavaFormatKey());
 
 
         }

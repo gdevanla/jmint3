@@ -1,17 +1,14 @@
 package jmint.mutants.javaish;
 
 import jmint.BaseMutantInjector;
+import jmint.MutantHeader;
 import jmint.SootUtilities;
 import jmint.UseDefChain;
 import jmint.mutants.MutantsCode;
 import soot.*;
-import soot.grimp.NewInvokeExpr;
 import soot.jimple.*;
-import soot.jimple.internal.InvokeExprBox;
-import soot.jimple.internal.JInstanceFieldRef;
+import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
-
-import java.util.List;
 
 public class JDC extends BaseMutantInjector {
     public JDC(UseDefChain udChain) {
@@ -19,17 +16,23 @@ public class JDC extends BaseMutantInjector {
     }
 
     @Override
-    public SootClass generateMutant(NewExpr expr, Pair<DefinitionStmt, SootMethod> parent) {
+    public SootClass generateMutant(NewExpr expr, Pair<Stmt, Host> parent) {
 
         if ( !SootUtilities.isTypeIncludedInAnalysis(
-                expr.getUseBoxes().get(0).getValue())) return null;
+                expr.getBaseType())) return null;
 
         Unit u = SootUtilities.getUnitInvokingDefaultConstructor(
                 parent.getO1().getDefBoxes().get(0).getValue(),
-                parent.getO2());
+                (SootMethod)parent.getO2());
 
-         //def_use_chain, <original_def_stmt>, mutant_code_no, line_no
-         //SootClass, replacedUnit, replacedMethod
+        if ( u != null ){
+            //TODO: Right now store the SpecialInvoke in DefStmt. Later this can be
+            //replaced with more generic reference to the constructor.
+            MutantHeader header = new MutantHeader(udChain, parent, new Pair<Stmt, Host>((InvokeStmt)u, udChain.getUseMethod()), MutantsCode.JDC);
+            if (!allMutants.containsKey(header.getKey())){
+                allMutants.put(header.getKey(), header);
+            }
+        }
 
         return null;
     }
@@ -38,9 +41,9 @@ public class JDC extends BaseMutantInjector {
     public boolean canInject(){
         assert(udChain.getDefStmt() instanceof AssignStmt);
 
-        for(Pair<DefinitionStmt, SootMethod> o :udChain.getAllDefStmts()){
+        for(Pair<Stmt, Host> o :udChain.getAllDefStmts()){
 
-            DefinitionStmt defStmt = o.getO1();
+            DefinitionStmt defStmt = (DefinitionStmt)o.getO1();
             if (!(defStmt instanceof AssignStmt))
                 continue; //for jdc we are not interested in any other statements
 
@@ -53,7 +56,7 @@ public class JDC extends BaseMutantInjector {
             //now go find the constructor being invoked and see if it is default constructor.
             Unit u = SootUtilities.getUnitInvokingDefaultConstructor(
                     defStmt.getDefBoxes().get(0).getValue(),
-                    o.getO2());
+                    (SootMethod)o.getO2());
             if (u!=null) System.out.println(u);
             if (u != null) return true;
         }

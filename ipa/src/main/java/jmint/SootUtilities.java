@@ -13,9 +13,9 @@ import java.util.List;
 
 public class SootUtilities {
 
-    public static boolean isTypeIncludedInAnalysis(Value r){
+    public static boolean isTypeIncludedInAnalysis(RefType r){
         for ( String s:Configuration.packageUnderTest){
-            if ( r.getType().toString().startsWith(s))
+            if ( r.toString().startsWith(s))
                 return true;
         }
         return false;

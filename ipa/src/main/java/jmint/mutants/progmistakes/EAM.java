@@ -35,23 +35,23 @@ public class EAM extends BaseMutantInjector {
         return false;
     }
 
-
     @Override
-    public SootClass generateMutant(AssignStmt stmt, Pair<DefinitionStmt, SootMethod> parent) {
+    public SootClass generateMutant(AssignStmt stmt, Pair<Stmt, Host> parent) {
 
-     if (! SootUtilities.isClassIncludedInAnalysis(parent.getO2().getDeclaringClass())){
+     SootMethod method = (SootMethod)parent.getO2();
+     if (! SootUtilities.isClassIncludedInAnalysis(method.getDeclaringClass())){
          return null;
         }
 
       List<MutantInfo> mutants = new ArrayList<MutantInfo>();
-      if ( parent.getO2().getName().matches("get.*")){
-          Set<Unit> units = findStatementsInvokingGetter(parent.getO2());
+      if ( method.getName().matches("get.*")){
+          Set<Unit> units = findStatementsInvokingGetter(method);
 
           //generating mutants
 
           //TODO: Generate the actual mutants
           for(Unit u:units){
-              MutantHeader header = new MutantHeader(udChain, new Pair<DefinitionStmt, Host>((DefinitionStmt)u, udChain.getUseMethod()), MutantsCode.EAM);
+              MutantHeader header = new MutantHeader(udChain, parent, new Pair<Stmt, Host>((Stmt)u, udChain.getUseMethod()), MutantsCode.EAM);
               if (!allMutants.containsKey(header.getKey())){
                   allMutants.put(header.getKey(), header);
               }

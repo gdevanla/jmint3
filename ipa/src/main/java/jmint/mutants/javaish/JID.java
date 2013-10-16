@@ -1,20 +1,59 @@
 package jmint.mutants.javaish;
 
 import jmint.BaseMutantInjector;
+import jmint.MutantHeader;
+import jmint.SootUtilities;
 import jmint.UseDefChain;
 import jmint.mutants.MutantsCode;
 import soot.*;
-import soot.JastAddJ.List;
-import soot.jimple.AssignStmt;
-import soot.jimple.InstanceFieldRef;
-import soot.jimple.StaticFieldRef;
+import soot.jimple.*;
 import soot.jimple.internal.JInstanceFieldRef;
+import soot.tagkit.Host;
 import soot.tagkit.Tag;
+import soot.toolkits.scalar.Pair;
 import soot.util.Chain;
 
 public class JID extends BaseMutantInjector {
     public JID(UseDefChain udChain) {
         super(udChain);
+    }
+
+    @Override
+    public SootClass generateMutant(InstanceFieldRef fieldRef, Pair<Stmt, Host> parent){
+
+        //TODO: does this work for superclasses?
+        Pair<Stmt, Host> initStmt = getUnitInitializing(fieldRef);
+        if ( initStmt == null)
+            return null;
+
+        MutantHeader header = new MutantHeader(udChain,parent, initStmt, MutantsCode.EAM);
+        if (!allMutants.containsKey(header.getKey())){
+            allMutants.put(header.getKey(), header);
+        }
+
+        return null;
+    }
+
+    public Pair<Stmt,Host> getUnitInitializing(InstanceFieldRef fieldRef){
+
+        SootMethod specialInit = getSpecialInit(SootUtilities.getResolvedClass(udChain.getDefMethod()));
+        if (specialInit  == null)
+            return null; //will this be true ever?
+
+        Pair<Stmt, Host> lastInitStmt = null;
+        for (Unit u: specialInit.getActiveBody().getUnits()){
+            if (u instanceof AssignStmt){
+                java.util.List<ValueBox> defBoxes = u.getDefBoxes();
+                assert(defBoxes.size() == 1);
+                Value definedValue = defBoxes.get(0).getValue();
+                if (fieldRef instanceof JInstanceFieldRef && fieldRef.getField().equals(fieldRef.getField())){
+                    //we continue doing this since we want to find the last assignment statement
+                    //that will override all other statements.
+                    lastInitStmt = new Pair<Stmt,Host>((Stmt)u, specialInit);
+                }
+            }
+        }
+        return lastInitStmt;
     }
 
     public boolean canInject(){

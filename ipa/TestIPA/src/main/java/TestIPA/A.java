@@ -1,5 +1,7 @@
 package TestIPA;
 
+import java.awt.*;
+
 public class A {
 
     public int result;
@@ -33,14 +35,23 @@ public class A {
         finally {
             System.out.println("Finally");
         }
+    }
 
+    public void testTryCatch1(){
+            int x = (int)Math.random();
+            System.out.println("This works.");
     }
 
 
     public static void main(String[] s){
         A a = new A();
-        int x  = a.callSomething();
-        System.out.println("Value of x is " + x);
+        //System.out.println("Test");
+        //int x  = a.callSomething();
+        //System.out.println("Value of x is " + x);
+        System.out.println("Calling catch1");
+        a.testTryCatch1();
+        System.out.println("Calling catch2");
+        a.testTryCatch();
 
     }
 

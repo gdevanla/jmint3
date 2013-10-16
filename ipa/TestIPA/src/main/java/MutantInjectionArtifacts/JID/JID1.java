@@ -7,6 +7,7 @@ public class JID1 {
     String s = "";
 
     public JID1(){
+        x = 100;
         s = "test";
     }
 

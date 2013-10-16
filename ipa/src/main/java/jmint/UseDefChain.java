@@ -4,6 +4,8 @@ import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
 import soot.jimple.DefinitionStmt;
+import soot.jimple.Stmt;
+import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
 
 import java.util.HashSet;
@@ -33,11 +35,11 @@ public class UseDefChain {
         this.allReachingDefs = allReachingDefs;
     }
 
-    public Set<Pair<DefinitionStmt, SootMethod>> getAllDefStmts()
+    public Set<Pair<Stmt, Host>> getAllDefStmts()
     {
-        Set<Pair<DefinitionStmt, SootMethod>> s = new HashSet<Pair<DefinitionStmt, SootMethod>>();
+        Set<Pair<Stmt, Host>> s = new HashSet<Pair<Stmt, Host>>();
 
-        s.add(new Pair<DefinitionStmt, SootMethod>(defStmt, defMethod));
+        s.add(new Pair<Stmt, Host>(defStmt, defMethod));
         for (Object o:allReachingDefs){
             //Keeping sane by doing these freaking casting in separate statements, oh Java!
             Set<DefinitionStmt> stmtSet = ((Pair<Value, Set<DefinitionStmt>>) ((Pair) o).getO1()).getO2();
@@ -48,7 +50,7 @@ public class UseDefChain {
             assert(stmtSet.size() <= 1);
             for (DefinitionStmt stmt:stmtSet){
                 SootMethod m = (SootMethod)((Pair) o).getO2();
-                s.add(new Pair<DefinitionStmt, SootMethod>( stmt ,m));
+                s.add(new Pair<Stmt, Host>(stmt ,m));
                 break;
             }
         }
