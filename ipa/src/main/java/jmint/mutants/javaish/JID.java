@@ -2,7 +2,7 @@ package jmint.mutants.javaish;
 
 import jmint.BaseMutantInjector;
 import jmint.MutantHeader;
-import jmint.SootUtilities;
+import jmint.SUtil;
 import jmint.UseDefChain;
 import jmint.mutants.MutantsCode;
 import soot.*;
@@ -36,7 +36,7 @@ public class JID extends BaseMutantInjector {
 
     public Pair<Stmt,Host> getUnitInitializing(InstanceFieldRef fieldRef){
 
-        SootMethod specialInit = getSpecialInit(SootUtilities.getResolvedClass(udChain.getDefMethod()));
+        SootMethod specialInit = getSpecialInit(SUtil.getResolvedClass(udChain.getDefMethod()));
         if (specialInit  == null)
             return null; //will this be true ever?
 

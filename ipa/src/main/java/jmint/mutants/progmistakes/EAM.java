@@ -39,7 +39,7 @@ public class EAM extends BaseMutantInjector {
     public SootClass generateMutant(AssignStmt stmt, Pair<Stmt, Host> parent) {
 
      SootMethod method = (SootMethod)parent.getO2();
-     if (! SootUtilities.isClassIncludedInAnalysis(method.getDeclaringClass())){
+     if (! SUtil.isClassIncludedInAnalysis(method.getDeclaringClass())){
          return null;
         }
 
@@ -70,14 +70,14 @@ public class EAM extends BaseMutantInjector {
         }
 
         Local l = (Local) udChain.useValue;
-        PatchingChain<Unit> units = SootUtilities.getResolvedMethod(
+        PatchingChain<Unit> units = SUtil.getResolvedMethod(
                 udChain.getUseMethod()).getActiveBody().getUnits();
 
-        PatchingChain<Unit> units2 = SootUtilities.getResolvedMethod(
+        PatchingChain<Unit> units2 = SUtil.getResolvedMethod(
                 udChain.getUseMethod()).getActiveBody().getUnits();
 
         SimpleLocalDefs localDefs = new SimpleLocalDefs(
-                new ExceptionalUnitGraph(SootUtilities.getResolvedMethod(
+                new ExceptionalUnitGraph(SUtil.getResolvedMethod(
                         udChain.getUseMethod()).getActiveBody()));
 
 
@@ -85,15 +85,15 @@ public class EAM extends BaseMutantInjector {
         //Plus LocalDefs does not work well with Units since Units does not implement hashCode.
         for (Unit u:units){
             // I hope this is not bad. Unit.equals Soot is mysteriously missing
-            if ( SootUtilities.AreTheseObjectEqualAsStrings(u, udChain.useUnit)
-                && SootUtilities.DoesUnitUseThisLocalAsString(u, l)){
-                Local equivLocal = SootUtilities.getEquivalentLocal(u, l);
+            if ( SUtil.AreTheseObjectEqualAsStrings(u, udChain.useUnit)
+                && SUtil.DoesUnitUseThisLocalAsString(u, l)){
+                Local equivLocal = SUtil.getEquivalentLocal(u, l);
                 if ( localDefs.hasDefsAt(equivLocal, u)){
                     for (Unit def:localDefs.getDefsOfAt(equivLocal, u)){
                         if (def instanceof JAssignStmt &&
 
-                                SootUtilities.isThisMethodInvoked((JAssignStmt)def, getterMethod) &&
-                                SootUtilities.areOtherGetterMethodsAvailable(getterMethod.getDeclaringClass(), getterMethod)) {
+                                SUtil.isThisMethodInvoked((JAssignStmt) def, getterMethod) &&
+                                SUtil.areOtherGetterMethodsAvailable(getterMethod.getDeclaringClass(), getterMethod)) {
 
 
                             if (! mutableUnits.contains(def)){
@@ -119,11 +119,11 @@ public class EAM extends BaseMutantInjector {
         CallGraph callGraph = callGraphBuilder.getCallGraph();
 
         ExceptionalUnitGraph expUnitGraph = new ExceptionalUnitGraph(
-                SootUtilities.getResolvedMethod(udChain.getUseMethod()).getActiveBody());
+                SUtil.getResolvedMethod(udChain.getUseMethod()).getActiveBody());
 
 
 
-        Iterator<Edge> edgeList = callGraph.edgesOutOf(SootUtilities.getResolvedMethod(udChain.getUseMethod()));
+        Iterator<Edge> edgeList = callGraph.edgesOutOf(SUtil.getResolvedMethod(udChain.getUseMethod()));
 
         while(edgeList.hasNext()){
             Edge  e = edgeList.next();

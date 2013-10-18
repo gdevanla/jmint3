@@ -2,7 +2,7 @@ package jmint.mutants.javaish;
 
 import jmint.BaseMutantInjector;
 import jmint.MutantHeader;
-import jmint.SootUtilities;
+import jmint.SUtil;
 import jmint.UseDefChain;
 import jmint.mutants.MutantsCode;
 import soot.*;
@@ -18,12 +18,12 @@ public class JDC extends BaseMutantInjector {
     @Override
     public SootClass generateMutant(NewExpr expr, Pair<Stmt, Host> parent) {
 
-        if ( !SootUtilities.isTypeIncludedInAnalysis(
+        if ( !SUtil.isTypeIncludedInAnalysis(
                 expr.getBaseType())) return null;
 
-        Unit u = SootUtilities.getUnitInvokingDefaultConstructor(
+        Unit u = SUtil.getUnitInvokingDefaultConstructor(
                 parent.getO1().getDefBoxes().get(0).getValue(),
-                (SootMethod)parent.getO2());
+                (SootMethod) parent.getO2());
 
         if ( u != null ){
             //TODO: Right now store the SpecialInvoke in DefStmt. Later this can be
@@ -54,9 +54,9 @@ public class JDC extends BaseMutantInjector {
             //missing
 
             //now go find the constructor being invoked and see if it is default constructor.
-            Unit u = SootUtilities.getUnitInvokingDefaultConstructor(
+            Unit u = SUtil.getUnitInvokingDefaultConstructor(
                     defStmt.getDefBoxes().get(0).getValue(),
-                    (SootMethod)o.getO2());
+                    (SootMethod) o.getO2());
             if (u!=null) System.out.println(u);
             if (u != null) return true;
         }

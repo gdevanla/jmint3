@@ -4,7 +4,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import jmint.mutants.MutantsCode;
 import soot.SootClass;
-import soot.SootMethod;
 import soot.jimple.*;
 import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
@@ -175,12 +174,12 @@ public class BaseMutantInjector implements IMutantInjector {
         injectorCount++;
         for (Table.Cell<MutantHeader, MutantsCode, List<MutantInfo>> m:generatedMutants.cellSet()){
 
-            String useStmt = m.getRowKey().udChain.useMethod + ":" + m.getRowKey().udChain.useUnit + ":" +  SootUtilities.getTagOrDefaultValue(m.getRowKey().udChain.useUnit.getTag("LineNumberTag"), "-1");
+            String useStmt = m.getRowKey().udChain.useMethod + ":" + m.getRowKey().udChain.useUnit + ":" +  SUtil.getTagOrDefaultValue(m.getRowKey().udChain.useUnit.getTag("LineNumberTag"), "-1");
             String originalStmt = m.getRowKey().originalDefStmt.getO2() + ":" + m.getRowKey().originalDefStmt.getO1();
             //String triggerStmt =  m.getRowKey(). .getO2() + ":" + m.getRowKey().originalDefStmt.getO1();
-            String template = String.format("[%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]",injectorCount, udChain.useValue, udChain.defStmt, useStmt, originalStmt, m.getColumnKey(),
-                    SootUtilities.getTagOrDefaultValue(m.getRowKey().originalDefStmt.getO1().getTag("LineNumberTag"), "-1"));
-            System.out.println(template);
+          //  String template = String.format("[%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]",injectorCount, udChain.useValue, udChain.defStmt, useStmt, originalStmt, m.getColumnKey(),
+          //          SUtil.getTagOrDefaultValue(m.getRowKey().originalDefStmt.getO1().getTag("LineNumberTag"), "-1"));
+            //System.out.println(template);
         }
 
     }
@@ -196,12 +195,14 @@ public class BaseMutantInjector implements IMutantInjector {
             }
             MutantHeader mutant = allMutants.get(m);
 
-            String template = "[%s]:[%s]";
-            System.out.println(String.format(template, m, mutant.originalDefStmt));
-            System.out.println(m);
-
-            //System.out.println(mutant.getMuJavaFormatKey());
-
+            System.out.println("*****Mutant Type:" + mutant.mutantsCode + "*****");
+            System.out.println("Use Stmt : " + udChain.useUnit + " in Method:" + udChain.useMethod );
+            System.out.println("Use Value :" + udChain.useValue);
+            System.out.println("Def Stmt : " + udChain.defStmt + " in Method:" + udChain.defMethod );
+            System.out.println("Original Def Stmt" + mutant.originalDefStmt);
+            System.out.println("Actual Def Stmt :" + mutant.actualDefStmt);
+            System.out.println("Line That might change/trigger change :" + SUtil.getTagOrDefaultValue(mutant.actualDefStmt.getO1().getTag("LineNumberTag"), "-1"));
+            System.out.println("Other Info:" + mutant.otherInfo);
 
         }
 

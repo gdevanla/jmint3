@@ -11,7 +11,7 @@ import soot.util.Chain;
 
 import java.util.List;
 
-public class SootUtilities {
+public class SUtil {
 
     public static boolean isTypeIncludedInAnalysis(RefType r){
         for ( String s:Configuration.packageUnderTest){
@@ -19,6 +19,10 @@ public class SootUtilities {
                 return true;
         }
         return false;
+    }
+
+    public static boolean eqAsStr(Object o1, Object o2){
+       return o1.toString().equals(o2.toString());
     }
 
     public static boolean isClassIncludedInAnalysis(SootClass r){

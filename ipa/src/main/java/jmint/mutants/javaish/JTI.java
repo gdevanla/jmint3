@@ -1,7 +1,7 @@
 package jmint.mutants.javaish;
 
 import jmint.BaseMutantInjector;
-import jmint.SootUtilities;
+import jmint.SUtil;
 import jmint.UseDefChain;
 import jmint.mutants.MutantsCode;
 import soot.*;
@@ -14,8 +14,6 @@ import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
 import soot.util.Chain;
 
-import java.util.List;
-
 public class JTI extends BaseMutantInjector {
 
     public JTI(UseDefChain udChain) {
@@ -25,7 +23,7 @@ public class JTI extends BaseMutantInjector {
     public Unit canInject(JimpleLocal l, DefinitionStmt defStmt, SootMethod method){
         assert(defStmt instanceof AssignStmt);
 
-        if (SootUtilities.doesClassHasMember(
+        if (SUtil.doesClassHasMember(
                 method.getDeclaringClass(),
                 l.getName(),
                 l.getType())) return defStmt;

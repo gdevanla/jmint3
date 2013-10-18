@@ -4,7 +4,6 @@ package jmint;
 import jmint.mutants.MutantsCode;
 import soot.SootClass;
 import soot.SootMethod;
-import soot.jimple.DefinitionStmt;
 import soot.jimple.Stmt;
 import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
@@ -16,16 +15,31 @@ public class MutantHeader {
 
     public final UseDefChain udChain;
     public final Pair<Stmt, Host> actualDefStmt;
-    public final Pair<Stmt,Host> originalDefStmt; //non-mutated stmt
+    public final Pair<?,?> originalDefStmt; //non-mutated stmt
     public final MutantsCode mutantsCode;
     public final List<MutantInfo> mutants = new ArrayList<MutantInfo>();
+    public String otherInfo="";
+    public final String lineNoOriginalStmt;
 
-    public MutantHeader(UseDefChain udChain, Pair<Stmt, Host> actualDefStmt, Pair<Stmt, Host> originalDefStmt, MutantsCode mutantsCode){
+    public MutantHeader(UseDefChain udChain, Pair<Stmt, Host> actualDefStmt, Pair<?, ?> originalDefStmt, MutantsCode mutantsCode){
         this.udChain = udChain;
         this.actualDefStmt = actualDefStmt;
 
         this.originalDefStmt = originalDefStmt;
         this.mutantsCode = mutantsCode;
+
+        if (actualDefStmt.getO1() instanceof Stmt){
+            this.lineNoOriginalStmt = SUtil.getTagOrDefaultValue(((Stmt) actualDefStmt.getO1()).getTag("LineNumberTag"), "-1");
+        }
+        else
+        {
+            this.lineNoOriginalStmt = "-1";
+        }
+    }
+
+    public MutantHeader(UseDefChain udChain, Pair<Stmt, Host> actualDefStmt, Pair<?, ?> originalDefStmt, MutantsCode mutantsCode, String otherInfo){
+       this(udChain, actualDefStmt, originalDefStmt, mutantsCode);
+        this.otherInfo = otherInfo;
     }
 
     public String getKey(){
@@ -34,7 +48,6 @@ public class MutantHeader {
 
         String sootClass = "";
         String sootMethod = "";
-        String lineNo = SootUtilities.getTagOrDefaultValue(originalDefStmt.getO1().getTag("LineNumberTag"), "-1");
 
         if ( originalDefStmt.getO2() instanceof SootClass){
             sootClass = originalDefStmt.getO2().toString();
@@ -44,7 +57,7 @@ public class MutantHeader {
             sootMethod = originalDefStmt.getO2().toString();
             sootClass = ((SootMethod)originalDefStmt.getO2()).getDeclaringClass().toString();
         }
-        return String.format(keyTemplate, sootClass, mutantsCode, lineNo );
+        return String.format(keyTemplate, sootClass, mutantsCode, lineNoOriginalStmt);
     }
 
     public String getMuJavaFormatKey(){
@@ -53,7 +66,6 @@ public class MutantHeader {
 
         String sootClass = "";
         String sootMethod = "";
-        String lineNo = SootUtilities.getTagOrDefaultValue(originalDefStmt.getO1().getTag("LineNumberTag"), "-1");
 
         if ( originalDefStmt.getO2() instanceof SootClass){
             sootClass = originalDefStmt.getO2().toString();
@@ -64,7 +76,7 @@ public class MutantHeader {
             sootClass = ((SootMethod)originalDefStmt.getO2()).getDeclaringClass().toString();
         }
 
-        return String.format(keyTemplate, sootClass, mutantsCode, lineNo );
+        return String.format(keyTemplate, sootClass, mutantsCode, lineNoOriginalStmt);
 
     }
 

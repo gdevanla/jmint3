@@ -2,9 +2,38 @@ package jmint;
 
 import jmint.mutants.MutantsCode;
 import soot.SootClass;
+import soot.SootMethod;
 import soot.jimple.DefinitionStmt;
+import soot.jimple.Stmt;
 import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
+
+import java.lang.reflect.Field;
+
+
+/*class MutantCandidate<T,V> {
+    final Pair<T,V> value;
+
+    public MutantCandidate(Pair<T,V> v){
+        this.value = v;
+    }
+
+} */
+
+/*class StmtMutantCandidate {
+    Pair<Stmt, SootMethod> value;
+}
+
+class FieldMutantCandidate {
+    Pair<Field, SootClass> value;
+}
+
+class MethodMutantCandidate {
+    Pair<SootMethod, SootClass> value;
+}*/
+
+
+
 
 /**
  * Created with IntelliJ IDEA.
