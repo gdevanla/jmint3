@@ -1,6 +1,5 @@
 package MutantInjectionArtifacts.IOD;
 
-
 class Base {
     public int getVariable() { return (int)Math.random();}
 }

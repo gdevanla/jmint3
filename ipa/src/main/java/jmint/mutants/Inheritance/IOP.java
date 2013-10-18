@@ -12,9 +12,4 @@ public class IOP extends BaseMutantInjector {
     public IOP(UseDefChain udChain) {
         super(udChain);
     }
-
-
-
-
-
 }

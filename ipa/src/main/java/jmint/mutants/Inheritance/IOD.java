@@ -26,6 +26,9 @@ public class IOD extends BaseMutantInjector {
             return null;
         }
 
+        if (method.getName().equals("<init>") || method.getName().equals("<clint>"))
+            return null; // we will deal with this as part of JDC.
+
         if (method.getDeclaringClass().hasSuperclass()){
            SootClass parentKlass = IsMethodAnOveride(method, method.getDeclaringClass().getSuperclass());
            if (parentKlass != null){
@@ -52,11 +55,16 @@ public class IOD extends BaseMutantInjector {
         NumberedString ns = Scene.v().getSubSigNumberer().find(method.getSubSignature());
         System.out.println("NumberedString:" + ns.getString() + ":" + ns.getNumber());
 
+        if (!SUtil.isClassIncludedInAnalysis(declaringClass)){
+            return  null;
+        }
 
+        if (declaringClass.isAbstract())
+            return null;
 
         if (declaringClass.declaresMethod( method.getNumberedSubSignature())){
             SootMethod sootMethod = declaringClass.getMethod(method.getSubSignature());
-            if (sootMethod.isPublic() || sootMethod.isProtected())
+            if ((sootMethod.isPublic() || sootMethod.isProtected()) && (!sootMethod.isAbstract()))
             {
                 return declaringClass;
             }

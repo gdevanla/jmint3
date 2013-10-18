@@ -138,7 +138,7 @@ public class SUtil {
         for (SootMethod method: methods){
             if (method.getParameterCount() == 0 &&
                     method.getName().startsWith("get")
-                    && !method.getName().equals(excludeMethod.getName())
+                    && !method.getName().equals(excludeMethod.getName()) && !method.isAbstract()
                     && method.getReturnType().toString().equals(excludeMethod.getReturnType().toString())){
                 return true;
             }
