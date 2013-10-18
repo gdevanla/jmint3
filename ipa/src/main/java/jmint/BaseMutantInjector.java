@@ -2,7 +2,24 @@ package jmint;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import jmint.mutants.Inheritance.*;
 import jmint.mutants.MutantsCode;
+import jmint.mutants.javaish.JDC;
+import jmint.mutants.javaish.JID;
+import jmint.mutants.javaish.JSC;
+import jmint.mutants.javaish.JTD;
+import jmint.mutants.overloading.OAN;
+import jmint.mutants.overloading.OAO;
+import jmint.mutants.overloading.OMD;
+import jmint.mutants.overloading.OMR;
+import jmint.mutants.polymorphism.PMD;
+import jmint.mutants.polymorphism.PNC;
+import jmint.mutants.polymorphism.PPD;
+import jmint.mutants.polymorphism.PRV;
+import jmint.mutants.progmistakes.EAM;
+import jmint.mutants.progmistakes.EMM;
+import jmint.mutants.progmistakes.EOA;
+import jmint.mutants.progmistakes.EOC;
 import soot.SootClass;
 import soot.jimple.*;
 import soot.tagkit.Host;
@@ -208,7 +225,34 @@ public class BaseMutantInjector implements IMutantInjector {
 
     }
 
+    public static BaseMutantInjector getMutantInjector(MutantsCode mutantsCode, UseDefChain udChain){
+        switch (mutantsCode){
+
+            case IHI : return new IHI(udChain);
+            case IOD : return new IOD(udChain);
+            case IOP : return new IOP(udChain);
+            case IOR : return new IOR(udChain);
+            case IPC : return new IPC(udChain);
+            case ISK : return new ISK(udChain);
+            case JDC : return new JDC(udChain);
+            case JID : return new JID(udChain);
+            case JTD : return new JTD(udChain);
+            case JSC : return new JSC(udChain);
+            case OAN : return new OAN(udChain);
+            case OAO : return new OAO(udChain);
+            case OMD : return new OMD(udChain);
+            case OMR : return new OMR(udChain);
+            case PMD : return new PMD(udChain);
+            case PNC : return new PNC(udChain);
+            case PPD : return new PPD(udChain);
+            case PRV : return new PRV(udChain);
+            case EAM : return new EAM(udChain);
+            case EMM : return new EMM(udChain);
+            case EOA : return new EOA(udChain);
+            case EOC : return new EOC(udChain);
+            default: return null;
+        }
 
 
-
-}
+        }
+    }
