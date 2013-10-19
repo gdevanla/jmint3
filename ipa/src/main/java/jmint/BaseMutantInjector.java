@@ -213,6 +213,7 @@ public class BaseMutantInjector implements IMutantInjector {
             MutantHeader mutant = allMutants.get(m);
 
             System.out.println("*****Mutant Type:" + mutant.mutantsCode + "*****");
+            System.out.println("Key: "  + m);
             System.out.println("Use Stmt : " + udChain.useUnit + " in Method:" + udChain.useMethod );
             System.out.println("Use Value :" + udChain.useValue);
             System.out.println("Def Stmt : " + udChain.defStmt + " in Method:" + udChain.defMethod );

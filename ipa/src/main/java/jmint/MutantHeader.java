@@ -28,8 +28,8 @@ public class MutantHeader {
         this.originalDefStmt = originalDefStmt;
         this.mutantsCode = mutantsCode;
 
-        if (actualDefStmt.getO1() instanceof Stmt){
-            this.lineNoOriginalStmt = SUtil.getTagOrDefaultValue(((Stmt) actualDefStmt.getO1()).getTag("LineNumberTag"), "-1");
+        if (originalDefStmt.getO1() instanceof Stmt){
+            this.lineNoOriginalStmt = SUtil.getTagOrDefaultValue(((Stmt) originalDefStmt.getO1()).getTag("LineNumberTag"), "-1");
         }
         else
         {

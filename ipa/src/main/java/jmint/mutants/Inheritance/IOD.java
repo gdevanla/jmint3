@@ -50,7 +50,6 @@ public class IOD extends BaseMutantInjector {
     }
 
     private SootClass IsMethodAnOveride(SootMethod method, SootClass declaringClass) {
-
         System.out.println("Looking up " + method.getSubSignature() + "in class=" + declaringClass);
         NumberedString ns = Scene.v().getSubSigNumberer().find(method.getSubSignature());
         System.out.println("NumberedString:" + ns.getString() + ":" + ns.getNumber());

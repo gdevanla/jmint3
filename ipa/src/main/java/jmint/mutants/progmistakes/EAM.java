@@ -80,7 +80,6 @@ public class EAM extends BaseMutantInjector {
                 new ExceptionalUnitGraph(SUtil.getResolvedMethod(
                         udChain.getUseMethod()).getActiveBody()));
 
-
         //Soot JimpleLocal.equals method is not implemented, and I got grief with this.
         //Plus LocalDefs does not work well with Units since Units does not implement hashCode.
         for (Unit u:units){
