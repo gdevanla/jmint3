@@ -525,12 +525,34 @@ public class TestMutationInjection {
     }
 
     @Test
+    public void TestISK1(){
+
+        BaseMutantInjector.allMutants.clear();
+
+        String[] sootAppFiles = { "MutantInjectionArtifacts.ISK.ISKTest1",
+                "MutantInjectionArtifacts.ISK.ISK1",
+                "MutantInjectionArtifacts.ISK.ISK2"};
+        //CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.IOP.IOPTest1", sootAppFiles);
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.ISK});
+        generateMutants("MutantInjectionArtifacts.ISK.ISKTest1", sootAppFiles, null,x);
+        assertEquals(1, BaseMutantInjector.allMutants.size());
+
+        assertEquals("Pair zz = this.<MutantInjectionArtifacts.ISK.Base: int basex>,<MutantInjectionArtifacts.ISK.ISK2: int getSomeInstanceVar()>",
+                BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
+
+    }
+
+
+    @Test
     public void TestBCEL(){
 
         appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
 
         final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
-        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.IOP});
+        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.ISK});
         generateMutants("", new String[]{}, null, x);
 
     }

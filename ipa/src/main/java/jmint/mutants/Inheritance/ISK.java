@@ -29,10 +29,18 @@ public class ISK extends BaseMutantInjector {
         SootField field = fieldRef.getField();
         SootMethod parentMethod = (SootMethod)parent.getO2();
 
-        System.out.println("Base = " + base.getType() + ":" + fieldRef.getField().getDeclaringClass());
+        if (!((SootMethod) parent.getO2()).getDeclaringClass().hasSuperclass()){
+            return null;
+        }
 
+        if(!parentMethod.getDeclaringClass().declaresField(field.getSubSignature())){
+            return null;
+        }
+
+        System.out.println("Base = " + base.getType() + ":" + fieldRef.getField().getDeclaringClass());
         if (base.toString().equals("this")){
             if (field.getDeclaringClass().equals(parentMethod.getDeclaringClass().getSuperclass())){
+
                 MutantHeader header = new MutantHeader(udChain,
                         parent,
                         parent,
@@ -41,7 +49,6 @@ public class ISK extends BaseMutantInjector {
                 if (!allMutants.containsKey(header.getKey())){
                     allMutants.put(header.getKey(), header);
                 }
-
             }
         }
 
