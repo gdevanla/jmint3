@@ -11,6 +11,10 @@ public class JID1 {
         s = "test";
     }
 
+    public JID1(int zz){
+        x = zz;
+    }
+
     public void F1(){
         JID2 t1_02 = new JID2();
         int zz  = t1_02.getSomeInstanceVar();

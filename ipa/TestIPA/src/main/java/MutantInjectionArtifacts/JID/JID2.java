@@ -5,6 +5,16 @@ public class JID2 {
     public int instancevar = (int)Math.random();
     public static int staticVar;
 
+    public JID2(){
+
+    }
+
+    public JID2(int x){
+
+        instancevar = (int)Math.random() + 1;
+
+    }
+
     public int getSomeInstanceVar(){
         int zz = this.instancevar;
         return zz;

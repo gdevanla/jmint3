@@ -1,16 +1,54 @@
 package jmint.mutants.Inheritance;
 
 import jmint.BaseMutantInjector;
+import jmint.MutantHeader;
+import jmint.SUtil;
 import jmint.UseDefChain;
+import jmint.mutants.MutantsCode;
 import soot.SootClass;
+import soot.SootField;
+import soot.SootMethod;
+import soot.Value;
 import soot.jimple.InstanceFieldRef;
 import soot.jimple.NewExpr;
 import soot.jimple.StaticFieldRef;
+import soot.jimple.Stmt;
 import soot.jimple.internal.JInstanceFieldRef;
+import soot.tagkit.Host;
+import soot.toolkits.scalar.Pair;
 
 public class ISK extends BaseMutantInjector {
     public ISK(UseDefChain udChain) {
         super(udChain);
     }
+
+    @Override
+    public SootClass generateMutant(InstanceFieldRef fieldRef, Pair<Stmt, Host> parent) {
+
+        Value base = fieldRef.getBase();
+        SootField field = fieldRef.getField();
+        SootMethod parentMethod = (SootMethod)parent.getO2();
+
+        System.out.println("Base = " + base.getType() + ":" + fieldRef.getField().getDeclaringClass());
+
+        if (base.toString().equals("this")){
+            if (field.getDeclaringClass().equals(parentMethod.getDeclaringClass().getSuperclass())){
+                MutantHeader header = new MutantHeader(udChain,
+                        parent,
+                        parent,
+                        MutantsCode.ISK,
+                        "");
+                if (!allMutants.containsKey(header.getKey())){
+                    allMutants.put(header.getKey(), header);
+                }
+
+            }
+        }
+
+        return null;
+
+    }
+
+
 
 }

@@ -15,7 +15,6 @@ public class IOD2 extends Base {
 
     @Override
     public int getVariable() {
-
         return (int)Math.random();
         //return new Base().getVariable();
     }

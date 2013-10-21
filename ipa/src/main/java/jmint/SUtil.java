@@ -41,8 +41,7 @@ public class SUtil {
             if (((InvokeStmt)u).getInvokeExpr() instanceof SpecialInvokeExpr){
                 SpecialInvokeExpr expr = (SpecialInvokeExpr) ((InvokeStmt)u).getInvokeExpr();
 
-                if (expr.getArgCount() == 0 &&
-                        expr.getBase().hashCode() == r.hashCode()) {//soot bug circumvented.
+                if (expr.getBase().equals(r)){
                     return true;
                 }
             }
@@ -50,7 +49,25 @@ public class SUtil {
         return false;
     }
 
+
+
     public static Unit getUnitInvokingDefaultConstructor(Value r, SootMethod method){
+        for (Unit u:getResolvedMethod(method).getActiveBody().getUnits()){
+            if (isSpecialInvokeExprOnValue(r, u))
+            {
+                if ( isUnitInvokingDefaultConstructor(u)){
+                    return u;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static boolean isUnitInvokingDefaultConstructor(Unit u) {
+        return ((InvokeStmt)u).getInvokeExpr().getArgCount() == 0;
+    }
+
+    public static Unit getUnitInvokingAnConstructor(Value r, SootMethod method){
         for (Unit u:getResolvedMethod(method).getActiveBody().getUnits()){
             if (isSpecialInvokeExprOnValue(r, u)) { return u; }
         }
@@ -155,4 +172,21 @@ public class SUtil {
     }
 
 
+    public static Unit getSpecialInvokeToBaseClassNonDefaultConstructor(SootMethod initMethod) {
+        PatchingChain<Unit> units = initMethod.getActiveBody().getUnits();
+
+        for ( Unit u:units){
+            if (u instanceof InvokeStmt){
+                if (((InvokeStmt)u).getInvokeExpr() instanceof SpecialInvokeExpr){
+                    SpecialInvokeExpr expr =  (SpecialInvokeExpr)((InvokeStmt)u).getInvokeExpr();
+                    if (expr.getMethod().getDeclaringClass().equals(initMethod.getDeclaringClass().getSuperclass())
+                            && expr.getMethod().getName().contains("<init>") && expr.getArgCount() > 0){
+                        return u;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
 }

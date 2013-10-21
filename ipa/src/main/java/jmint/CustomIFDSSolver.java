@@ -113,8 +113,11 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
                 new HashSet<Pair<Pair<Value, Set<DefinitionStmt>>, SootMethod>>();
 
         for(Object o:cols.keySet()){
-            l.add(new Pair<Pair<Value, Set<DefinitionStmt>>, SootMethod>((Pair<Value, Set<DefinitionStmt>>) o,
-                    (SootMethod)icfg.getMethodOf(def)));
+            assert(((Pair<Value, Set<DefinitionStmt>>)o).getO2().size() <= 1);
+            if (((Pair<Value, Set<DefinitionStmt>>)o).getO2().size() == 1){
+                l.add(new Pair<Pair<Value, Set<DefinitionStmt>>, SootMethod>((Pair<Value, Set<DefinitionStmt>>) o,
+                        (SootMethod)icfg.getMethodOf(((Pair<Value, Set<DefinitionStmt>>) o).getO2().iterator().next())));
+            }
         }
 
         return l;

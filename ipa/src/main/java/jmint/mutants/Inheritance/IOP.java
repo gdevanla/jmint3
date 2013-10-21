@@ -74,6 +74,13 @@ public class IOP extends BaseMutantInjector {
         SootMethod invokedMethod = ((SpecialInvokeExpr) stmt.getInvokeExpr()).getMethod();
         SootClass invokedClass = invokedMethod.getDeclaringClass();
 
+        if (invokedMethod.getName().equals("<init>") ||
+                invokedMethod.getName().equals("<clinit>")){
+            return false; //not interested in constructor calls.
+        }
+
+        if (! SUtil.isTypeIncludedInAnalysis(invokedClass.getType())) return false;
+
         //check if base class being used to invoke some method in base class.
         if (invokedClass.equals(((SootMethod)parent.getO2()).getDeclaringClass().getSuperclass())){
             return true;
