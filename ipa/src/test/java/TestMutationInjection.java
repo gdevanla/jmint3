@@ -588,6 +588,97 @@ public class TestMutationInjection {
 
     }
 
+    @Test
+    public void TestPNC1(){
+
+        BaseMutantInjector.allMutants.clear();
+
+        String[] sootAppFiles = { "MutantInjectionArtifacts.PNC.PNCTest1",
+                "MutantInjectionArtifacts.PNC.PNC1",
+                "MutantInjectionArtifacts.PNC.PNC2",
+                "MutantInjectionArtifacts.PNC.PNC3", "MutantInjectionArtifacts.PNC.Base"};
+
+        //CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.IOP.IOPTest1", sootAppFiles);
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.PNC});
+        generateMutants("MutantInjectionArtifacts.PNC.PNCTest1", sootAppFiles, null,x);
+        assertEquals(1, BaseMutantInjector.allMutants.size());
+
+        assertEquals("Pair $r0 = new MutantInjectionArtifacts.PNC.PNC3,<MutantInjectionArtifacts.PNC.PNC1: void F1()>",
+                BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
+
+    }
+
+    @Test
+    public void TestPMD1(){
+
+        BaseMutantInjector.allMutants.clear();
+
+        String[] sootAppFiles = { "MutantInjectionArtifacts.PMD.PMDTest1",
+                "MutantInjectionArtifacts.PMD.PMD1",
+                "MutantInjectionArtifacts.PMD.PMD2",
+                "MutantInjectionArtifacts.PMD.PMD3"};
+
+        //CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.IOP.IOPTest1", sootAppFiles);
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.PMD});
+        generateMutants("MutantInjectionArtifacts.PMD.PMDTest1", sootAppFiles, null,x);
+        assertEquals(1, BaseMutantInjector.allMutants.size());
+
+        assertEquals("Pair zz = virtualinvoke t1_02.<MutantInjectionArtifacts.PMD.PMD2: int getVariable(int,java.lang.String)>($i0, \"fsda\"),<MutantInjectionArtifacts.PMD.PMD1: void F1()>",
+                BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
+
+    }
+
+    @Test
+    public void TestPPD1(){
+
+        BaseMutantInjector.allMutants.clear();
+
+        String[] sootAppFiles = { "MutantInjectionArtifacts.PPD.PPDTest1",
+                "MutantInjectionArtifacts.PPD.PPD1",
+                "MutantInjectionArtifacts.PPD.PPD2",
+                "MutantInjectionArtifacts.PPD.Parent",
+                "MutantInjectionArtifacts.PPD.Child"};
+
+        //CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.IOP.IOPTest1", sootAppFiles);
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.PPD});
+        generateMutants("MutantInjectionArtifacts.PPD.PPDTest1", sootAppFiles, null,x);
+        assertEquals(1, BaseMutantInjector.allMutants.size());
+
+
+    }
+
+    @Test
+    public void TestPRV1(){
+
+        BaseMutantInjector.allMutants.clear();
+
+        String[] sootAppFiles = { "MutantInjectionArtifacts.PRV.PRVTest1",
+                "MutantInjectionArtifacts.PRV.PRV1",
+                "MutantInjectionArtifacts.PRV.PRV2"};
+        //CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.IOP.IOPTest1", sootAppFiles);
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.PRV});
+        generateMutants("MutantInjectionArtifacts.PRV.PRVTest1", sootAppFiles, null,x);
+        assertEquals(1, BaseMutantInjector.allMutants.size());
+
+        assertEquals("Pair zz = virtualinvoke t1_02.<MutantInjectionArtifacts.PRV.PRV2: int getVariable(int,java.lang.String)>($i0, \"fsda\"),<MutantInjectionArtifacts.PRV.PRV1: void F1()>",
+                BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
+
+    }
+
+
+
 
     @Test
     public void TestBCEL(){

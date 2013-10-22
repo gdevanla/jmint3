@@ -7,11 +7,14 @@ import soot.jimple.InvokeExpr;
 import soot.jimple.InvokeStmt;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.internal.JAssignStmt;
+import soot.jimple.internal.JVirtualInvokeExpr;
 import soot.tagkit.Tag;
 import soot.toolkits.graph.ExceptionalUnitGraph;
+import soot.toolkits.scalar.Pair;
 import soot.toolkits.scalar.SimpleLocalDefs;
 import soot.util.Chain;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -293,6 +296,113 @@ public class SUtil {
         }
         return false;
     }
+
+    public static Set<SootClass> getSubClassesWithDefaultConstructor(Type type) {
+        Set<SootClass> classes =  new HashSet<SootClass>();
+        Collection<SootClass> subClasses = Scene.v().getFastHierarchy().
+                getSubclassesOf(SUtil.getResolvedClass(type.toString()));
+
+        //check if atleast one subClass has a default constructor
+        for (SootClass c:subClasses){
+            for (SootMethod m:c.getMethods()){
+                if ( m.getName().equals("<init>") && m.getParameterCount() == 0){
+                    classes.add(c);
+                }
+            }
+        }
+
+        return classes;
+    }
+
+
+    public static Set<Unit> findAssignStmtsWithInvoke(UseDefChain udChain, SootMethod getterMethod){
+        Set<Unit> mutableUnits = new HashSet<Unit>();
+        //assert(udChain.useValue instanceof Local);
+        if (!(udChain.useValue instanceof Local)){
+            System.out.println("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
+            return mutableUnits;
+        }
+
+        Local l = (Local) udChain.useValue;
+        PatchingChain<Unit> units = SUtil.getResolvedMethod(
+                udChain.getUseMethod()).getActiveBody().getUnits();
+
+        PatchingChain<Unit> units2 = SUtil.getResolvedMethod(
+                udChain.getUseMethod()).getActiveBody().getUnits();
+
+        SimpleLocalDefs localDefs = new SimpleLocalDefs(
+                new ExceptionalUnitGraph(SUtil.getResolvedMethod(
+                        udChain.getUseMethod()).getActiveBody()));
+
+        for (Unit u:units){
+            if ( u.equals(udChain.useUnit)
+                    && SUtil.DoesUnitUseThisLocalAsString(u, l)){
+                //Local equivLocal = SUtil.getEquivalentLocal(u, l);
+                if ( localDefs.hasDefsAt(l, u)){
+                    for (Unit def:localDefs.getDefsOfAt(l, u)){
+                        if (def instanceof JAssignStmt &&
+                                ((JAssignStmt) def).containsInvokeExpr() &&
+                                areParametersGeneralizable(((JAssignStmt) def).getInvokeExpr())){
+
+                            if (! mutableUnits.contains(def)){
+                                mutableUnits.add(def);
+                            }
+                            else
+                            {
+                                //System.out.println(def);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return mutableUnits;
+
+    }
+
+    public static boolean areParametersGeneralizable(InvokeExpr invokeExpr) {
+        if (!(invokeExpr instanceof JVirtualInvokeExpr)){
+            return false;
+        }
+
+        JVirtualInvokeExpr expr = (JVirtualInvokeExpr) invokeExpr;
+        SootClass klass = SUtil.getResolvedClass(expr.getBase().getType().toString());
+        SootMethod method = expr.getMethod();
+        List<Type> parameterTypes = method.getParameterTypes();
+
+        for (Type t:parameterTypes){
+            SootClass c = SUtil.getResolvedClass(t.toString());
+            if (c.hasSuperclass()) return true;
+        }
+
+        return false;
+    }
+
+
+    public static Set<Pair<Type, Type>> getGeneralizableParameters(InvokeExpr invokeExpr) {
+        Set<Pair<Type, Type>> params = new HashSet<Pair<Type, Type>>();
+        if (!(invokeExpr instanceof JVirtualInvokeExpr)){
+            return params;
+        }
+
+        JVirtualInvokeExpr expr = (JVirtualInvokeExpr) invokeExpr;
+        SootClass klass = SUtil.getResolvedClass(expr.getBase().getType().toString());
+        SootMethod method = expr.getMethod();
+        List<Type> parameterTypes = method.getParameterTypes();
+
+        for (Type t:parameterTypes){
+            SootClass c = SUtil.getResolvedClass(t.toString());
+            if (c.hasSuperclass())
+            {
+             params.add(new Pair<Type, Type>(c.getType(), c.getSuperclass().getType()));
+            }
+        }
+
+        return params;
+    }
+
+
+
 }
 
 
