@@ -402,7 +402,41 @@ public class SUtil {
     }
 
 
+    public static boolean isTypeIncludedInAnalysis(Type t) {
+        for ( String s:Configuration.packageUnderTest){
+            if ( t.toString().startsWith(s))
+                return true;
+        }
+        return false;
+    }
 
+    public static Set<Type> getAllTypesInLocal(Chain<Local> locals, boolean filterByAnalyzedPackage) {
+        Set<Type> types = new HashSet<Type>();
+
+        for(Local l:locals){
+            if (filterByAnalyzedPackage && !SUtil.isTypeIncludedInAnalysis(l.getType())) continue;
+            else types.add(l.getType());
+
+        }
+        return types;
+
+    }
+
+    public static boolean doTypesShareParentClass(Type t1, Type t2) {
+
+        SootClass c1 = SUtil.getResolvedClass(t1.toString());
+        SootClass c2 = SUtil.getResolvedClass(t2.toString());
+
+        if (!c1.hasSuperclass()) return false;
+        if (!c2.hasSuperclass()) return false;
+        if (c1.equals(c2)) return false;
+
+        if ( c1.getSuperclass().equals(c2.getSuperclass())){
+            return true;
+        }
+
+        return false;
+    }
 }
 
 

@@ -663,8 +663,11 @@ public class TestMutationInjection {
 
         String[] sootAppFiles = { "MutantInjectionArtifacts.PRV.PRVTest1",
                 "MutantInjectionArtifacts.PRV.PRV1",
-                "MutantInjectionArtifacts.PRV.PRV2"};
-        //CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.IOP.IOPTest1", sootAppFiles);
+                "MutantInjectionArtifacts.PRV.PRV2",
+                "MutantInjectionArtifacts.PRV.PRV3",
+                "MutantInjectionArtifacts.PRV.PRV4" ,
+                "MutantInjectionArtifacts.PRV.Base"};
+
 
         final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
 
