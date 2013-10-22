@@ -23,5 +23,6 @@ public enum MutantsCode {
     EAM,
     EMM,
     EOA,
+    JTI,
     EOC
 }

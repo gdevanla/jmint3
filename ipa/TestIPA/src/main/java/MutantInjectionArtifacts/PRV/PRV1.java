@@ -4,7 +4,7 @@ public class PRV1 {
 
     public void F1(){
         PRV3 prv3 = new PRV3();
-        PRV3 prv4 = new PRV4();
+        PRV4 prv4 = new PRV4();
 
         PRV2 prv2 = new PRV2();
 

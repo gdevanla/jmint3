@@ -20,10 +20,6 @@ public class JSC extends BaseMutantInjector {
         super(udChain);
     }
 
-
-
-
-
     public boolean canInject(){
         assert(udChain.getDefStmt() instanceof AssignStmt);
 
@@ -34,22 +30,6 @@ public class JSC extends BaseMutantInjector {
         return false;
     }
 
-    public String getLineNumber(){
-        assert(canInject());
-
-        return "-1";
-    }
-
-    public String getMutantString(){
-        return "";
-    }
-
-    @Override
-    public String mutantLog(){
-        String mutantLog = "%s:%s_%s:%s:%s";
-        return String.format(mutantLog, udChain.getDefMethod().getDeclaringClass().getName(),
-                MutantsCode.JSC, 0, getLineNumber(), getMutantString());
-    }
 }
 
 

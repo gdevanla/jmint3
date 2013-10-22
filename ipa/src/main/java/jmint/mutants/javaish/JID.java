@@ -28,7 +28,7 @@ public class JID extends BaseMutantInjector {
         Set<Pair<Stmt, Host>> initStmts = getUnitsInitializing(fieldRef);
 
         for(Pair<Stmt, Host> initStmt: initStmts){
-            MutantHeader header = new MutantHeader(udChain,parent, initStmt, MutantsCode.EAM);
+            MutantHeader header = new MutantHeader(udChain,parent, initStmt, MutantsCode.JID);
             if (!allMutants.containsKey(header.getKey())){
                 allMutants.put(header.getKey(), header);
             }

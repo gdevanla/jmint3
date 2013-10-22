@@ -1,9 +1,11 @@
 package jmint.mutants.javaish;
 
 import jmint.BaseMutantInjector;
+import jmint.MutantHeader;
 import jmint.SUtil;
 import jmint.UseDefChain;
 import jmint.mutants.MutantsCode;
+import org.junit.Assume;
 import soot.*;
 import soot.jimple.AssignStmt;
 import soot.jimple.DefinitionStmt;
@@ -20,7 +22,52 @@ public class JTI extends BaseMutantInjector {
         super(udChain);
     }
 
-    public Unit canInject(JimpleLocal l, DefinitionStmt defStmt, SootMethod method){
+    @Override
+    public SootClass generateMutant(AssignStmt stmt, Pair<Stmt, Host> parent){
+
+        SootMethod method = (SootMethod)parent.getO2();
+
+        if (!(stmt.getRightOp() instanceof JimpleLocal )) return null;
+
+        Unit u = injectableUnit((JimpleLocal)stmt.getRightOp(), stmt, method);
+        if (u != null)
+        {
+            MutantHeader header = new MutantHeader(udChain,
+                    parent,
+                    parent,
+                    MutantsCode.JTD,
+                    String.format("this.%s will replace this %s", ((JimpleLocal) stmt.getRightOp()).getName(),
+                            ((JimpleLocal) stmt.getRightOp()).getName()));
+
+            if (!allMutants.containsKey(header.getKey())){
+                allMutants.put(header.getKey(), header);
+            }
+        }
+
+        u = injectableUnit((JimpleLocal)stmt.getLeftOp(), stmt, method);
+        if (u != null){
+            if (u != null)
+            {
+                MutantHeader header = new MutantHeader(udChain,
+                        parent,
+                        parent,
+                        MutantsCode.JTD,
+                        String.format("this.%s will replace this %s", ((JimpleLocal) stmt.getRightOp()).getName(),
+                                ((JimpleLocal) stmt.getRightOp()).getName()));
+
+                if (!allMutants.containsKey(header.getKey())){
+                    allMutants.put(header.getKey(), header);
+                }
+            }
+        }
+
+
+        return null;
+    }
+
+
+
+    public Unit injectableUnit(JimpleLocal l, DefinitionStmt defStmt, SootMethod method){
         assert(defStmt instanceof AssignStmt);
 
         if (SUtil.doesClassHasMember(
@@ -32,55 +79,6 @@ public class JTI extends BaseMutantInjector {
         return null;
 
     }
-
-    public boolean canInject(){
-        assert(udChain.getDefStmt() instanceof AssignStmt);
-       // if (!(udChain.getDefStmt().getRightOp() instanceof JimpleLocal)) return false;
-
-
-        for(Pair<Stmt, Host> o :udChain.getAllDefStmts()){
-            DefinitionStmt defStmt = (DefinitionStmt)o.getO1();
-            SootMethod method = (SootMethod)o.getO2();
-
-            if (!(defStmt.getRightOp() instanceof JimpleLocal )) continue;
-            Unit u = canInject((JimpleLocal)defStmt.getRightOp(), defStmt, method);
-            if (u != null) return true;
-
-            u = canInject((JimpleLocal)defStmt.getLeftOp(), defStmt, method);
-            if (u != null) return true;
-
-        }
-        return false;
-    }
-
-    public String getMutantString(){
-        return "";
-    }
-
-    @Override
-    public String mutantLog(){
-        String mutantLog = "%s:%s_%s:%s:%s";
-        return String.format(mutantLog, udChain.getDefMethod().getDeclaringClass().getName(),
-                MutantsCode.JTD, 0, udChain.getDefStmt().getTag("LineNumberTag"), getMutantString());
-    }
-
-
-    //@Override
-    public SootClass generateMutant(InstanceFieldRef fieldRef, Object o) {
-
-        String fieldName = fieldRef.getField().getName();
-
-        Chain<Local> locals = udChain.getDefMethod().getActiveBody().getLocals();
-        for(Local l : locals){
-            if (l.getName().equals(fieldName)){
-                //writeMutantLog()
-            }
-        }
-
-        return udChain.getDefMethod().getDeclaringClass();
-
-    }
-
 
 
 }

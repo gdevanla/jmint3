@@ -204,23 +204,13 @@ public class TestMutationInjection {
         String[] sootAppFiles = { "MutantInjectionArtifacts.JTD.JTDTest1",
                 "MutantInjectionArtifacts.JTD.JTD1",
                 "MutantInjectionArtifacts.JTD.JTD2"};
-        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.JTD.JTDTest1", sootAppFiles);
 
-        //solver.printFilteredResults();
-
-        assertEquals(1, solver.udChains.size());
-
-        final JTD jtd = new JTD(solver.udChains.get(0));
-
-        Transform x = (new Transform("wjtp.jtdinjector", new SceneTransformer() {
-            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
-                assertEquals(true, jtd.canInject());
-                System.out.println(jtd.mutantLog());
-            }
-        }));
-
-        generateMutants("MutantInjectionArtifacts.JTD.JTDTest1",sootAppFiles, solver.udChains, x);
-
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.JTD});
+        generateMutants("MutantInjectionArtifacts.JTD.JTDTest1",sootAppFiles, null, x);
+        assertEquals(1, BaseMutantInjector.allMutants.size());
+        assertEquals("Pair $i0 = this.<MutantInjectionArtifacts.JTD.JTD1: int x>,<MutantInjectionArtifacts.JTD.JTD1: void F1()>",
+                BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
 
         }
 
@@ -230,30 +220,32 @@ public class TestMutationInjection {
         String[] sootAppFiles = { "MutantInjectionArtifacts.EAM.EAMTest1",
                 "MutantInjectionArtifacts.EAM.EAM1",
                 "MutantInjectionArtifacts.EAM.EAM2"};
-        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.EAM.EAMTest1", sootAppFiles);
 
-        //solver.printFilteredResults();
-        //assertEquals(1, solver.udChains.size());
-        //final EAM eam = new EAM(solver.udChains.get(0));
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.EAM});
+        generateMutants("MutantInjectionArtifacts.EAM.EAMTest1", sootAppFiles, null,x);
+        assertEquals(1, BaseMutantInjector.allMutants.size());
+        assertEquals("Pair zz = virtualinvoke t1_02.<MutantInjectionArtifacts.EAM.EAM2: int getVariable()>(),<MutantInjectionArtifacts.EAM.EAM1: void F1()>",
+                BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
 
-        EAM eam = new EAM(solver.udChains.get(0));
-        List<BaseMutantInjector> injectors = new ArrayList<BaseMutantInjector>();
-        injectors.add(eam);
+    }
 
-        final MutantGenerator generator = new MutantGenerator(injectors);
+    @Test
+    public void TestEMM1(){
 
-        Transform x = (new Transform("wjtp.eaminjector", new SceneTransformer() {
-            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
-                generator.generate();
-                //System.out.println(generator.mutantLog());
-            }
-        }));
+        String[] sootAppFiles = { "MutantInjectionArtifacts.EMM.EMMTest1",
+                "MutantInjectionArtifacts.EMM.EMM1",
+                "MutantInjectionArtifacts.EMM.EMM2"};
 
-        generateMutants("MutantInjectionArtifacts.EAM.EAMTest1",sootAppFiles, solver.udChains, x);
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef =
+                new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.EMM});
+        generateMutants("MutantInjectionArtifacts.EMM.EMMTest1", sootAppFiles, null,x);
 
-        for (BaseMutantInjector injector:injectors){
-            injector.printInfo();
-        }
+        assertEquals(1, BaseMutantInjector.allMutants.size());
+        assertEquals("Pair zz = virtualinvoke t1_02.<MutantInjectionArtifacts.EMM.EMM2: int setVariable()>(),<MutantInjectionArtifacts.EMM.EMM1: void F1()>",
+                BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
+
     }
 
     @Test
@@ -330,19 +322,16 @@ public class TestMutationInjection {
         String[] sootAppFiles = { "MutantInjectionArtifacts.JTI.JTITest1",
                 "MutantInjectionArtifacts.JTI.JTI1",
                 "MutantInjectionArtifacts.JTI.JTI2"};
-        CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = runIPA("MutantInjectionArtifacts.JTI.JTITest1", sootAppFiles);
 
-        final JTI jti = new JTI(solver.udChains.get(0));
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.JTI});
+        generateMutants("MutantInjectionArtifacts.JTI.JTITest1",sootAppFiles, null, x);
 
-        Transform x = (new Transform("wjtp.jti1injector", new SceneTransformer() {
-            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
-                assertEquals(true, jti.canInject());
-                System.out.println(jti.mutantLog());
-            }
-        }));
-
-        generateMutants("MutantInjectionArtifacts.JTI.JTITest1",sootAppFiles, solver.udChains, x);
+        assertEquals(1, BaseMutantInjector.allMutants.size());
+        assertEquals("Pair z = x,<MutantInjectionArtifacts.JTI.JTI1: void F1()>",
+             BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
     }
+
 
     @Test
     public void TestIHD1(){
@@ -668,19 +657,16 @@ public class TestMutationInjection {
                 "MutantInjectionArtifacts.PRV.PRV4" ,
                 "MutantInjectionArtifacts.PRV.Base"};
 
-
         final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
 
         Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.PRV});
         generateMutants("MutantInjectionArtifacts.PRV.PRVTest1", sootAppFiles, null,x);
         assertEquals(1, BaseMutantInjector.allMutants.size());
 
-        assertEquals("Pair zz = virtualinvoke t1_02.<MutantInjectionArtifacts.PRV.PRV2: int getVariable(int,java.lang.String)>($i0, \"fsda\"),<MutantInjectionArtifacts.PRV.PRV1: void F1()>",
+        assertEquals("Pair prv3 = $r0,<MutantInjectionArtifacts.PRV.PRV1: void F1()>",
                 BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
 
     }
-
-
 
 
     @Test

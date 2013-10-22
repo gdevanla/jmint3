@@ -21,20 +21,6 @@ public class EAM extends BaseMutantInjector {
         super(udChain);
     }
 
-    private boolean keyPresent(Unit u) {
-        for (MutantHeader header:generatedMutants.rowKeySet()){
-            if (header.originalDefStmt.getO1().toString().equals(u.toString())
-                    && header.originalDefStmt.getO2().toString().equals(udChain.getUseMethod().toString())){
-
-                System.out.println(generatedMutants.containsRow(new Pair<DefinitionStmt, Host>((DefinitionStmt)u, udChain.getUseMethod())));
-                System.out.println(header.originalDefStmt.getO1().equals(u));
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     @Override
     public SootClass generateMutant(AssignStmt stmt, Pair<Stmt, Host> parent) {
 

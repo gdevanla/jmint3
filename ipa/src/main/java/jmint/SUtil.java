@@ -437,6 +437,27 @@ public class SUtil {
 
         return false;
     }
+
+    public static boolean areOtherSetterMethodsAvailable(SootClass declaringClass, SootMethod excludeMethod) {
+        List<SootMethod> methods = declaringClass.getMethods();
+
+        Multiset<Type> typesInExcludeMethod = HashMultiset.create();
+        typesInExcludeMethod.addAll(excludeMethod.getParameterTypes());
+
+        for (SootMethod method: methods){
+            Multiset<Type> typesInMethod = HashMultiset.create();
+            typesInMethod.addAll(method.getParameterTypes());
+
+            if (method.getName().startsWith("set")
+                    && !method.getName().equals(excludeMethod.getName()) && !method.isAbstract()
+                    && method.getReturnType().toString().equals(excludeMethod.getReturnType().toString())
+                    && isTypeListASubset(typesInExcludeMethod, typesInMethod)){
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 

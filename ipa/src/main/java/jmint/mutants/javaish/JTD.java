@@ -1,14 +1,16 @@
 package jmint.mutants.javaish;
 
+import jmint.MutantHeader;
 import jmint.UseDefChain;
 import jmint.BaseMutantInjector;
 import jmint.mutants.MutantsCode;
-import soot.Local;
-import soot.Scene;
-import soot.SootClass;
-import soot.Value;
+import soot.*;
 import soot.jimple.*;
+import soot.tagkit.Host;
+import soot.toolkits.scalar.Pair;
 import soot.util.Chain;
+
+import java.util.Set;
 
 public class JTD extends BaseMutantInjector {
 
@@ -16,10 +18,10 @@ public class JTD extends BaseMutantInjector {
         super(udChain);
     }
 
-    public boolean canInject(InstanceFieldRef fieldRef){
-
+    @Override
+    public SootClass generateMutant(InstanceFieldRef fieldRef, Pair<Stmt, Host> parent){
         if (!fieldRef.getBase().toString().equals("this")){
-            return false; //stmt is not an instance of this.some_member
+            return null; //stmt is not an instance of this.some_member
         }
 
         String fieldName = fieldRef.getField().getName();
@@ -30,48 +32,18 @@ public class JTD extends BaseMutantInjector {
 
         for(Local l : locals){
             if (l.getName().equals(fieldName)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean canInject(){
-        assert(udChain.getDefStmt() instanceof AssignStmt);
-
-        Value v = udChain.getDefStmt().getRightOp();
-        if ( v instanceof InstanceFieldRef){
-             return canInject((InstanceFieldRef)v);
-        }
-        return false;
-    }
-
-    public String getMutantString(){
-        return "";
-    }
-
-    @Override
-    public String mutantLog(){
-        String mutantLog = "%s:%s_%s:%s:%s";
-        return String.format(mutantLog, udChain.getDefMethod().getDeclaringClass().getName(),
-                MutantsCode.JTD, 0, udChain.getDefStmt().getTag("LineNumberTag"), getMutantString());
-    }
-
-
-    //@Override
-    public SootClass generateMutant(InstanceFieldRef fieldRef, Object o) {
-
-        String fieldName = fieldRef.getField().getName();
-
-        Chain<Local> locals = udChain.getDefMethod().getActiveBody().getLocals();
-        for(Local l : locals){
-            if (l.getName().equals(fieldName)){
-                //writeMutantLog()
+                MutantHeader header = new MutantHeader(udChain,
+                        parent,
+                        parent,
+                        MutantsCode.JTD,
+                        String.format("Local %s will replace this.%s", l.getName(), fieldName));
+                if (!allMutants.containsKey(header.getKey())){
+                    allMutants.put(header.getKey(), header);
+                }
             }
         }
 
-        return udChain.getDefMethod().getDeclaringClass();
-
+        return null;
     }
 
 }
