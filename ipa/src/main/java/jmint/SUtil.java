@@ -1,15 +1,22 @@
 package jmint;
 
 
+import com.google.common.collect.ConcurrentHashMultiset;
 import soot.*;
 import soot.jimple.InvokeExpr;
 import soot.jimple.InvokeStmt;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.internal.JAssignStmt;
 import soot.tagkit.Tag;
+import soot.toolkits.graph.ExceptionalUnitGraph;
+import soot.toolkits.scalar.SimpleLocalDefs;
 import soot.util.Chain;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.HashMultiset;
 
 public class SUtil {
 
@@ -189,4 +196,103 @@ public class SUtil {
 
         return null;
     }
+
+    public static Set<Unit> findUnitInvokingOverloadedMethods(UseDefChain udChain, SootMethod method){
+        Set<Unit> mutableUnits = new HashSet<Unit>();
+        //assert(udChain.useValue instanceof Local);
+        if (!(udChain.useValue instanceof Local)){
+            System.out.println("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
+            return mutableUnits;
+        }
+
+        Local l = (Local) udChain.useValue;
+        PatchingChain<Unit> units = SUtil.getResolvedMethod(
+                udChain.getUseMethod()).getActiveBody().getUnits();
+
+        PatchingChain<Unit> units2 = SUtil.getResolvedMethod(
+                udChain.getUseMethod()).getActiveBody().getUnits();
+
+        SimpleLocalDefs localDefs = new SimpleLocalDefs(
+                new ExceptionalUnitGraph(SUtil.getResolvedMethod(
+                        udChain.getUseMethod()).getActiveBody()));
+
+        for (Unit u:units){
+            // I hope this is not bad. Unit.equals Soot is mysteriously missing
+            if ( u.equals(udChain.useUnit)
+                    && SUtil.DoesUnitUseThisLocalAsString(u, l)){
+                Local equivLocal = SUtil.getEquivalentLocal(u, l);
+                if ( localDefs.hasDefsAt(equivLocal, u)){
+                    for (Unit def:localDefs.getDefsOfAt(equivLocal, u)){
+                        if (def instanceof JAssignStmt &&
+                                ((JAssignStmt) def).containsInvokeExpr() &&
+                                SUtil.isThisMethodOverloaded((((JAssignStmt) def).getInvokeExpr()))){
+                            if (! mutableUnits.contains(def)){
+                                mutableUnits.add(def);
+                            }
+                            else
+                            {
+                                //System.out.println(def);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return mutableUnits;
+
+    }
+
+    private static boolean isThisMethodOverloaded(InvokeExpr invokeExpr) {
+        SootClass klass = SUtil.getResolvedClass(invokeExpr.getMethod().getDeclaringClass().toString());
+        SootMethod method = invokeExpr.getMethod();
+
+        for(SootMethod m : klass.getMethods()){
+            if (m.getName().equals(method.getName()) && !m.getSubSignature().equals(method.getSubSignature())){
+                return true; //we have found atleast one overloaded method
+            }
+        }
+        return false;
+    }
+
+    public static Multiset<Type> getTypesInMethod(SootMethod method){
+        Multiset<Type> argumentTypes = HashMultiset.create();
+        for (Type t:method.getParameterTypes()){
+            argumentTypes.add(t);
+        }
+        return argumentTypes;
+    }
+
+    public static boolean isTypeListASubset(Multiset<Type> t, Multiset<Type> ts  ){
+
+        //TODO: Check for base/sub class relationships.
+        for (Type type:ts){
+            if (!t.contains(type) || ts.count(type) != t.count(type)){
+                return false;
+            }
+        }
+        return true;
+
+    }
+
+    public static boolean isAlternateMethodAvail(InvokeExpr expr){
+
+        SootMethod method = expr.getMethod();
+        SootClass klass = expr.getMethod().getDeclaringClass();
+
+        Multiset<Type> origTypes = getTypesInMethod(expr.getMethod());
+
+        for (SootMethod m:klass.getMethods()){
+            Multiset<Type> types = getTypesInMethod(m);
+            if ( !m.equals(method)
+                    && m.getReturnType().equals(method.getReturnType())
+                    && m.getName().equals(method.getName())
+                    && isTypeListASubset(origTypes, types)){
+                System.out.println("Overloaded method=" + m + "can be substituted for " + method);
+                return true;
+            }
+        }
+        return false;
+    }
 }
+
+
