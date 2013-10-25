@@ -3,6 +3,7 @@ package jmint;
 import com.google.common.collect.Table;
 import heros.IFDSTabulationProblem;
 import heros.InterproceduralCFG;
+import org.slf4j.Logger;
 import soot.*;
 import soot.jimple.internal.JInstanceFieldRef;
 import soot.toolkits.scalar.Pair;
@@ -16,6 +17,7 @@ Based on JimpleIFDSSolver
 */
 
 public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>> extends JimpleIFDSSolver {
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     public List<UseDefChain> udChains = new ArrayList<UseDefChain>();
 
@@ -36,7 +38,7 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
     public boolean isCrossBoundaryDefUse(DefinitionStmt defStmt, SootMethod useMethod){
         SootMethod defMethod = (SootMethod)icfg.getMethodOf(defStmt);
         Value rightOpValue = defStmt.getRightOp();
-        //System.out.println("LeftOp values =====\n" +  unit + "," + rightOpValue.toString() + "," + rightOpValue.getClass().toString());
+        //logger.debug("LeftOp values =====\n" +  unit + "," + rightOpValue.toString() + "," + rightOpValue.getClass().toString());
         if (defStmt.getRightOp() instanceof JInstanceFieldRef
             && !(((JInstanceFieldRef)rightOpValue).getField().getDeclaringClass().equals(useMethod.getDeclaringClass())))
         {
@@ -69,12 +71,12 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
                 continue;
 
             for(ValueBox b:unit.getUseBoxes()){
-                //System.out.println("Use Boxes = " +  b.getValue() + ":" + unit);
+                //logger.debug("Use Boxes = " +  b.getValue() + ":" + unit);
 
                 Value v = (columnKey.getO1() instanceof EquivalentValue)?
                         ((EquivalentValue)columnKey.getO1()).getDeepestValue():columnKey.getO1();
 
-                //System.out.println(b.getValue() + "," + columnKey.getO1() + "," + columnKey.getO2() + "," + unit);
+                //logger.debug(b.getValue() + "," + columnKey.getO1() + "," + columnKey.getO2() + "," + unit);
 
                 if (v.equivTo(b.getValue())){
 
@@ -84,14 +86,14 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
 
                             UseDefChain useDefChain = new UseDefChain(method, unit, b.getValue(),
                                     defMethod,def, getDefStmtMethodPairs(def));
-                            //System.out.println("Line Number Use Unit=" + unit.getTag("LineNumberTag") +
+                            //logger.debug("Line Number Use Unit=" + unit.getTag("LineNumberTag") +
                             //        "Line Number of DefStmt=" + def.getTag("LineNumberTag"));
                             //useDefChain.printInfo();
                             udChains.add(useDefChain);
 
                         }
-                        //System.out.println("Size = " + udChains.size());
-                        //System.out.println(b.getValue() + "," + columnKey.getO1() + "," + columnKey.getO2() + "," + unit);
+                        //logger.debug("Size = " + udChains.size());
+                        //logger.debug(b.getValue() + "," + columnKey.getO1() + "," + columnKey.getO2() + "," + unit);
 
                     }
                 }
@@ -100,10 +102,10 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
     }
 
     private void printReachingDefs(DefinitionStmt def) {
-        System.out.println("This is the def=" + def);
+        logger.debug("This is the def=" + def);
         Map cols = val.row(def);
         for(Object o:cols.keySet()){
-            System.out.println((Pair<Value,DefinitionStmt>)o);
+            logger.debug("{}", (Pair<Value, DefinitionStmt>) o);
         }
     }
 

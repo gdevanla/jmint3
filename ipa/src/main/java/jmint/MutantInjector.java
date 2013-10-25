@@ -1,5 +1,6 @@
 package jmint;
 
+import org.slf4j.Logger;
 import soot.*;
 import soot.JastAddJ.Binary;
 import soot.jimple.*;
@@ -9,6 +10,8 @@ import soot.jimple.internal.JimpleLocal;
 
 
 public class MutantInjector {
+
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     private final Unit unit;
 
@@ -151,7 +154,7 @@ public class MutantInjector {
     }
 
     public boolean canMutate() {
-        System.out.println("Can mutate=" + unit.getClass());
+        logger.debug("Can mutate=" + unit.getClass());
         if (!(unit instanceof AssignStmt)
                 && !(unit instanceof JIdentityStmt))
                 // || (unit instanceof IfStmt))
@@ -174,12 +177,12 @@ public class MutantInjector {
 
         if ( unit instanceof JIdentityStmt){
             if ( unit.getRightOp() instanceof ThisRef) {
-                System.out.println("Identity=" + unit + ":" + unit.getRightOp().getClass());
+                logger.debug("Identity=" + unit + ":" + unit.getRightOp().getClass());
                 return true;
             }
             else
             {
-                System.out.println("Unhandled class=" + unit.getClass() +
+                logger.debug("Unhandled class=" + unit.getClass() +
                         " with getRightOp()=" + unit.getRightOp() + ", unit=" + unit);
             }
         }
@@ -198,9 +201,9 @@ public class MutantInjector {
             }
         }
 
-       System.out.println(unit + ":" + (unit.getRightOp().getClass()));
+       logger.debug(unit + ":" + (unit.getRightOp().getClass()));
        if ( unit.getRightOp() instanceof JInstanceFieldRef ){
-           System.out.println(unit + ":" + (unit.getRightOp() instanceof JInstanceFieldRef));
+           logger.debug(unit + ":" + (unit.getRightOp() instanceof JInstanceFieldRef));
            return true;
        }
 

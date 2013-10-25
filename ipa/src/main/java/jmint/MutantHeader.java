@@ -20,6 +20,9 @@ public class MutantHeader {
     public final List<MutantInfo> mutants = new ArrayList<MutantInfo>();
     public String otherInfo="";
     public final String lineNoOriginalStmt;
+    public final String lineNoActualStmt;
+    public final String lineNoUseStmt;
+    public final String lineNoDefStmt;
 
     public MutantHeader(UseDefChain udChain, Pair<Stmt, Host> actualDefStmt, Pair<?, ?> originalDefStmt, MutantsCode mutantsCode){
         this.udChain = udChain;
@@ -28,6 +31,8 @@ public class MutantHeader {
         this.originalDefStmt = originalDefStmt;
         this.mutantsCode = mutantsCode;
 
+
+        //TODO: clean this shit up
         if (originalDefStmt.getO1() instanceof Stmt){
             this.lineNoOriginalStmt = SUtil.getTagOrDefaultValue(((Stmt) originalDefStmt.getO1()).getTag("LineNumberTag"), "-1");
         }
@@ -35,6 +40,34 @@ public class MutantHeader {
         {
             this.lineNoOriginalStmt = "-1";
         }
+
+        if (actualDefStmt.getO1() instanceof Stmt){
+            this.lineNoActualStmt = SUtil.getTagOrDefaultValue(((Stmt) actualDefStmt.getO1()).getTag("LineNumberTag"), "-1");
+        }
+        else
+        {
+            this.lineNoActualStmt = "-1";
+        }
+
+        if (udChain.defStmt  instanceof Stmt){
+            this.lineNoDefStmt = SUtil.getTagOrDefaultValue(((Stmt) udChain.defStmt).getTag("LineNumberTag"), "-1");
+        }
+        else
+        {
+            this.lineNoDefStmt = "-1";
+        }
+
+        if (udChain.useUnit  instanceof Stmt){
+            this.lineNoUseStmt = SUtil.getTagOrDefaultValue(((Stmt) udChain.useUnit).getTag("LineNumberTag"), "-1");
+        }
+        else
+        {
+            this.lineNoUseStmt = "-1";
+        }
+
+
+
+
     }
 
     public MutantHeader(UseDefChain udChain, Pair<Stmt, Host> actualDefStmt, Pair<?, ?> originalDefStmt, MutantsCode mutantsCode, String otherInfo){

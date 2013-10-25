@@ -1,6 +1,7 @@
 package jmint.mutants.overloading;
 import jmint.*;
 import jmint.mutants.MutantsCode;
+import org.slf4j.Logger;
 import soot.SootClass;
 import soot.SootMethod;
 import soot.Unit;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Set;
 
 public class OMR extends BaseMutantInjector {
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     public OMR(UseDefChain udChain) {
         super(udChain);
     }
@@ -33,7 +36,7 @@ public class OMR extends BaseMutantInjector {
             //generating mutants
             //TODO: Generate the actual mutants
             for(Unit u:units){
-                System.out.println(u);
+                logger.debug("{}", u);
                 InvokeExpr expr = (InvokeExpr)((AssignStmt)u).getRightOpBox().getValue();
 
                 if ( SUtil.isAlternateMethodAvail(expr)){

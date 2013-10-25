@@ -2,6 +2,7 @@ package jmint;
 
 
 import com.google.common.collect.ConcurrentHashMultiset;
+import org.slf4j.Logger;
 import soot.*;
 import soot.jimple.InvokeExpr;
 import soot.jimple.InvokeStmt;
@@ -22,6 +23,8 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.HashMultiset;
 
 public class SUtil {
+
+    final static Logger logger = org.slf4j.LoggerFactory.getLogger(SUtil.class);
 
     public static boolean isTypeIncludedInAnalysis(RefType r){
         for ( String s:Configuration.packageUnderTest){
@@ -95,14 +98,14 @@ public class SUtil {
         //Assume Soot scene is currently active
         SootClass klass = Scene.v().forceResolve(method.getDeclaringClass().getName(),
                 SootClass.SIGNATURES);
-        //System.out.println(method.getName() + ":" + method.getSignature() + ":" + method.getSubSignature());
+        //logger.debug(method.getName() + ":" + method.getSignature() + ":" + method.getSubSignature());
         return klass.getMethod(method.getSubSignature());
     }
 
     public static SootClass getResolvedClass(String className) {
         //Assume Soot scene is currently active
         SootClass klass = Scene.v().forceResolve(className,
-                SootClass.SIGNATURES);
+                SootClass.BODIES | SootClass.SIGNATURES);
         return klass;
     }
 
@@ -204,7 +207,7 @@ public class SUtil {
         Set<Unit> mutableUnits = new HashSet<Unit>();
         //assert(udChain.useValue instanceof Local);
         if (!(udChain.useValue instanceof Local)){
-            System.out.println("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
+            logger.debug("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
             return mutableUnits;
         }
 
@@ -234,7 +237,7 @@ public class SUtil {
                             }
                             else
                             {
-                                //System.out.println(def);
+                                //logger.debug(def);
                             }
                         }
                     }
@@ -290,7 +293,7 @@ public class SUtil {
                     && m.getReturnType().equals(method.getReturnType())
                     && m.getName().equals(method.getName())
                     && isTypeListASubset(origTypes, types)){
-                System.out.println("Overloaded method=" + m + "can be substituted for " + method);
+                logger.debug("Overloaded method=" + m + "can be substituted for " + method);
                 return true;
             }
         }
@@ -319,7 +322,7 @@ public class SUtil {
         Set<Unit> mutableUnits = new HashSet<Unit>();
         //assert(udChain.useValue instanceof Local);
         if (!(udChain.useValue instanceof Local)){
-            System.out.println("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
+            logger.debug("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
             return mutableUnits;
         }
 
@@ -349,7 +352,7 @@ public class SUtil {
                             }
                             else
                             {
-                                //System.out.println(def);
+                                //logger.debug(def);
                             }
                         }
                     }

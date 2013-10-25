@@ -17,6 +17,7 @@ import jmint.mutants.progmistakes.EAM;
 import jmint.mutants.progmistakes.EMM;
 import jmint.mutants.progmistakes.EOA;
 import jmint.mutants.progmistakes.EOC;
+import org.slf4j.LoggerFactory;
 import soot.SootClass;
 import soot.jimple.*;
 import soot.tagkit.Host;
@@ -28,11 +29,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+
+
 /* This class just fills in the boiler plate code that the child classes
 could choose not to implement.
  */
 
 public class BaseMutantInjector implements IMutantInjector {
+
+    final Logger logger = LoggerFactory.getLogger(BaseMutantInjector.class);
 
     public UseDefChain udChain;
     public final Table<SootClass, MutantsCode, Integer> mutantMap = HashBasedTable.create();
@@ -73,7 +79,7 @@ public class BaseMutantInjector implements IMutantInjector {
             }
             else
             {
-                System.out.println("Ignoring DefStmt = " + stmt.getO1() + "of type" + stmt.getO1().getClass());
+                logger.debug("Ignoring DefStmt = " + stmt.getO1() + "of type" + stmt.getO1().getClass());
             }
         }
     }
@@ -94,7 +100,7 @@ public class BaseMutantInjector implements IMutantInjector {
             generateMutant((StaticFieldRef) v, parent);
         }
         else{
-            System.out.println("Not supported :" + v.getClass() + ":" + parent.getO1());
+            logger.debug("Not supported :" + v.getClass() + ":" + parent.getO1());
         }
     }
 
@@ -113,7 +119,7 @@ public class BaseMutantInjector implements IMutantInjector {
         }
         else
         {
-            System.out.println("Not supported:" + expr.getClass() + ":" + parent.getO1());
+            logger.debug("Not supported:" + expr.getClass() + ":" + parent.getO1());
         }
     }
 
@@ -130,7 +136,7 @@ public class BaseMutantInjector implements IMutantInjector {
         }
         else
         {
-            System.out.println("Not supported:" + expr.getClass() + ":" + parent.getO1() + ":" + expr);
+            logger.debug("Not supported:" + expr.getClass() + ":" + parent.getO1() + ":" + expr);
         }
     }
 
@@ -193,34 +199,50 @@ public class BaseMutantInjector implements IMutantInjector {
             //String triggerStmt =  m.getRowKey(). .getO2() + ":" + m.getRowKey().originalDefStmt.getO1();
           //  String template = String.format("[%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]",injectorCount, udChain.useValue, udChain.defStmt, useStmt, originalStmt, m.getColumnKey(),
           //          SUtil.getTagOrDefaultValue(m.getRowKey().originalDefStmt.getO1().getTag("LineNumberTag"), "-1"));
-            //System.out.println(template);
+            //logger.debug(template);
         }
 
     }
 
-    public void printMutantKeys(){
-        for (String m:allMutants.keySet()){
-            if (m.equals("SootClass=[org.apache.bcel.verifier.structurals.InstConstraintVisitor]:SootMethod=[<org.apache.bcel.verifier.structurals.InstConstraintVisitor: void visitCASTORE(org.apache.bcel.generic.CASTORE)>]:MutantCode=[EAM]:LineNo=[639]")){
+    public String generateJSONOutput(HashMap<String, String> h){
 
-                System.out.println(allMutants.get(m).originalDefStmt);
-                System.out.println(allMutants.get(m).udChain.useValue);
-                System.out.println(allMutants.get(m).udChain.defStmt);
-                System.out.println(allMutants.get(m).udChain.useUnit);
-            }
-            MutantHeader mutant = allMutants.get(m);
-
-            System.out.println("*****Mutant Type:" + mutant.mutantsCode + "*****");
-            System.out.println("Key: "  + m);
-            System.out.println("Use Stmt : " + udChain.useUnit + " in Method:" + udChain.useMethod );
-            System.out.println("Use Value :" + udChain.useValue);
-            System.out.println("Def Stmt : " + udChain.defStmt + " in Method:" + udChain.defMethod );
-            System.out.println("Original Def Stmt" + mutant.originalDefStmt);
-            System.out.println("Actual Def Stmt :" + mutant.actualDefStmt);
-            System.out.println("Line That might change/trigger change :" + SUtil.getTagOrDefaultValue(mutant.actualDefStmt.getO1().getTag("LineNumberTag"), "-1"));
-            System.out.println("Other Info:" + mutant.otherInfo);
-
+        StringBuffer buffer = new StringBuffer();
+        for(String key:h.keySet()){
+            buffer.append((key)).append(": ")
+                    .append(h.get(key)).append(",");
         }
 
+        //remove the last comma,
+        System.out.println(buffer.toString() + "," + buffer.length() );
+
+        buffer = buffer.replace(buffer.length()-1,buffer.length(),"");
+        return ("{" + buffer.toString() + "}");
+
+    }
+
+    private String qw(String s){
+        return "\"" + s.replace("\"", "\\\"") + "\"";
+    }
+
+    public void printMutantKeys(){
+
+        //dirty hack to get json format quickly
+        HashMap<String, String> h = new HashMap<String, String>();
+        for (String m:allMutants.keySet()){
+            MutantHeader mutant = allMutants.get(m);
+            h.put( qw("Mutant Type"), qw(mutant.mutantsCode.toString()));
+            h.put(qw("Key"), qw(m));
+            h.put(qw("Use Stmt"), String.format("[%s,%s,%s]", qw(udChain.useUnit.toString()) ,qw(udChain.useMethod.toString()) , qw(mutant.lineNoUseStmt)));
+            h.put(qw("Use Value"), qw(udChain.useValue.toString()));
+            h.put(qw("Def Stmt"), String.format("[%s,%s,%s]", qw(udChain.defStmt.toString()) ,qw(udChain.defMethod.toString()) , qw(mutant.lineNoDefStmt)));
+            h.put(qw("Orig Stmt"), String.format("[%s,%s,%s]", qw(mutant.originalDefStmt.getO1().toString()),
+                    qw(mutant.originalDefStmt.getO2().toString()), qw(mutant.lineNoOriginalStmt)));
+            h.put(qw("Act Stmt") , String.format("[%s,%s,%s]", qw(mutant.actualDefStmt.getO1().toString()) ,
+                    qw(mutant.actualDefStmt.getO2().toString()), qw(mutant.lineNoActualStmt)));
+            h.put(qw("Other Info"), qw(mutant.otherInfo));
+            logger.info(generateJSONOutput(h));
+            h.clear();
+        }
     }
 
     public static BaseMutantInjector getMutantInjector(MutantsCode mutantsCode, UseDefChain udChain){
@@ -249,9 +271,9 @@ public class BaseMutantInjector implements IMutantInjector {
             case EMM : return new EMM(udChain);
             case EOA : return new EOA(udChain);
             case EOC : return new EOC(udChain);
-            default: return null;
+            case IHD : return new IHD(udChain);
+            default: throw new RuntimeException("Unsupported mutant injector = " + mutantsCode);
         }
-
 
         }
     }

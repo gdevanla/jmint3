@@ -5,12 +5,16 @@ import jmint.MutantHeader;
 import jmint.SUtil;
 import jmint.UseDefChain;
 import jmint.mutants.MutantsCode;
+import org.slf4j.Logger;
 import soot.*;
 import soot.jimple.*;
 import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
 
 public class IHD extends BaseMutantInjector {
+
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     public IHD(UseDefChain udChain) {
         super(udChain);
     }
@@ -25,12 +29,12 @@ public class IHD extends BaseMutantInjector {
         //does superclass have similar member
         //then yes.
 
-        System.out.println("Base = " + base.getType() + ":" + fieldRef.getField().getDeclaringClass());
+        logger.debug("Base = " + base.getType() + ":" + fieldRef.getField().getDeclaringClass());
 
         if (SUtil.eqAsStr(base.getType(), fieldRef.getField().getDeclaringClass())
                 && field.getDeclaringClass().hasSuperclass()){
 
-            System.out.println(field.getSignature() + ": was part of original base.");
+            logger.debug(field.getSignature() + ": was part of original base.");
             SootClass superKlass = getSuperClassWithSameField(field.getDeclaringClass().getSuperclass(), field);
 
             if ( superKlass!=null){
@@ -53,7 +57,7 @@ public class IHD extends BaseMutantInjector {
     }
 
     private SootClass getSuperClassWithSameField(SootClass declaringClass, SootField field) {
-        System.out.println("Looking up " + field.getSignature() + "in class=" + declaringClass);
+        logger.debug("Looking up " + field.getSignature() + "in class=" + declaringClass);
         if (declaringClass.declaresField(field.getSubSignature())){
             SootField declaredField = declaringClass.getField(field.getSubSignature());
             if (declaredField.isPublic() || declaredField.isProtected())

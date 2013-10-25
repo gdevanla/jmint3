@@ -3,7 +3,7 @@ package MutantInjectionArtifacts.JTD;
 
 public class JTD1 {
 
-    int x = 10;
+    int x = (int)Math.random();
     private int y = 100;
 
     public void F1(){

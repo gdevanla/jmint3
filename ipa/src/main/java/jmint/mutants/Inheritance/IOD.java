@@ -2,6 +2,7 @@ package jmint.mutants.Inheritance;
 
 import jmint.*;
 import jmint.mutants.MutantsCode;
+import org.slf4j.Logger;
 import soot.*;
 import soot.jimple.*;
 import soot.jimple.internal.JInstanceFieldRef;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Set;
 
 public class IOD extends BaseMutantInjector {
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     public IOD(UseDefChain udChain) {
         super(udChain);
     }
@@ -32,7 +35,7 @@ public class IOD extends BaseMutantInjector {
         if (method.getDeclaringClass().hasSuperclass()){
            SootClass parentKlass = IsMethodAnOveride(method, method.getDeclaringClass().getSuperclass());
            if (parentKlass != null){
-               System.out.println(method + " was overriden in parent class " + parentKlass);
+               logger.debug(method + " was overriden in parent class " + parentKlass);
 
                MutantHeader header = new MutantHeader(udChain,
                        parent,
@@ -50,9 +53,9 @@ public class IOD extends BaseMutantInjector {
     }
 
     private SootClass IsMethodAnOveride(SootMethod method, SootClass declaringClass) {
-        System.out.println("Looking up " + method.getSubSignature() + "in class=" + declaringClass);
+        logger.debug("Looking up " + method.getSubSignature() + "in class=" + declaringClass);
         NumberedString ns = Scene.v().getSubSigNumberer().find(method.getSubSignature());
-        System.out.println("NumberedString:" + ns.getString() + ":" + ns.getNumber());
+        logger.debug("NumberedString:" + ns.getString() + ":" + ns.getNumber());
 
         if (!SUtil.isClassIncludedInAnalysis(declaringClass)){
             return  null;

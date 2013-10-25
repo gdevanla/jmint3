@@ -44,6 +44,7 @@ public class JTI extends BaseMutantInjector {
             }
         }
 
+        if (!(stmt.getLeftOp() instanceof JimpleLocal )) return null;
         u = injectableUnit((JimpleLocal)stmt.getLeftOp(), stmt, method);
         if (u != null){
             if (u != null)

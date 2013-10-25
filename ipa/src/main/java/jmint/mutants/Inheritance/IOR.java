@@ -33,8 +33,8 @@ public class IOR extends BaseMutantInjector {
 
         Set<SootMethod> methods = Scene.v().getFastHierarchy().resolveAbstractDispatch(method.getDeclaringClass(), method);
         for ( SootMethod m:methods){
-            System.out.println(m.getDeclaringClass());
-            System.out.println("Method = " + method  + " can be renamed or duplicated.");
+            logger.debug(m.getDeclaringClass());
+            logger.debug("Method = " + method  + " can be renamed or duplicated.");
         }
 
         return null;
@@ -58,7 +58,7 @@ public class IOR extends BaseMutantInjector {
             Edge  e = edgeList.next();
             if (e.tgt().equivHashCode() == getterMethod.equivHashCode() &&
                     ){
-                System.out.println("Returning unit=" +  e.srcUnit() + " calling getter " + getterMethod);
+                logger.debug("Returning unit=" +  e.srcUnit() + " calling getter " + getterMethod);
                 return e.srcUnit();
 
             }

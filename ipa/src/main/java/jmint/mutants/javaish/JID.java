@@ -5,6 +5,7 @@ import jmint.MutantHeader;
 import jmint.SUtil;
 import jmint.UseDefChain;
 import jmint.mutants.MutantsCode;
+import org.slf4j.Logger;
 import soot.*;
 import soot.jimple.*;
 import soot.jimple.internal.JInstanceFieldRef;
@@ -17,6 +18,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class JID extends BaseMutantInjector {
+
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+
     public JID(UseDefChain udChain) {
         super(udChain);
     }
@@ -41,11 +46,19 @@ public class JID extends BaseMutantInjector {
 
         Set<Pair<Stmt, Host>> units = new HashSet<Pair<Stmt,Host>>();
 
+
+
+
         Set<SootMethod> specialUnits = getSpecialInit(SUtil.getResolvedClass(udChain.getDefMethod()));
         if (specialUnits  == null)
             return null; //will this be true ever?
 
         for ( SootMethod specialInit:specialUnits){
+            if (!specialInit.hasActiveBody())
+            {
+                logger.debug("Active body not present for " + specialInit.getSubSignature());
+                continue;
+            }
             Pair<Stmt, Host> lastInitStmt = null;
             for (Unit u: specialInit.getActiveBody().getUnits()){
                 if (u instanceof AssignStmt){
@@ -69,7 +82,7 @@ public class JID extends BaseMutantInjector {
         Set<SootMethod> inits = new HashSet<SootMethod>();
         Chain<SootField> fields = klass.getFields();
         for(SootMethod m: klass.getMethods()){
-            System.out.println("Method Name = " + m.getName());
+            logger.debug("Method Name = " + m.getName());
             if (m.getName().equals("<init>")){
               inits.add(m);
             }

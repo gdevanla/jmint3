@@ -1,22 +1,34 @@
+// This is a mutant program.
+// Author : ysma
+
 package MutantInjectionArtifacts.IOD;
 
-class Base {
-    public int getVariable() { return (int)Math.random();}
-}
 
+class Base
+{
 
-public class IOD2 extends Base {
-    public IOD2(){
+    public  int getVariable()
+    {
+        return (int) Math.random();
     }
 
-    public int getSomeOtherVariable(){
+}
+
+public class IOD2 extends MutantInjectionArtifacts.IOD.Base
+{
+
+    public IOD2()
+    {
+    }
+
+    public  int getSomeOtherVariable()
+    {
         return -1;
     }
 
-    @Override
-    public int getVariable() {
-        return (int)Math.random();
-        //return new Base().getVariable();
+    public  int getVariable()
+    {
+        return (int) Math.random();
     }
 
 }

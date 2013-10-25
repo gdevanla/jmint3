@@ -5,6 +5,7 @@ import jmint.MutantHeader;
 import jmint.SUtil;
 import jmint.UseDefChain;
 import jmint.mutants.MutantsCode;
+import org.slf4j.Logger;
 import soot.SootClass;
 import soot.SootField;
 import soot.SootMethod;
@@ -18,6 +19,9 @@ import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
 
 public class ISK extends BaseMutantInjector {
+
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     public ISK(UseDefChain udChain) {
         super(udChain);
     }
@@ -37,7 +41,7 @@ public class ISK extends BaseMutantInjector {
             return null;
         }
 
-        System.out.println("Base = " + base.getType() + ":" + fieldRef.getField().getDeclaringClass());
+        logger.debug("Base = " + base.getType() + ":" + fieldRef.getField().getDeclaringClass());
         if (base.toString().equals("this")){
             if (field.getDeclaringClass().equals(parentMethod.getDeclaringClass().getSuperclass())){
 

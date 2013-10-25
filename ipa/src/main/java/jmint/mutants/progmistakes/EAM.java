@@ -2,6 +2,7 @@ package jmint.mutants.progmistakes;
 
 import jmint.*;
 import jmint.mutants.MutantsCode;
+import org.slf4j.Logger;
 import soot.*;
 import soot.jimple.*;
 import soot.jimple.internal.JAssignStmt;
@@ -17,6 +18,8 @@ import java.util.*;
 that is in the form of an getter */
 
 public class EAM extends BaseMutantInjector {
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     public EAM(UseDefChain udChain) {
         super(udChain);
     }
@@ -29,7 +32,7 @@ public class EAM extends BaseMutantInjector {
          return null;
         }
 
-      List<MutantInfo> mutants = new ArrayList<MutantInfo>();
+        List<MutantInfo> mutants = new ArrayList<MutantInfo>();
       if ( method.getName().matches("get.*")){
           Set<Unit> units = findStatementsInvokingGetter(method);
 
@@ -51,7 +54,7 @@ public class EAM extends BaseMutantInjector {
         Set<Unit> mutableUnits = new HashSet<Unit>();
         //assert(udChain.useValue instanceof Local);
         if (!(udChain.useValue instanceof Local)){
-            System.out.println("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
+            logger.debug("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
             return mutableUnits;
         }
 
@@ -86,7 +89,7 @@ public class EAM extends BaseMutantInjector {
                             }
                             else
                             {
-                                //System.out.println(def);
+                                //logger.debug(def);
                             }
                         }
                     }
@@ -114,7 +117,7 @@ public class EAM extends BaseMutantInjector {
             Edge  e = edgeList.next();
             if (e.tgt().equivHashCode() == getterMethod.equivHashCode() &&
                     ){
-                System.out.println("Returning unit=" +  e.srcUnit() + " calling getter " + getterMethod);
+                logger.debug("Returning unit=" +  e.srcUnit() + " calling getter " + getterMethod);
                 return e.srcUnit();
 
             }

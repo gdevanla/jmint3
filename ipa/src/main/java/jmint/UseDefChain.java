@@ -1,5 +1,6 @@
 package jmint;
 
+import org.slf4j.Logger;
 import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
@@ -13,6 +14,9 @@ import java.util.List;
 import java.util.Set;
 
 public class UseDefChain {
+
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
 
     final public SootMethod useMethod;
     final public Unit useUnit;
@@ -65,11 +69,11 @@ public class UseDefChain {
     public DefinitionStmt getDefStmt() { return defStmt; }
 
     public void printInfo(){
-       System.out.println(String.format("UseMethod: %s, UseUnit: %s, UseValue:%s,\n DefMethod: %s, DefStmt :%s",
+       logger.debug(String.format("UseMethod: %s, UseUnit: %s, UseValue:%s,\n DefMethod: %s, DefStmt :%s",
                useMethod, useUnit, useValue, defMethod, defStmt));
-       //System.out.println("All reaching Defs=");
+       //logger.debug("All reaching Defs=");
        for (Pair<Pair<Value, Set<DefinitionStmt>>, SootMethod> p:allReachingDefs){
-            System.out.println(p.getO1().getO2());
+            logger.debug("{}", p.getO1().getO2());
         }
     }
 

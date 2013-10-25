@@ -1,6 +1,7 @@
 package jmint.mutants.progmistakes;
 import jmint.*;
 import jmint.mutants.MutantsCode;
+import org.slf4j.Logger;
 import soot.*;
 import soot.jimple.*;
 import soot.jimple.internal.JAssignStmt;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 public class EMM extends BaseMutantInjector {
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     public EMM(UseDefChain udChain) {
         super(udChain);
     }
@@ -51,7 +54,7 @@ public class EMM extends BaseMutantInjector {
         Set<Unit> mutableUnits = new HashSet<Unit>();
         //assert(udChain.useValue instanceof Local);
         if (!(udChain.useValue instanceof Local)){
-            System.out.println("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
+            logger.debug("useValue other than Local found=" + udChain.useUnit + ":" + udChain.useValue.getClass());
             return mutableUnits;
         }
 

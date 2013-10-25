@@ -28,7 +28,7 @@ public class JTD extends BaseMutantInjector {
         SootClass klass = Scene.v().forceResolve(udChain.getDefMethod().getDeclaringClass().getName(),
                 SootClass.SIGNATURES);
 
-        Chain<Local> locals = klass.getMethodByName(udChain.getDefMethod().getName()).getActiveBody().getLocals();
+        Chain<Local> locals = klass.getMethod(udChain.getDefMethod().getSubSignature()).getActiveBody().getLocals();
 
         for(Local l : locals){
             if (l.getName().equals(fieldName)){
