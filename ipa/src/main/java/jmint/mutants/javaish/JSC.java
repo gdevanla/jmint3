@@ -31,5 +31,3 @@ public class JSC extends BaseMutantInjector {
     }
 
 }
-
-

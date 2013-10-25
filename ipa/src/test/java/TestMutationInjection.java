@@ -432,6 +432,7 @@ public class TestMutationInjection {
     @After
     public void tearDown(){
         BaseMutantInjector.allMutants.clear();
+        G.reset();
     }
 
     @Test
@@ -600,7 +601,7 @@ public class TestMutationInjection {
 
     }
 
-    @Test
+    /*@Test
     public void TestPMD1(){
 
         BaseMutantInjector.allMutants.clear();
@@ -621,7 +622,7 @@ public class TestMutationInjection {
         assertEquals("Pair zz = virtualinvoke t1_02.<MutantInjectionArtifacts.PMD.PMD2: int getVariable(int,java.lang.String)>($i0, \"fsda\"),<MutantInjectionArtifacts.PMD.PMD1: void F1()>",
                 BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
 
-    }
+    }*/
 
     @Test
     public void TestPPD1(){
@@ -675,7 +676,8 @@ public class TestMutationInjection {
         appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
 
         final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
-        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.OMR});
+
+        Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.EAM});
         generateMutants("", new String[]{}, null, x);
 
     }
