@@ -11,7 +11,7 @@ public class JID2 {
 
     public JID2(int x){
 
-//        instancevar = (int)Math.random() + 1;
+        instancevar = (int)Math.random() + 1;
 
     }
 

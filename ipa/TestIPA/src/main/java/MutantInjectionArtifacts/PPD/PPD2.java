@@ -6,7 +6,7 @@ public class PPD2 {
         return 100;
     }
 
-    public void updateObject(Base t7_03) {
+    public void updateObject(PPD3 t7_03) {
         int y = (int)Math.random();
         t7_03.x = y;
     }

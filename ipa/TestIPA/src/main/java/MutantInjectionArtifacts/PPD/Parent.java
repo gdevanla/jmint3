@@ -1,5 +1,5 @@
 package MutantInjectionArtifacts.PPD;
 
-public class Child extends Parent {
+public class Parent {
 
 }

@@ -8,6 +8,6 @@ public class JTDTest1 {
 
     public static void main(String[] args){
         JTD1 t = new JTD1();
-        t.F1();
+        t.F1(1010);
     }
 }

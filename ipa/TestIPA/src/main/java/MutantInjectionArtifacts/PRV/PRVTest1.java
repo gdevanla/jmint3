@@ -8,6 +8,6 @@ public class PRVTest1 {
 
     public static void main(String[] args){
         PRV1 t = new PRV1();
-        t.F1();
+        t.F1(new PRV3(), new PRV3(), new PRV3());
     }
 }
