@@ -41,7 +41,7 @@ public class IPC extends BaseMutantInjector {
         if ( constructorCall != null ){
             MutantHeader header = new MutantHeader(udChain, parent,
                     new Pair<Stmt, Host>((InvokeStmt)constructorCall, initMethod),
-                    MutantsCode.IPC);
+                    MutantsCode.IPC, constructorCall.toString());
             if (!allMutants.containsKey(header.getKey())){
                 allMutants.put(header.getKey(), header);
             }

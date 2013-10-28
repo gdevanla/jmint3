@@ -6,10 +6,11 @@ package MutantInjectionArtifacts.IOP;
 
 class Base
 {
-
-    public  int setVariable( int y )
+    int member = 0;
+    public  void setVariable( int y )
     {
-        return (int) Math.random();
+        member = y;
+        //return (int) Math.random();
     }
 
 }
@@ -26,11 +27,13 @@ public class IOP2 extends MutantInjectionArtifacts.IOP.Base
         return -1;
     }
 
-    public  int setVariable( int yyy )
+    public  void setVariable( int yyy )
     {
-        int ann = super.setVariable( 10101 );
-        int zzz = (int) Math.random();
-        return zzz;
+        //int ann =
+        super.setVariable( 10101 );
+        member = yyy;
+        //int zzz = (int) Math.random();
+        //return zzz;
     }
 
 }

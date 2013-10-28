@@ -49,7 +49,7 @@ public class ISK extends BaseMutantInjector {
                         parent,
                         parent,
                         MutantsCode.ISK,
-                        "");
+                        parent.toString());
                 if (!allMutants.containsKey(header.getKey())){
                     allMutants.put(header.getKey(), header);
                 }

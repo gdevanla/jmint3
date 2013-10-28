@@ -29,7 +29,8 @@ public class JDC extends BaseMutantInjector {
             //TODO: Right now store the SpecialInvoke in DefStmt. Later this can be
             //replaced with more generic reference to the constructor.
             MutantHeader header = new MutantHeader(udChain, parent,
-                    new Pair<Stmt, Host>((InvokeStmt)u, udChain.getUseMethod()), MutantsCode.JDC);
+                    new Pair<Stmt, Host>((InvokeStmt)u, udChain.getUseMethod()),
+                    MutantsCode.JDC, "public " + udChain.getUseMethod().getDeclaringClass().toString() + "() is delete.");
             if (!allMutants.containsKey(header.getKey())){
                 allMutants.put(header.getKey(), header);
             }

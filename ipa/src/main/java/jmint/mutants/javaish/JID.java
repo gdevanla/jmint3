@@ -26,6 +26,10 @@ public class JID extends BaseMutantInjector {
         super(udChain);
     }
 
+    private String getText(Pair<Stmt, Host> p){
+        return p.getO1().getFieldRef().getField().getDeclaration();
+    }
+
     @Override
     public SootClass generateMutant(InstanceFieldRef fieldRef, Pair<Stmt, Host> parent){
 
@@ -33,7 +37,8 @@ public class JID extends BaseMutantInjector {
         Set<Pair<Stmt, Host>> initStmts = getUnitsInitializing(fieldRef);
 
         for(Pair<Stmt, Host> initStmt: initStmts){
-            MutantHeader header = new MutantHeader(udChain,parent, initStmt, MutantsCode.JID);
+            MutantHeader header = new MutantHeader(udChain,parent, initStmt,
+                    MutantsCode.JID, getText(initStmt));
             if (!allMutants.containsKey(header.getKey())){
                 allMutants.put(header.getKey(), header);
             }
@@ -45,9 +50,6 @@ public class JID extends BaseMutantInjector {
     public Set<Pair<Stmt,Host>> getUnitsInitializing(InstanceFieldRef fieldRef){
 
         Set<Pair<Stmt, Host>> units = new HashSet<Pair<Stmt,Host>>();
-
-
-
 
         Set<SootMethod> specialUnits = getSpecialInit(SUtil.getResolvedClass(udChain.getDefMethod()));
         if (specialUnits  == null)
@@ -70,6 +72,7 @@ public class JID extends BaseMutantInjector {
                         //we continue doing this since we want to find the last assignment statement
                         //that will override all other statements.
                         units.add(new Pair<Stmt,Host>((Stmt)u, specialInit));
+                        break; //the first initialization is the one defined outside the function if any.
                     }
                 }
             }

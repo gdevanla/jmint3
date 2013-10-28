@@ -11,7 +11,7 @@ public class JTD1
 
     private int y = 100;
 
-    public  void F1( int x )
+    public  void F1( int x)
     {
         x = (int) Math.random();
         MutantInjectionArtifacts.JTD.JTD2 t1_02 = new MutantInjectionArtifacts.JTD.JTD2();

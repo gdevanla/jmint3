@@ -1,5 +1,5 @@
 // This is a mutant program.
-// Author : ysma                            `
+// Author : ysma
 
 package MutantInjectionArtifacts.OMR;
 
@@ -12,9 +12,9 @@ public class OMR2
         return "";
     }
 
-    public  int getVariable( java.lang.String s, int x1 )
+    public  int getVariable( java.lang.String s, int x )
     {
-        return (int) Math.random() + x1;
+        return (int) Math.random() + x;
     }
 
     public  int getVariable( int x1, java.lang.String s )

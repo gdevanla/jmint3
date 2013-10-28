@@ -4,6 +4,7 @@ package jmint;
 import com.google.common.collect.ConcurrentHashMultiset;
 import org.slf4j.Logger;
 import soot.*;
+import soot.JastAddJ.PrimitiveType;
 import soot.jimple.InvokeExpr;
 import soot.jimple.InvokeStmt;
 import soot.jimple.SpecialInvokeExpr;
@@ -268,36 +269,43 @@ public class SUtil {
         return argumentTypes;
     }
 
-    public static boolean isTypeListASubset(Multiset<Type> t, Multiset<Type> ts  ){
-
+    public static boolean isTypeListASubset(Multiset<Type> t, Multiset<Type> ts ,
+                                            boolean argTypeCountEquals){
         //TODO: Check for base/sub class relationships.
         for (Type type:ts){
-            if (!t.contains(type) || ts.count(type) != t.count(type)){
+            if (!t.contains(type)){
                 return false;
             }
+            else if (argTypeCountEquals && ts.count(type) != t.count(type)){
+                return false;
+            }
+            else if (!argTypeCountEquals && ts.count(type) > t.count(type)){
+                return false;
+            }
+
         }
         return true;
-
     }
 
-    public static boolean isAlternateMethodAvail(InvokeExpr expr){
+    public static boolean areMethodsAvailableFor(SootMethod method, boolean argTypesCount){
 
-        SootMethod method = expr.getMethod();
-        SootClass klass = expr.getMethod().getDeclaringClass();
-
-        Multiset<Type> origTypes = getTypesInMethod(expr.getMethod());
+        SootClass klass = method.getDeclaringClass();
+        Multiset<Type> origTypes = getTypesInMethod(method);
 
         for (SootMethod m:klass.getMethods()){
             Multiset<Type> types = getTypesInMethod(m);
+
             if ( !m.equals(method)
                     && m.getReturnType().equals(method.getReturnType())
                     && m.getName().equals(method.getName())
-                    && isTypeListASubset(origTypes, types)){
+                    && isTypeListASubset(origTypes, types, argTypesCount)){
                 logger.debug("Overloaded method=" + m + "can be substituted for " + method);
                 return true;
             }
         }
         return false;
+
+
     }
 
     public static Set<SootClass> getSubClassesWithDefaultConstructor(Type type) {
@@ -454,12 +462,79 @@ public class SUtil {
             if (method.getName().startsWith("set")
                     && !method.getName().equals(excludeMethod.getName()) && !method.isAbstract()
                     && method.getReturnType().toString().equals(excludeMethod.getReturnType().toString())
-                    && isTypeListASubset(typesInExcludeMethod, typesInMethod)){
+                    && isTypeListASubset(typesInExcludeMethod, typesInMethod, true)){
                 return true;
             }
         }
 
         return false;
+    }
+
+    public static boolean isAlternateMethodAvailForOMD(SootMethod method) {
+
+        SootClass klass = method.getDeclaringClass();
+
+        List<Type> types = method.getParameterTypes();
+
+        for (SootMethod m:klass.getMethods()){
+            if (method.equals(m))
+                continue;
+            if (method.getName().equals(m.getName())
+                    && method.getReturnType().toString().equals(m.getReturnType().toString())
+                    && canEachTypeBeUpCast(types, m)) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    private static boolean canEachTypeBeUpCast(List<Type> types, SootMethod m) {
+
+        if (types.size() != m.getParameterCount()) return false;
+
+        FastHierarchy fh = Scene.v().getFastHierarchy();
+        for(int i=0; i< types.size(); i++){
+
+            Type t1 = types.get(i);
+            Type t2 = m.getParameterType(i);
+
+          if (SUtil.isPrimitive(t1) || SUtil.isPrimitive(t2)){
+                if (!canCastPrimitive(t1, t2))
+                    return false;
+          }
+          else {
+              SootClass klass1 = Scene.v().forceResolve(t1.toString(),
+                      SootClass.SIGNATURES);
+              SootClass klass2 = Scene.v().forceResolve(t2.toString(),
+                      SootClass.SIGNATURES);
+              if (!fh.isSubclass(klass1, klass2))
+                  return false;
+          }
+        }
+
+        return true;
+    }
+
+    private static boolean canCastPrimitive(Type from, Type to){
+        if ( from instanceof IntType && (to instanceof FloatType || to instanceof DoubleType)){
+            return true;
+        }
+
+        if ( from instanceof FloatType && to instanceof DoubleType){
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public static boolean isPrimitive(soot.Type t) {
+        return t instanceof IntType ||t instanceof FloatType
+                || t instanceof FloatType ||  t instanceof DoubleType
+                || t instanceof LongType || t instanceof soot.BooleanType
+                || t instanceof soot.CharType || t instanceof soot.ByteType
+                || t instanceof soot.ShortType;
     }
 }
 

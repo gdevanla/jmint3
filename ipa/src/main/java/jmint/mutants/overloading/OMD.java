@@ -27,20 +27,24 @@ public class OMD extends BaseMutantInjector {
             return null;
         }
 
+        //we only want OMD on def stmt classes
+        if ( ! method.getDeclaringClass().equals(udChain.defMethod.getDeclaringClass())){ return null;}
+
+
         List<MutantInfo> mutants = new ArrayList<MutantInfo>();
-        if ( method.getName().matches("get.*")){
-            Set<Unit> units = SUtil.findUnitInvokingOverloadedMethods(udChain, method);
+        if (SUtil.isAlternateMethodAvailForOMD(method)){
 
-            //generating mutants
-            //TODO: Generate the actual mutants
-            for(Unit u:units){
-                MutantHeader header = new MutantHeader(udChain, parent,
-                        new Pair<Stmt, Host>((Stmt)u, udChain.getUseMethod()), MutantsCode.OMD);
-                if (!allMutants.containsKey(header.getKey())){
-                    allMutants.put(header.getKey(), header);
-                }
+            //this mutant will be replacing the body with one call to alternate method. We represent
+            // this with getUnits().getFirst()
+            MutantHeader header = new MutantHeader(udChain,
+                    parent,
+                    new Pair<Stmt, Host>((Stmt)method.getActiveBody().getUnits().getFirst(),method),
+                    MutantsCode.OMD
+
+            );
+            if (!allMutants.containsKey(header.getKey())){
+                allMutants.put(header.getKey(), header);
             }
-
         }
         return null;
     }
