@@ -33,10 +33,11 @@ public class PRV extends BaseMutantInjector {
         Type t1 = stmt.getRightOp().getType();
         if (! SUtil.isTypeIncludedInAnalysis(t1)) return null;
 
-        Set<Type> localTypes = SUtil.getAllTypesInLocal(((SootMethod) parent.getO2()).getActiveBody().getLocals(), true);
+        //Set<Type> localTypes = SUtil.getAllTypesInLocal(((SootMethod) parent.getO2()).getActiveBody().getLocals(), true);
+        Set<Type> localTypes = SUtil.getAllTypesInInstance( SUtil.getResolvedClass(method), true);
 
         for (Type t2:localTypes){
-            if ( SUtil.doTypesShareParentClass(t1, t2)){
+            if ( t2.equals(t1) ) { //SUtil.doTypesShareParentClass(t1, t2)){ muJava does not do class hierarchy comaparison
                 String replacableTypes = String.format("%s to %s since their parent is %s",
                         t1 , SUtil.getResolvedClass(t2.toString()),
                         SUtil.getResolvedClass(t1.toString()).getSuperclass());

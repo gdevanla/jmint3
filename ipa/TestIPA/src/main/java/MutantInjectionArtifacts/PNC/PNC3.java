@@ -4,23 +4,15 @@
 package MutantInjectionArtifacts.PNC;
 
 
-class Base
-{
-
-    public int x;
-
-}
-
 public class PNC3 extends MutantInjectionArtifacts.PNC.Base
 {
-
-    public PNC3()
+    public PNC3(int y)
     {
+        super(y);
     }
 
-    public PNC3( int y )
-    {
-        x = y;
+    public int something(int aaa){
+        return aaa + 1;
     }
 
 }

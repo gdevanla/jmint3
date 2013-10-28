@@ -433,6 +433,18 @@ public class SUtil {
 
     }
 
+
+    public static Set<Type> getAllTypesInInstance(SootClass klass, boolean filterByAnalyzedPackage) {
+        Set<Type> types = new HashSet<Type>();
+
+        for (SootField f:klass.getFields()){
+            if (filterByAnalyzedPackage && !SUtil.isTypeIncludedInAnalysis(f.getType())) continue;
+            types.add(f.getType());
+        }
+
+        return types;
+    }
+
     public static boolean doTypesShareParentClass(Type t1, Type t2) {
 
         SootClass c1 = SUtil.getResolvedClass(t1.toString());
