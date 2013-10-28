@@ -1,35 +1,31 @@
+// This is a mutant program.
+// Author : ysma
+
 package MutantInjectionArtifacts.IHI;
 
-class IHIParent1 {
-    public int x;
+
+class IHIParent1
+{
+    public int xx;
 }
 
-class A{
-   protected int x; //IHD
+class IHDUnRelatedClass
+{
 
-}
-
-class B extends A {
-
-}
-
-class IHDUnRelatedClass{
     public int y;
+
 }
 
-public class IHI1 extends IHIParent1 {
+public class IHI1 extends MutantInjectionArtifacts.IHI.IHIParent1
+{
 
-
-    //private int y = 100;
-
-    public void F1(){
-        IHDUnRelatedClass c = new IHDUnRelatedClass();
+    public  void F1()
+    {
+        MutantInjectionArtifacts.IHI.IHDUnRelatedClass c = new MutantInjectionArtifacts.IHI.IHDUnRelatedClass();
         int y = c.y;
-        int z = new B().x;
-        IHI2 t1_02 = new IHI2();
-        t1_02.useLocalVariable(this.x+z);
+        int z = (new MutantInjectionArtifacts.IHI.B()).x;
+        MutantInjectionArtifacts.IHI.IHI2 t1_02 = new MutantInjectionArtifacts.IHI.IHI2();
+        t1_02.useLocalVariable( this.xx + z );
     }
 
 }
-
-

@@ -33,40 +33,37 @@ public class MutantHeader {
 
 
         //TODO: clean this shit up
-        if (originalDefStmt.getO1() instanceof Stmt){
-            this.lineNoOriginalStmt = SUtil.getTagOrDefaultValue(((Stmt) originalDefStmt.getO1()).getTag("LineNumberTag"), "-1");
+        if (originalDefStmt.getO1() instanceof Host){
+            this.lineNoOriginalStmt = SUtil.getTagOrDefaultValue(((Host) originalDefStmt.getO1()).getTag("LineNumberTag"), "-1");
         }
         else
         {
-            this.lineNoOriginalStmt = "-1";
+            this.lineNoOriginalStmt = "-10";
         }
 
-        if (actualDefStmt.getO1() instanceof Stmt){
-            this.lineNoActualStmt = SUtil.getTagOrDefaultValue(((Stmt) actualDefStmt.getO1()).getTag("LineNumberTag"), "-1");
+        if (actualDefStmt.getO1() instanceof Host){
+            this.lineNoActualStmt = SUtil.getTagOrDefaultValue(((Host) actualDefStmt.getO1()).getTag("LineNumberTag"), "-1");
         }
         else
         {
-            this.lineNoActualStmt = "-1";
+            this.lineNoActualStmt = "-10";
         }
 
-        if (udChain.defStmt  instanceof Stmt){
-            this.lineNoDefStmt = SUtil.getTagOrDefaultValue(((Stmt) udChain.defStmt).getTag("LineNumberTag"), "-1");
-        }
-        else
-        {
-            this.lineNoDefStmt = "-1";
-        }
-
-        if (udChain.useUnit  instanceof Stmt){
-            this.lineNoUseStmt = SUtil.getTagOrDefaultValue(((Stmt) udChain.useUnit).getTag("LineNumberTag"), "-1");
+        if (udChain.defStmt  instanceof Host){
+            this.lineNoDefStmt = SUtil.getTagOrDefaultValue(((Host) udChain.defStmt).getTag("LineNumberTag"), "-1");
         }
         else
         {
-            this.lineNoUseStmt = "-1";
+            this.lineNoDefStmt = "-10";
         }
 
-
-
+        if (udChain.useUnit  instanceof Host){
+            this.lineNoUseStmt = SUtil.getTagOrDefaultValue(((Host) udChain.useUnit).getTag("LineNumberTag"), "-1");
+        }
+        else
+        {
+            this.lineNoUseStmt = "-10";
+        }
 
     }
 

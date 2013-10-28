@@ -35,18 +35,16 @@ public class IHI extends BaseMutantInjector {
 
         logger.debug("Base = " + base.getType() + ":" + fieldRef.getField().getDeclaringClass());
 
-        for (Tag t:field.getTags()){
-            System.out.println(t.toString());
-        }
-
-        if (!SUtil.eqAsStr(base.getType(), fieldRef.getField().getDeclaringClass())){
+        //only deal with public fields, courtesy soot!
+        if ( (!SUtil.eqAsStr(base.getType(), fieldRef.getField().getDeclaringClass()))
+                && fieldRef.getField().isPublic()){
             logger.debug(field.getSignature() + ": was part of parent class");
             MutantHeader header = new MutantHeader(udChain,
                     parent,
                     new Pair<SootField, SootClass>(field, (SootClass)SUtil.getResolvedClass(base.getType().toString())),
-                    MutantsCode.IHI,
-                    "Field =" + field.getSignature() + " referred from parent =" +
-                            fieldRef.getField().getDeclaringClass());
+                    MutantsCode.IHI, fieldRef.getField().getDeclaration() + " is added.");
+                    //"Field =" + field.getSignature() + " referred from parent =" +
+                    //        fieldRef.getField().getDeclaringClass());
                 if (!allMutants.containsKey(header.getKey())){
                     allMutants.put(header.getKey(), header);
                 }

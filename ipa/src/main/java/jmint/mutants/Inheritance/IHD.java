@@ -31,6 +31,8 @@ public class IHD extends BaseMutantInjector {
 
         logger.debug("Base = " + base.getType() + ":" + fieldRef.getField().getDeclaringClass());
 
+        if (!field.isPublic()) { return null; } //we don't support protected, courtesy muJava
+
         if (SUtil.eqAsStr(base.getType(), fieldRef.getField().getDeclaringClass())
                 && field.getDeclaringClass().hasSuperclass()){
 
@@ -38,14 +40,15 @@ public class IHD extends BaseMutantInjector {
             SootClass superKlass = getSuperClassWithSameField(field.getDeclaringClass().getSuperclass(), field);
 
             if ( superKlass!=null){
+
                 MutantHeader header = new MutantHeader(udChain,
                         parent,
                         new Pair<SootField, SootClass>(field, (SootClass)fieldRef.getField().getDeclaringClass())
                         ,
-                        MutantsCode.IHD,
-                        "Field =" + field.getSignature() + " also declared in parent =" +
-                        superKlass + " as " + superKlass.getField(field.getSubSignature()).getSignature() + ", isPrivate=" +
-                        superKlass.getField(field.getSubSignature()).isPrivate());
+                        MutantsCode.IHD, field.getDeclaration().toString() + " is deleted.") ;
+                        //"Field =" + field.getSignature() + " also declared in parent =" +
+                        //superKlass + " as " + superKlass.getField(field.getSubSignature()).getSignature() + ", isPublic=" +
+                        //superKlass.getField(field.getSubSignature()).isPublic());
                 if (!allMutants.containsKey(header.getKey())){
                     allMutants.put(header.getKey(), header);
                 }
@@ -60,7 +63,9 @@ public class IHD extends BaseMutantInjector {
         logger.debug("Looking up " + field.getSignature() + "in class=" + declaringClass);
         if (declaringClass.declaresField(field.getSubSignature())){
             SootField declaredField = declaringClass.getField(field.getSubSignature());
-            if (declaredField.isPublic() || declaredField.isProtected())
+            if (declaredField.isPublic() )
+            //declaredField.isProtected()) not supported by muJava,
+            // so we ignore that as well
             {
                 return declaringClass;
             }

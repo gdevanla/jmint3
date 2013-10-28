@@ -7,7 +7,7 @@ package MutantInjectionArtifacts.IOD;
 class Base
 {
 
-    public  int getVariable()
+    protected  int getVariable()
     {
         return (int) Math.random();
     }
@@ -26,7 +26,7 @@ public class IOD2 extends MutantInjectionArtifacts.IOD.Base
         return -1;
     }
 
-    public  int getVariable()
+    protected  int getVariable()
     {
         return (int) Math.random();
     }

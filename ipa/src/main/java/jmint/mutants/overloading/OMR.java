@@ -41,7 +41,7 @@ public class OMR extends BaseMutantInjector {
 
                 if ( SUtil.isAlternateMethodAvail(expr)){
                     MutantHeader header = new MutantHeader(udChain, parent,
-                            new Pair<Stmt, Host>((Stmt)u, udChain.getUseMethod()), MutantsCode.OMD);
+                            new Pair<Stmt, Host>((Stmt)u, udChain.getUseMethod()), MutantsCode.OMR);
                     if (!allMutants.containsKey(header.getKey())){
                         allMutants.put(header.getKey(), header);
                     }

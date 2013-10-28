@@ -31,12 +31,16 @@ public class TestMutationInjection {
 
     final Logger logger = org.slf4j.LoggerFactory.getLogger(TestMutationInjection.class);
 
-    String jcePath = "/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/jce.jar";
+    String jcePath = "/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/jce.jar";
+
+    //        "/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/jce.jar";
     String appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/myprojects/jMint_paper/jmint3/ipa/TestIPA/target/classes/";
-    //String appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/ipa/TestIPA/target/classes";
+    //String appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/myprojects/jMint_paper/jmint3/ipa/TestIPA/src/main/java/";
 
     public void setSootOptions(){
 
+        G.reset();
+        //Options.v().set_verbose(true);
         Options.v().set_no_bodies_for_excluded(true);
         ArrayList<String> exclude_list = new ArrayList<String>();
         exclude_list.add("java.");
@@ -45,8 +49,8 @@ public class TestMutationInjection {
         Options.v().set_output_format(Options.output_format_J);
         Options.v().set_keep_line_number(true);
         Options.v().setPhaseOption("jb", "use-original-names");
-        Scene.v().setSootClassPath(
-                Scene.v().getSootClassPath() + ":" + appSourcePath + ":" + jcePath);
+        Scene.v().setSootClassPath(jcePath + ":" + appSourcePath);
+        //System.out.println(Scene.v().getSootClassPath());
 
     }
 
@@ -65,8 +69,8 @@ public class TestMutationInjection {
                 @SuppressWarnings({ "rawtypes", "unchecked" })
                 final CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = new CustomIFDSSolver(problem, true);
 
-                solver.solve();
-                solverRef.add(solver);
+                //solver.solve();
+                //solverRef.add(solver);
                 //solver.printFilteredResults();
 
             }
@@ -390,9 +394,9 @@ public class TestMutationInjection {
                 //Set<UseDefChain> uniqueUDChain = new HashSet<UseDefChain>();
                 //injectors.add(ihi1);
 
-                MutantGenerator generator = new MutantGenerator(injectors);
-                generator.generate();
-                injectors.get(0).printMutantKeys();
+               MutantGenerator generator = new MutantGenerator(injectors);
+               generator.generate();
+               injectors.get(0).printMutantKeys();
 
             }
         }));

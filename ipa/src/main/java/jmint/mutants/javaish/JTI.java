@@ -35,7 +35,7 @@ public class JTI extends BaseMutantInjector {
             MutantHeader header = new MutantHeader(udChain,
                     parent,
                     parent,
-                    MutantsCode.JTD,
+                    MutantsCode.JTI,
                     String.format("this.%s will replace this %s", ((JimpleLocal) stmt.getRightOp()).getName(),
                             ((JimpleLocal) stmt.getRightOp()).getName()));
 

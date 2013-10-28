@@ -40,8 +40,8 @@ public class IOD extends BaseMutantInjector {
                MutantHeader header = new MutantHeader(udChain,
                        parent,
                        new Pair<SootMethod, SootClass>(method, method.getDeclaringClass()),
-                       MutantsCode.IOD,
-                       "Method =" + method.getSignature() + " also declared in parent =" + parentKlass);
+                       MutantsCode.IOD, method.getDeclaration() + " is deleted.");
+                       //"Method =" + method.getSignature() + " also declared in parent =" + parentKlass);
 
                if (!allMutants.containsKey(header.getKey())){
                    allMutants.put(header.getKey(), header);

@@ -1,27 +1,18 @@
+// This is a mutant program.
+// Author : ysma
+
 package MutantInjectionArtifacts.PPD;
 
+public class PPD3 extends MutantInjectionArtifacts.PPD.Base
+{
 
-import soot.jimple.GroupIntPair;
-
-class Base {
-    public int x;
-
-    public int getFromChild(Child child) {
-            return (int)Math.random();
-    }
-}
-
-public class PPD3 extends Base {
-
-
-    public PPD3(){
-
+    public PPD3()
+    {
     }
 
-    public PPD3(int y){
+    public PPD3( int y )
+    {
         x = y;
     }
 
-
 }
-

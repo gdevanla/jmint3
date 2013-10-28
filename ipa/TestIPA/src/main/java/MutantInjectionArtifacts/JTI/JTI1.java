@@ -1,18 +1,22 @@
+// This is a mutant program.
+// Author : ysma
+
 package MutantInjectionArtifacts.JTI;
 
 
-public class JTI1 {
+public class JTI1
+{
 
     int x = 10;
+
     private int y = 100;
 
-    public void F1(){
-        int x = (int)Math.random() ;
+    public  void F1()
+    {
+        int x = (int) Math.random();
         int z = x;
-
-        JTI2 t1_02 = new JTI2();
-        t1_02.useLocalVariable(z);
+        MutantInjectionArtifacts.JTI.JTI2 t1_02 = new MutantInjectionArtifacts.JTI.JTI2();
+        t1_02.useLocalVariable( z );
     }
+
 }
-
-
