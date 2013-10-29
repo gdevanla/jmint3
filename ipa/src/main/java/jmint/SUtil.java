@@ -505,7 +505,7 @@ public class SUtil {
 
         if (types.size() != m.getParameterCount()) return false;
 
-        FastHierarchy fh = Scene.v().getFastHierarchy();
+        FastHierarchy fh = Scene.v().getOrMakeFastHierarchy();
         for(int i=0; i< types.size(); i++){
 
             Type t1 = types.get(i);
@@ -520,6 +520,26 @@ public class SUtil {
                       SootClass.SIGNATURES);
               SootClass klass2 = Scene.v().forceResolve(t2.toString(),
                       SootClass.SIGNATURES);
+              //System.out.println(t1);
+              //System.out.println(t2);
+              //System.out.println("klass1=" + klass1);
+              //System.out.println("klass2=" + klass2);
+
+              if ( !SUtil.isClassIncludedInAnalysis(klass1) || !SUtil.isClassIncludedInAnalysis(klass2))
+              {
+                  return false;
+              }
+
+              if ( klass1.isPhantom())
+              {
+                  logger.debug("klass1 =" + klass1 + "was a phantom class");
+                  return false;
+              }
+              if (klass2.isPhantom()){
+                  logger.debug("klass2 =" + klass2 + "was a phantom class");
+                  return false;
+              }
+
               if (!fh.isSubclass(klass1, klass2))
                   return false;
           }

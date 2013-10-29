@@ -32,7 +32,6 @@ public class OMR extends BaseMutantInjector {
         //we only want OMD on def stmt classes
         if ( ! method.getDeclaringClass().equals(udChain.defMethod.getDeclaringClass())){ return null;}
 
-
         List<MutantInfo> mutants = new ArrayList<MutantInfo>();
         if (SUtil.areMethodsAvailableFor(method, false)){
 

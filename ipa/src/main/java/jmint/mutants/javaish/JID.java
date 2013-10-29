@@ -37,21 +37,35 @@ public class JID extends BaseMutantInjector {
         Set<Pair<Stmt, Host>> initStmts = getUnitsInitializing(fieldRef);
 
         for(Pair<Stmt, Host> initStmt: initStmts){
-            MutantHeader header = new MutantHeader(udChain,parent, initStmt,
-                    MutantsCode.JID, getText(initStmt));
-            if (!allMutants.containsKey(header.getKey())){
-                allMutants.put(header.getKey(), header);
+
+            if (reallyInit(initStmt)){
+                MutantHeader header = new MutantHeader(udChain,parent, initStmt,
+                        MutantsCode.JID, getText(initStmt));
+                if (!allMutants.containsKey(header.getKey())){
+                    allMutants.put(header.getKey(), header);
+                }
             }
         }
 
         return null;
     }
 
+    private boolean reallyInit(Pair<Stmt, Host> initStmt) {
+        String lineNoOfInit = SUtil.getTagOrDefaultValue(initStmt.getO1().getTag("LineNumberTag"), "9999");
+        String lineNoOfInitMethod = SUtil.getTagOrDefaultValue(((SootMethod)initStmt.getO2()).getTag("LineNumberTag"), "-1");
+
+        if (Integer.parseInt(lineNoOfInit) < Integer.parseInt(lineNoOfInitMethod))
+            return true;
+
+        return false;
+
+    }
+
     public Set<Pair<Stmt,Host>> getUnitsInitializing(InstanceFieldRef fieldRef){
 
         Set<Pair<Stmt, Host>> units = new HashSet<Pair<Stmt,Host>>();
 
-        Set<SootMethod> specialUnits = getSpecialInit(SUtil.getResolvedClass(udChain.getDefMethod()));
+        Set<SootMethod> specialUnits = getSpecialInit(fieldRef.getField().getDeclaringClass());
         if (specialUnits  == null)
             return null; //will this be true ever?
 

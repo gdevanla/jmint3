@@ -27,29 +27,31 @@ public enum MutantsCode {
     EOC, ISD;
 
     public static MutantsCode[] getAllMutantCodes(){
-        return new MutantsCode[]{ IHD,
+        return new MutantsCode[]{
+                IHD,
                 IHI,
                 IOD,
-                IOP,
-                IOR,
+                //IOP,
+                //IOR,
                 IPC,
                 ISK,
-                JDC,
+                //JDC,
                 JID,
                 JTD,
-                JSC,
-                OAN,
-                OAO,
+                JTI,
+                //JSC,
+                //OAN,
+                //OAO,
                 OMD,
                 OMR,
                 PMD,
                 PNC,
-                PPD,
+                //PPD,
                 PRV,
-                EAM,
-                EMM,
-                EOA,
-                JTI,
-                EOC};
+                EAM
+                //EMM,
+                //EOA,
+                //EOC
+        };
     }
 }
