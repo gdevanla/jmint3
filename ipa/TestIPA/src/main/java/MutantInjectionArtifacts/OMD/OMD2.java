@@ -30,16 +30,12 @@ public class OMD2
         return (int) Math.random() + 1;
     }
 
-    public  int getVariable1(float a)
+    public  int getVariable1( float a )
     {
         return (int) Math.random();
     }
 
-    /*public int getVariable1(int a){
-        return (int)Math.random();
-    } */
-
-    public  int getVariable1( double b)
+    public  int getVariable1( double b )
     {
         return (int) Math.random();
     }

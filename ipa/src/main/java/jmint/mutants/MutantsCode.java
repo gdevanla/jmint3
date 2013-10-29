@@ -24,7 +24,7 @@ public enum MutantsCode {
     EMM,
     EOA,
     JTI,
-    EOC;
+    EOC, ISD;
 
     public static MutantsCode[] getAllMutantCodes(){
         return new MutantsCode[]{ IHD,

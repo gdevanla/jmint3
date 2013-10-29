@@ -48,7 +48,7 @@ public class ISK extends BaseMutantInjector {
                 MutantHeader header = new MutantHeader(udChain,
                         parent,
                         parent,
-                        MutantsCode.ISK,
+                        MutantsCode.ISD, //substitutes ISK for parity with muJava.
                         parent.toString());
                 if (!allMutants.containsKey(header.getKey())){
                     allMutants.put(header.getKey(), header);

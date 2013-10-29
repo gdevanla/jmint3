@@ -34,7 +34,15 @@ public class MutantHeader {
 
         //TODO: clean this shit up
         if (originalDefStmt.getO1() instanceof Host){
-            this.lineNoOriginalStmt = SUtil.getTagOrDefaultValue(((Host) originalDefStmt.getO1()).getTag("LineNumberTag"), "-1");
+            String lineNo = SUtil.getTagOrDefaultValue(((Host) originalDefStmt.getO1()).getTag("LineNumberTag"), "-1");
+            //does this work always??
+            if (originalDefStmt.getO1() instanceof SootMethod && !((SootMethod) originalDefStmt.getO1()).getName().contains("<init>")){
+                this.lineNoOriginalStmt = String.valueOf(Integer.parseInt(lineNo) - 1);   //to match muJava
+            }
+            else
+            {
+                this.lineNoOriginalStmt = lineNo;
+            }
         }
         else
         {

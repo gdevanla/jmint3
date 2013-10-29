@@ -3,6 +3,22 @@
 
 package MutantInjectionArtifacts.PPD;
 
+
+import soot.jimple.GroupIntPair;
+
+
+class Base
+{
+
+    public int x;
+
+    public  int getFromChild( MutantInjectionArtifacts.PPD.Child child )
+    {
+        return (int) Math.random();
+    }
+
+}
+
 public class PPD3 extends MutantInjectionArtifacts.PPD.Base
 {
 

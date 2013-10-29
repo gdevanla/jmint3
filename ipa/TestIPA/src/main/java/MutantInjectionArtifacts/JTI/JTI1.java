@@ -11,9 +11,8 @@ public class JTI1
 
     private int y = 100;
 
-    public  void F1(int x)
+    public  void F1( int x )
     {
-        //int x = (int) Math.random();
         int z = x;
         MutantInjectionArtifacts.JTI.JTI2 t1_02 = new MutantInjectionArtifacts.JTI.JTI2();
         t1_02.useLocalVariable( z );

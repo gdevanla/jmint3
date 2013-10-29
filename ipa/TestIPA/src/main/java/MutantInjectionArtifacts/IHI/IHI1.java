@@ -6,7 +6,9 @@ package MutantInjectionArtifacts.IHI;
 
 class IHIParent1
 {
+
     public int xx;
+
 }
 
 class IHDUnRelatedClass

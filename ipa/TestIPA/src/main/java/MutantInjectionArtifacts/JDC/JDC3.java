@@ -17,10 +17,4 @@ public class JDC3
         x = 10;
     }
 
-    /*
-    public JDC3( int y )
-    {
-        x = y;
-    } */
-
 }

@@ -601,6 +601,7 @@ public class TestMutationInjection {
 
     }*/
 
+    @Ignore("muJava does not produce any results")
     @Test
     public void TestPPD1(){
 
@@ -661,7 +662,7 @@ public class TestMutationInjection {
     }
 
 
-    @Test
+    //@Test
     public void TestTryCatch(){
 
         Transform x = (new Transform("jtp.transformer", new BodyTransformer() {
