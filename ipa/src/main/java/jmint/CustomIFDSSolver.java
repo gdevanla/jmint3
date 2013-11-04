@@ -9,6 +9,7 @@ import soot.jimple.internal.JInstanceFieldRef;
 import soot.toolkits.scalar.Pair;
 import soot.jimple.DefinitionStmt;
 import soot.jimple.toolkits.ide.JimpleIFDSSolver;
+import sun.jvm.hotspot.oops.Klass;
 
 import java.util.*;
 
@@ -36,7 +37,12 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
     }
 
     public boolean isCrossBoundaryDefUse(DefinitionStmt defStmt, SootMethod useMethod){
+
         SootMethod defMethod = (SootMethod)icfg.getMethodOf(defStmt);
+        if (! SUtil.isClassIncludedInAnalysis(defMethod.getDeclaringClass())){
+            return false;
+        }
+
         Value rightOpValue = defStmt.getRightOp();
         //logger.debug("LeftOp values =====\n" +  unit + "," + rightOpValue.toString() + "," + rightOpValue.getClass().toString());
         if (defStmt.getRightOp() instanceof JInstanceFieldRef
@@ -64,11 +70,19 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
             //Set<Pair<DefinitionStmt, SootMethod>> allReachingDefs = getDefStmtMethodPairs(defs);
 
             SootMethod method = (SootMethod)icfg.getMethodOf(unit);
+            if (!SUtil.isClassIncludedInAnalysis(method.getDeclaringClass()))
+                continue;
+
+/*
             if (! method.getDeclaringClass().getPackageName().contains("TestArtifact")
                     && !method.getDeclaringClass().getPackageName().contains("MutantInjection")
-                    && !method.getDeclaringClass().getPackageName().contains("org.apache.bcel")
+                    //&& !method.getDeclaringClass().getPackageName().contains("org.apache.bcel")
+                    //&& !method.getDeclaringClass().getPackageName().contains("org.apache.tools.ant")
+                    //&& !method.getDeclaringClass().getPackageName().contains("org.jfree")
+                      &&  !method.getDeclaringClass().getPackageName().contains("com.google.test")
                     )
                 continue;
+*/
 
             for(ValueBox b:unit.getUseBoxes()){
                 //logger.debug("Use Boxes = " +  b.getValue() + ":" + unit);
@@ -121,8 +135,72 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
                         (SootMethod)icfg.getMethodOf(((Pair<Value, Set<DefinitionStmt>>) o).getO2().iterator().next())));
             }
         }
-
         return l;
     }
 
+
+    //print unique set of ud-pairs by class
+    //print unique set of ud-pairs by use-statement-method
+    //print unique set of ud-pairs by def-statement-method
+
+    public void printAllClassPairs(){
+        HashMap<Pair<SootClass, SootClass>, Integer> class_pairs = new HashMap<Pair<SootClass, SootClass>, Integer>();
+        HashMap<SootClass, Integer > useClasses = new HashMap<SootClass, Integer>();
+        HashMap<SootClass, Integer > defClasses = new HashMap<SootClass, Integer>();
+
+
+        for (UseDefChain ud:udChains){
+            SootClass klassDef = ud.getDefMethod().getDeclaringClass();
+            SootClass klassUse = ud.getUseMethod().getDeclaringClass();
+            Pair<SootClass, SootClass> p = new Pair<SootClass, SootClass>(klassUse, klassDef);
+            if (class_pairs.containsKey(p))
+            {
+                class_pairs.put(new Pair<SootClass, SootClass>(klassUse, klassDef),
+                        class_pairs.get(p)+1);
+            }
+            else
+            {
+                class_pairs.put(new Pair<SootClass, SootClass>(klassUse, klassDef), 1);
+            }
+
+            if (useClasses.containsKey(klassUse)){
+                useClasses.put(klassUse, useClasses.get(klassUse)+1);
+            }
+            else
+            {
+                useClasses.put(klassUse, 1);
+            }
+
+            if (defClasses.containsKey(klassDef)){
+                defClasses.put(klassDef, defClasses.get(klassDef)+1);
+            }
+            else
+            {
+                defClasses.put(klassDef, 1);
+            }
+        }
+
+        String template = "ClassMetrics: {} = {}";
+        logger.debug(template, "Unique pairs", class_pairs.size());
+        logger.debug(template, "Use Classes", useClasses.size());
+        logger.debug(template, "Def Classes", defClasses.size());
+
+        logger.debug(template, "UseClasses", "UseClasses");
+        for (SootClass c:useClasses.keySet()){
+            logger.debug(template, c.toString(), useClasses.get(c));
+        }
+
+        logger.debug(template, "DefClasses", "DefClasses");
+        for (SootClass c:defClasses.keySet()){
+            logger.debug(template, c.toString(), defClasses.get(c));
+        }
+
+        logger.debug(template, "ClassPairs", "ClassPairs");
+        for (Pair p:class_pairs.keySet()){
+            logger.debug(template, p.toString(), class_pairs.get(p));
+        }
+
+
+    }
 }
+

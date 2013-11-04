@@ -389,11 +389,14 @@ public class TestMutationInjection {
                         injectors.add(BaseMutantInjector.getMutantInjector(mutantCode, udChain));
                     }
                 }
+
+                solver.printAllClassPairs();
+
                 //final BaseMutantInjector ihi1 = new IOD(solver.udChains.get(0));
 
                 //Set<UseDefChain> uniqueUDChain = new HashSet<UseDefChain>();
                 //injectors.add(ihi1);
-
+               logger.debug("Total UD Chains = " + solver.udChains.size());
                MutantGenerator generator = new MutantGenerator(injectors);
                generator.generate();
                injectors.get(0).printMutantKeys();
@@ -648,6 +651,7 @@ public class TestMutationInjection {
     }
 
 
+   //@Ignore("Subject app")
     @Test
     public void TestBCEL(){
 
@@ -663,6 +667,57 @@ public class TestMutationInjection {
         generateMutants("", new String[]{}, null, x);
 
     }
+
+    //@Ignore("Subject app")
+    @Test
+    public void TestApacheAnt(){
+
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/myprojects/jMint/subject_apps/apache-ant-1.8.4/build/classes";
+
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
+
+    //@Ignore("Subject app")
+    @Test
+    public void TestJFreeChart(){
+
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/myprojects/jMint/subject_apps/jfreechart-1.0.16/build/";
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
+
+
+    //@Ignore("Subject app")
+    @Test
+    public void TestTestabilityExplorer(){
+
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/myprojects/jMint/subject_apps/testability-explorer-read-only/testability-explorer/target/classes";
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
+
 
 
     //@Test

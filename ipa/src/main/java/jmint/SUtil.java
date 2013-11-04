@@ -540,8 +540,17 @@ public class SUtil {
                   return false;
               }
 
-              if (!fh.isSubclass(klass1, klass2))
-                  return false;
+              try {
+                  if (!fh.isSubclass(klass1, klass2))
+                      return false;
+              }
+              catch (Exception ex){
+                  logger.debug("IsSubClass exception for klasses=" + klass1 + ":" + klass2);
+              }
+
+
+
+
           }
         }
 

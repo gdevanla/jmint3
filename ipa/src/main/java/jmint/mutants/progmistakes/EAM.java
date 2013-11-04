@@ -76,7 +76,7 @@ public class EAM extends BaseMutantInjector {
             if ( SUtil.AreTheseObjectEqualAsStrings(u, udChain.useUnit)
                 && SUtil.DoesUnitUseThisLocalAsString(u, l)){
                 Local equivLocal = SUtil.getEquivalentLocal(u, l);
-                if ( localDefs.hasDefsAt(equivLocal, u)){
+                if ( localDefs.hasDefsAt(l, u)){
                     for (Unit def:localDefs.getDefsOfAt(equivLocal, u)){
                         if (def instanceof JAssignStmt &&
 

@@ -10,6 +10,12 @@ package jmint;
 public final class Configuration {
 
     static String sourceFolder = "";
-    static String[] packageUnderTest = {"TestArtifacts", "MutantInjectionArtifacts", "org.apache.bcel"};
+    static String[] packageUnderTest = {
+            "MutantInjectionArtifacts",
+            //"org.apache.tools.ant",
+            "org.apache.bcel",
+            //"org.jfree",
+            //"com.google.test",
+            "TestArtifacts"};
 
 }
