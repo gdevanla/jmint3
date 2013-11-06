@@ -6,9 +6,13 @@ package MutantInjectionArtifacts.IPC;
 
 class Base
 {
+    public Base (){
+
+    }
 
     public Base( java.lang.String s )
     {
+
     }
 
 }

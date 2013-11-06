@@ -5,6 +5,7 @@ import com.google.common.collect.ConcurrentHashMultiset;
 import org.slf4j.Logger;
 import soot.*;
 import soot.JastAddJ.PrimitiveType;
+import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.InvokeExpr;
 import soot.jimple.InvokeStmt;
 import soot.jimple.SpecialInvokeExpr;
@@ -16,10 +17,8 @@ import soot.toolkits.scalar.Pair;
 import soot.toolkits.scalar.SimpleLocalDefs;
 import soot.util.Chain;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 import com.google.common.collect.Multiset;
 import com.google.common.collect.HashMultiset;
 
@@ -160,7 +159,9 @@ public class SUtil {
     }
 
     public static boolean isThisMethodInvoked(JAssignStmt def, SootMethod getterMethod) {
-        return def.containsInvokeExpr() &&
+        /*TODO: This method does not support method invocations as part of invoke interface
+        since the full signature returned by getSignature would be different*/
+        return def.containsInvokeExpr()  && (def.getRightOp() instanceof InstanceInvokeExpr) &&
                 ((InvokeExpr)def.getRightOp()).getMethod().getSignature().equals(getterMethod.getSignature());
     }
 
@@ -176,6 +177,21 @@ public class SUtil {
         }
 
         return false;
+    }
+
+    public static List<SootMethod> getAlternateGetterMethods(SootClass declaringClass, SootMethod excludeMethod) {
+        List<SootMethod> availMethods = new ArrayList<SootMethod>();
+
+        for (SootMethod method: declaringClass.getMethods()){
+            if (method.getParameterCount() == 0 &&
+                    method.getName().startsWith("get")
+                    && !method.getName().equals(excludeMethod.getName()) && !method.isAbstract()
+                    && method.getReturnType().toString().equals(excludeMethod.getReturnType().toString())){
+                availMethods.add(method);
+            }
+        }
+
+        return availMethods;
     }
 
     public static String getTagOrDefaultValue(Tag tag, String defaultValue){
@@ -202,6 +218,17 @@ public class SUtil {
         }
 
         return null;
+    }
+
+    public static boolean doesClassHaveDefaultConstructor(SootClass c){
+
+        List<SootMethod> methods = c.getMethods();
+        for (SootMethod m:methods){
+            if ( m.getName().contains("<init>") && m.getParameterCount() == 0){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Set<Unit> findUnitInvokingOverloadedMethods(UseDefChain udChain, SootMethod method){

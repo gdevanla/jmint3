@@ -36,7 +36,12 @@ public class IPC extends BaseMutantInjector {
         //Get the actual constructor being invoked
         SootMethod initMethod = ((InvokeStmt)u).getInvokeExpr().getMethod();
 
-        Unit  constructorCall = SUtil.getSpecialInvokeToBaseClassNonDefaultConstructor(initMethod);
+        if (! (initMethod.getDeclaringClass().hasSuperclass() &&
+                SUtil.doesClassHaveDefaultConstructor(initMethod.getDeclaringClass().getSuperclass()))){
+            return null;
+        }
+
+        Unit constructorCall = SUtil.getSpecialInvokeToBaseClassNonDefaultConstructor(initMethod);
 
         if ( constructorCall != null ){
             MutantHeader header = new MutantHeader(udChain, parent,
