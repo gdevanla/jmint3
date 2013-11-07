@@ -1,11 +1,13 @@
 package jmint.mutants.javaish;
 
+import jmint.MutantGenerator;
 import jmint.MutantHeader;
 import jmint.UseDefChain;
 import jmint.BaseMutantInjector;
 import jmint.mutants.MutantsCode;
 import soot.*;
 import soot.jimple.*;
+import soot.jimple.internal.JAssignStmt;
 import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
 import soot.util.Chain;
@@ -16,6 +18,33 @@ public class JTD extends BaseMutantInjector {
 
     public JTD(UseDefChain udChain) {
         super(udChain);
+    }
+
+    public void writeMutant(MutantHeader h){
+        Pair<Stmt, SootMethod> origStmt = (Pair<Stmt, SootMethod>) h.originalDefStmt;
+        InstanceFieldRef instanceFieldRef = (InstanceFieldRef)(((AssignStmt)origStmt.getO1()).getRightOp());
+
+        JAssignStmt newAssignStmt =
+                new JAssignStmt( ((AssignStmt)origStmt.getO1()).getLeftOp(),
+                       getLocalByName(origStmt.getO2(), instanceFieldRef.getField().getName()));
+
+        try
+        {
+            origStmt.getO2().getActiveBody().getUnits().swapWith(origStmt.getO1(), newAssignStmt);
+            MutantGenerator.write(origStmt.getO2().getDeclaringClass(), MutantsCode.JTD);
+        }
+        finally {
+            origStmt.getO2().getActiveBody().getUnits().swapWith(newAssignStmt, origStmt.getO1());
+        }
+    }
+
+    private Value getLocalByName(SootMethod m, String name) {
+        for(Local l:m.getActiveBody().getLocals()){
+            if (l.getName().equals(name)){
+                return l;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -38,6 +67,7 @@ public class JTD extends BaseMutantInjector {
                         MutantsCode.JTD,
                         String.format("Local %s will replace this.%s", l.getName(), fieldName));
                 if (!allMutants.containsKey(header.getKey())){
+                    writeMutant(header);
                     allMutants.put(header.getKey(), header);
                 }
             }

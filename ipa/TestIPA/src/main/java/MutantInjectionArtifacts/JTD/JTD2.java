@@ -11,7 +11,7 @@ public class JTD2
     {
         int y = 10;
         int z = x + y;
-        System.out.println( "value of z =" + z );
+        System.out.println( "value of z = " + z + " and value of x passed=" +  x);
     }
 
 }

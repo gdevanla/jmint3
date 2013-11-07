@@ -8,6 +8,7 @@ import soot.JastAddJ.PrimitiveType;
 import soot.jimple.*;
 import soot.jimple.internal.JAssignStmt;
 import soot.jimple.internal.JVirtualInvokeExpr;
+import soot.jimple.internal.JimpleLocal;
 import soot.tagkit.Tag;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.scalar.Pair;
@@ -327,6 +328,25 @@ public class SUtil {
         return true;
     }
 
+    public static List<SootMethod> alternateMethodsForOMR(SootMethod method){
+        List<SootMethod> methods = new ArrayList<SootMethod>();
+        SootClass klass = method.getDeclaringClass();
+        Multiset<Type> origTypes = getTypesInMethod(method);
+
+        for (SootMethod m:klass.getMethods()){
+            Multiset<Type> types = getTypesInMethod(m);
+
+            if ( !m.equals(method)
+                    && m.getReturnType().equals(method.getReturnType())
+                    && m.getName().equals(method.getName())
+                    && isTypeListASubset(origTypes, types, false)){
+                logger.debug("Overloaded method=" + m + "can be substituted for " + method);
+                methods.add(m);
+            }
+        }
+        return methods;
+    }
+
     public static boolean areMethodsAvailableFor(SootMethod method, boolean argTypesCount){
 
         SootClass klass = method.getDeclaringClass();
@@ -344,7 +364,6 @@ public class SUtil {
             }
         }
         return false;
-
 
     }
 
@@ -646,6 +665,16 @@ public class SUtil {
             }
         }
         return null;
+    }
+
+    public static List<Local> createLocals(SootMethod m){
+        List<Local> locals = new ArrayList<Local>();
+        int i=0;
+        for(Type t:m.getParameterTypes()){
+            locals.add(new JimpleLocal( "mutant_local0" + i ,t));
+            i++;
+        }
+        return locals;
     }
 }
 

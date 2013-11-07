@@ -5,28 +5,17 @@ import jmint.mutants.MutantsCode;
 import soot.*;
 import soot.jimple.*;
 import soot.jimple.internal.*;
-import soot.shimple.internal.SValueUnitPair;
 import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class OMD extends BaseMutantInjector {
     public OMD(UseDefChain udChain) {
         super(udChain);
     }
 
-    public List<Local> createLocals(SootMethod m){
-        List<Local> locals = new ArrayList<Local>();
-        int i=0;
-        for(Type t:m.getParameterTypes()){
-            locals.add(new JimpleLocal( "mutant_local0" + i ,t));
-            i++;
-        }
-        return locals;
-    }
 
     public void writeMutants(MutantHeader h){
         Pair<Stmt, SootMethod> origStmt = (Pair<Stmt, SootMethod>)h.originalDefStmt;
@@ -42,7 +31,7 @@ public class OMD extends BaseMutantInjector {
             List<Unit> newStmts = new ArrayList<Unit>();
 
             try {
-                paramLocals = createLocals(m);
+                paramLocals = SUtil.createLocals(m);
                 newLocals.addAll(paramLocals);
 
                // newLocals.add(ll);

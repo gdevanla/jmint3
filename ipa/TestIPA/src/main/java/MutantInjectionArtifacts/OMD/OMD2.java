@@ -6,10 +6,12 @@ package MutantInjectionArtifacts.OMD;
 
 class A
 {
+
 }
 
 class B extends MutantInjectionArtifacts.OMD.A
 {
+
 }
 
 public class OMD2
