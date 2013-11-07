@@ -1,8 +1,5 @@
 package jmint.mutants.Inheritance;
-import jmint.BaseMutantInjector;
-import jmint.MutantHeader;
-import jmint.SUtil;
-import jmint.UseDefChain;
+import jmint.*;
 import jmint.mutants.MutantsCode;
 import org.slf4j.Logger;
 import soot.SootClass;
@@ -23,6 +20,26 @@ public class IHI extends BaseMutantInjector {
 
     public IHI(UseDefChain udChain) {
         super(udChain);
+    }
+
+    public static void writeMutantClass(InstanceFieldRef fieldRef, MutantHeader h){
+        Pair<SootField, SootClass> f =  (Pair<SootField, SootClass>)h.originalDefStmt;
+
+        System.out.println("Over here" + fieldRef.getField().getDeclaringClass());
+        System.out.println(f.getO2());
+
+        SootField field = new SootField(fieldRef.getField().getName(), fieldRef.getField().getType(), fieldRef.getField().getModifiers());
+
+        SootClass klass = SUtil.getResolvedClass(fieldRef.getBase().getType().toString());
+        try {
+            klass.addField(field);
+            MutantGenerator.write(f.getO2(), MutantsCode.IHI);
+        }
+        finally{
+            klass.removeField(field);
+        }
+
+
     }
 
     @Override
@@ -46,6 +63,7 @@ public class IHI extends BaseMutantInjector {
                     //"Field =" + field.getSignature() + " referred from parent =" +
                     //        fieldRef.getField().getDeclaringClass());
                 if (!allMutants.containsKey(header.getKey())){
+                    writeMutantClass(fieldRef, header);
                     allMutants.put(header.getKey(), header);
                 }
             }

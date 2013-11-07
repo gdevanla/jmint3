@@ -2,6 +2,10 @@ package jmint;
 
 import jmint.IMutantInjector;
 import jmint.UseDefChain;
+import jmint.mutants.MutantsCode;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
 import soot.*;
 import soot.jimple.*;
 import soot.options.Options;
@@ -9,28 +13,25 @@ import soot.toolkits.scalar.Pair;
 import soot.util.EscapedWriter;
 import soot.util.JasminOutputStream;
 
+import javax.swing.tree.MutableTreeNode;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public class MutantGenerator {
+    final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-    private List<UseDefChain> udChains;
-    private IMutantInjector injector;
     public final List<BaseMutantInjector> injectors;
 
-    public MutantGenerator(List<UseDefChain> udChains, IMutantInjector injector, List<BaseMutantInjector> injectors) {
-        this.udChains = udChains;
-        this.injector = injector;
-        this.injectors = injectors;
-    }
-
-    public MutantGenerator(UseDefChain udChain, IMutantInjector injector, List<BaseMutantInjector> injectors){
-        this.injectors = injectors;
-        this.udChains = new ArrayList<UseDefChain>();
-        this.udChains.add(udChain);
-        this.injector = injector;
+    static {
+        try{
+            FileUtils.cleanDirectory(new File(Configuration.resultRootFolder));
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Error delete results folder = " + Configuration.resultRootFolder);
+        }
     }
 
     public MutantGenerator(List<BaseMutantInjector> injectors) {
@@ -38,29 +39,78 @@ public class MutantGenerator {
     }
 
     public void generate() {
-        /*for (UseDefChain udChain: udChains){
-            generate(udChain);
-        } */
-
         for (BaseMutantInjector injector:injectors) {
             injector.generate(injector.udChain);
         }
     }
 
+    public static String makeAndGetLocation(SootClass c, MutantsCode code, int format){
+        try{
 
+            String formatString = "";
+            if (format == Options.v().output_format_jimple){
+                formatString = "jimple";
+            }
+            else
+            {
+                formatString = "class";
+            }
 
-    public void writeClass(SootClass c) {
-        //final int format = Options.v().output_format_class;
-        final int format = Options.v().output_format_jimple;
+            //TODO: For lack or ignorance of existing of good API?
+            String class_mutants_fldr =
+                    FilenameUtils.concat(FilenameUtils.concat(
+                            FilenameUtils.concat(Configuration.resultRootFolder, formatString),
+                            "class_mutants"), c.toString());
+
+            //get index to use
+            int index = 1;
+            while(true){
+                String fldr = FilenameUtils.concat(class_mutants_fldr,code + "_" + index);
+                if (!(new File(fldr)).exists())
+                {
+                    new File(fldr).mkdirs();
+                    return fldr;
+                }
+
+                index++;
+            }
+
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+            System.out.println(ex);
+        }
+
+        return "";
+
+    }
+
+    public static void write(SootClass c, MutantsCode code){
+        write(c, code, Options.v().output_format_class);
+        write(c, code, Options.v().output_format_jimple);
+
+    }
+
+    public static void writeClass(SootClass c, MutantsCode code){
+        write(c, code, Options.v().output_format_class);
+    }
+
+    public static void writeJimple(SootClass c, MutantsCode code){
+        write(c, code, Options.v().output_format_jimple);
+    }
+
+    public static void write(SootClass c, MutantsCode code,  int format) {
 
         OutputStream streamOut = null;
         PrintWriter writerOut = null;
 
-        String fileName = SourceLocator.v().getFileNameFor(c, format);
+        String fileName = FilenameUtils.getName(SourceLocator.v().getFileNameFor(c, format));
+
+       //String fileName = SourceLocator.v().getFileNameFor(c, format);
 
         try {
-            new File("/tmp/" + fileName ).getParentFile().mkdirs();
-            streamOut = new FileOutputStream("/tmp/" + fileName);
+            //new File("/tmp/" + fileName ).getParentFile().mkdirs();
+            streamOut = new FileOutputStream(FilenameUtils.concat(makeAndGetLocation(c, code, format), fileName));
 
             if(format == Options.output_format_class) {
                 streamOut = new JasminOutputStream(streamOut);
@@ -90,12 +140,6 @@ public class MutantGenerator {
         }
     }
 
-    private void generateBehavioralMutants(UseDefChain udChain) {
-
-    }
-
-    private void generateStructuralMutants(UseDefChain udChain) {
-    }
 
 
 }

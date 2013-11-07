@@ -3,15 +3,28 @@
 
 package MutantInjectionArtifacts.EAM;
 
+interface BaseInterface{
+    public int getSomeVariable2();
+    public int getSomeVariable3();
+}
 
-class Base
-{
+
+class BaseEAM implements BaseInterface {
 
     public  int getVariable()
     {
         return (int) Math.random();
     }
 
+    @Override
+    public int getSomeVariable2() {
+         return (int)Math.random();
+    }
+
+    @Override
+    public int getSomeVariable3() {
+        return (int)Math.random();
+    }
 }
 
 public class EAM2
@@ -23,11 +36,13 @@ public class EAM2
 
     public  int getSomeOtherVariable()
     {
+        System.out.println("GetSomeOtherVariable");
         return -1;
     }
 
     public  int getVariable()
     {
+        System.out.println("GetVariable");
         return (int) Math.random();
     }
 

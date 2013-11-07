@@ -9,5 +9,7 @@ public class EAMTest1 {
     public static void main(String[] args){
         EAM1 t = new EAM1();
         t.F1();
+        t.F2();
+        System.out.println("Hi");
     }
 }

@@ -1,17 +1,16 @@
 package jmint.mutants.polymorphism;
-import jmint.BaseMutantInjector;
-import jmint.MutantHeader;
-import jmint.SUtil;
-import jmint.UseDefChain;
+import jmint.*;
 import jmint.mutants.MutantsCode;
 import soot.*;
 import soot.jimple.*;
+import soot.jimple.internal.JAssignStmt;
 import soot.jimple.internal.JInstanceFieldRef;
 import soot.jimple.internal.JimpleLocal;
 import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
 import soot.util.Chain;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -19,6 +18,46 @@ public class PRV extends BaseMutantInjector {
     public PRV(UseDefChain udChain) {
         super(udChain);
     }
+
+    //TODO: Break this prototype into more readable code
+    public void writeMutant(MutantHeader h){
+        Pair<Stmt, SootMethod> origStmt = (Pair<Stmt, SootMethod>) h.originalDefStmt;
+
+        Value variable = ((AssignStmt)origStmt.getO1()).getLeftOp();
+
+        SootClass klass = origStmt.getO2().getDeclaringClass();
+        PatchingChain<Unit> units = origStmt.getO2().getActiveBody().getUnits();
+
+
+        for (SootField f: klass.getFields() ){
+            if ( f.equals(variable)) { continue;}
+            if (f.getType().equals(variable.getType())){
+
+                Local newLocal = new JimpleLocal("mutant_local", f.getType());
+                origStmt.getO2().getActiveBody().getLocals().addLast(newLocal);
+                JInstanceFieldRef newInstanceFieldRef = new JInstanceFieldRef(origStmt.getO2().getActiveBody().getThisLocal(),
+                        f.makeRef());
+                JAssignStmt initLocalAssignStmt = new JAssignStmt(newLocal, newInstanceFieldRef);
+                JAssignStmt newAssignStmt = new JAssignStmt(variable, newLocal);
+
+                try {
+                    origStmt.getO2()
+                            .getActiveBody()
+                            .getUnits()
+                            .insertBefore(initLocalAssignStmt, origStmt.getO1());
+
+                    origStmt.getO2().getActiveBody().getUnits().swapWith(origStmt.getO1(), newAssignStmt);
+                    MutantGenerator.write(klass, MutantsCode.PRV);
+                }
+                finally {
+                    origStmt.getO2().getActiveBody().getLocals().remove(newLocal);
+                    origStmt.getO2().getActiveBody().getUnits().remove(initLocalAssignStmt);
+                    origStmt.getO2().getActiveBody().getUnits().swapWith(newAssignStmt, origStmt.getO1());
+                }
+            }
+        }
+    }
+
 
     @Override
     public SootClass generateMutant(AssignStmt stmt, Pair<Stmt, Host> parent) {
@@ -43,6 +82,7 @@ public class PRV extends BaseMutantInjector {
                         SUtil.getResolvedClass(t1.toString()).getSuperclass());
                 MutantHeader header = new MutantHeader(udChain, parent, parent, MutantsCode.PRV, replacableTypes);
                 if (!allMutants.containsKey(header.getKey())){
+                    writeMutant(header);
                     allMutants.put(header.getKey(), header);
                 }
             }
@@ -51,5 +91,7 @@ public class PRV extends BaseMutantInjector {
         return null;
 
     }
+
+
 
 }

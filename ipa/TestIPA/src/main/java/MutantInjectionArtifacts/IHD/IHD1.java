@@ -13,7 +13,7 @@ public class IHD1 extends MutantInjectionArtifacts.IHD.IHDParent1
     {
         MutantInjectionArtifacts.IHD.IHDUnRelatedClass c = new MutantInjectionArtifacts.IHD.IHDUnRelatedClass();
         int y = c.y;
-        int z = (new MutantInjectionArtifacts.IHD.B()).x;
+        int z = (new MutantInjectionArtifacts.IHD.B()).bx;
         MutantInjectionArtifacts.IHD.IHD2 t1_02 = new MutantInjectionArtifacts.IHD.IHD2();
         t1_02.useLocalVariable( this.x + z );
     }

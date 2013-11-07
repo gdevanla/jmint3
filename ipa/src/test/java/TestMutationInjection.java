@@ -91,6 +91,47 @@ public class TestMutationInjection {
         return solverRef.get(0);
     }
 
+    private Transform getTransformForJMint(final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef,
+                                           final MutantsCode[] mutants){
+        Transform x = (new Transform("wjtp.iodinjector", new SceneTransformer() {
+            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
+                IFDSTabulationProblem<Unit,?,SootMethod,InterproceduralCFG<Unit,SootMethod>> problem = new IFDSReachingDefinitions(new JimpleBasedInterproceduralCFG());
+                @SuppressWarnings({ "rawtypes", "unchecked" })
+                final CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = new CustomIFDSSolver(problem, true);
+                solver.solve();
+                solverRef.add(solver);
+
+                final List<BaseMutantInjector> injectors = new ArrayList<BaseMutantInjector>();
+                for (UseDefChain udChain:solver.udChains){
+                    for(MutantsCode mutantCode:mutants){
+                        injectors.add(BaseMutantInjector.getMutantInjector(mutantCode, udChain));
+                    }
+                }
+
+                solver.printAllClassPairs();
+
+                //final BaseMutantInjector ihi1 = new IOD(solver.udChains.get(0));
+
+                //Set<UseDefChain> uniqueUDChain = new HashSet<UseDefChain>();
+                //injectors.add(ihi1);
+                logger.debug("Total UD Chains = " + solver.udChains.size());
+                MutantGenerator generator = new MutantGenerator(injectors);
+                generator.generate();
+                injectors.get(0).printMutantKeys();
+
+            }
+        }));
+
+        logger.debug("{}", BaseMutantInjector.allMutants.size());
+        return x;
+    }
+
+    @After
+    public void tearDown(){
+        BaseMutantInjector.allMutants.clear();
+        G.reset();
+    }
+
    /* private void generateMutants(String mainClass, String[] sootAppFiles, final List<UseDefChain> udChains ){
 
         setSootOptions();
@@ -363,7 +404,10 @@ public class TestMutationInjection {
 
         String[] sootAppFiles = { "MutantInjectionArtifacts.IHI.IHITest1",
                 "MutantInjectionArtifacts.IHI.IHI1",
-                "MutantInjectionArtifacts.IHI.IHI2"};
+                "MutantInjectionArtifacts.IHI.IHI2",
+                "MutantInjectionArtifacts.IHI.A",
+                "MutantInjectionArtifacts.IHI.B",
+        };
 
         final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
         Transform x = getTransformForJMint(solverRef, new MutantsCode[]{MutantsCode.IHI});
@@ -373,46 +417,7 @@ public class TestMutationInjection {
 
     }
 
-    private Transform getTransformForJMint(final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef,
-                                   final MutantsCode[] mutants){
-        Transform x = (new Transform("wjtp.iodinjector", new SceneTransformer() {
-            protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
-                IFDSTabulationProblem<Unit,?,SootMethod,InterproceduralCFG<Unit,SootMethod>> problem = new IFDSReachingDefinitions(new JimpleBasedInterproceduralCFG());
-                @SuppressWarnings({ "rawtypes", "unchecked" })
-                final CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = new CustomIFDSSolver(problem, true);
-                solver.solve();
-                solverRef.add(solver);
 
-                final List<BaseMutantInjector> injectors = new ArrayList<BaseMutantInjector>();
-                for (UseDefChain udChain:solver.udChains){
-                    for(MutantsCode mutantCode:mutants){
-                        injectors.add(BaseMutantInjector.getMutantInjector(mutantCode, udChain));
-                    }
-                }
-
-                solver.printAllClassPairs();
-
-                //final BaseMutantInjector ihi1 = new IOD(solver.udChains.get(0));
-
-                //Set<UseDefChain> uniqueUDChain = new HashSet<UseDefChain>();
-                //injectors.add(ihi1);
-               logger.debug("Total UD Chains = " + solver.udChains.size());
-               MutantGenerator generator = new MutantGenerator(injectors);
-               generator.generate();
-               injectors.get(0).printMutantKeys();
-
-            }
-        }));
-
-        logger.debug("{}", BaseMutantInjector.allMutants.size());
-        return x;
-    }
-
-    @After
-    public void tearDown(){
-        BaseMutantInjector.allMutants.clear();
-        G.reset();
-    }
 
     @Test
     public void TestIOD1(){
@@ -581,7 +586,7 @@ public class TestMutationInjection {
 
     }
 
-    /*@Test
+    @Test
     public void TestPMD1(){
 
         BaseMutantInjector.allMutants.clear();
@@ -602,7 +607,7 @@ public class TestMutationInjection {
         assertEquals("Pair zz = virtualinvoke t1_02.<MutantInjectionArtifacts.PMD.PMD2: int getVariable(int,java.lang.String)>($i0, \"fsda\"),<MutantInjectionArtifacts.PMD.PMD1: void F1()>",
                 BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
 
-    }*/
+    }
 
     @Ignore("muJava does not produce any results")
     @Test
@@ -709,6 +714,23 @@ public class TestMutationInjection {
         //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
         //appSourcePath = "/tmp/bcel/target/classes";
         appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/myprojects/jMint/subject_apps/testability-explorer-read-only/testability-explorer/target/classes";
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
+
+
+    //@Ignore("Subject app")
+    @Test
+    public void TestJGraphTExplorer(){
+
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/myprojects/jMint/subject_apps/jgrapht/jgrapht-core/target/classes";
 
         final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
 

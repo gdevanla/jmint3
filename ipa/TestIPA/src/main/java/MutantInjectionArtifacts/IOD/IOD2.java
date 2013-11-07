@@ -6,7 +6,6 @@ package MutantInjectionArtifacts.IOD;
 
 class Base
 {
-
     protected  int getVariable()
     {
         return (int) Math.random();

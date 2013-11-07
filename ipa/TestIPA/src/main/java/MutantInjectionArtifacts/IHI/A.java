@@ -7,6 +7,6 @@ package MutantInjectionArtifacts.IHI;
 class A
 {
 
-    public int x;
+    public int bx;
 
 }

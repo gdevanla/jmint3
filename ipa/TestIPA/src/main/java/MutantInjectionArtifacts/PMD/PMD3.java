@@ -1,13 +1,13 @@
 // This is a mutant program.
 // Author : ysma
 
-package MutantInjectionArtifacts.PNC;
+package MutantInjectionArtifacts.PMD;
 
 
-public class PNC3 extends MutantInjectionArtifacts.PNC.Base
+public class PMD3 extends Base
 {
 
-    public PNC3()
+    public PMD3()
     {
        System.out.println("PMD3() called");
     }

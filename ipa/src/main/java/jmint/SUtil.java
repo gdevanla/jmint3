@@ -472,6 +472,7 @@ public class SUtil {
         return types;
     }
 
+    //Note that this method handles case where t1 is child of t2
     public static boolean doTypesShareParentClass(Type t1, Type t2) {
 
         SootClass c1 = SUtil.getResolvedClass(t1.toString());
@@ -603,6 +604,15 @@ public class SUtil {
                 || t instanceof LongType || t instanceof soot.BooleanType
                 || t instanceof soot.CharType || t instanceof soot.ByteType
                 || t instanceof soot.ShortType;
+    }
+
+    public static SootMethod getDefaultConstructor(SootClass c){
+        for (SootMethod m: c.getMethods()){
+            if ( m.getName().contains("<init>") && m.getParameterCount() == 0){
+                return m;
+            }
+        }
+        return null;
     }
 }
 

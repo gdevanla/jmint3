@@ -1,7 +1,7 @@
 // This is a mutant program.
 // Author : ysma
 
-package MutantInjectionArtifacts.PNC;
+package MutantInjectionArtifacts.PMD;
 
 
 class Base

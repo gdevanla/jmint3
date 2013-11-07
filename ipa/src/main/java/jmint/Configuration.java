@@ -13,9 +13,12 @@ public final class Configuration {
     static String[] packageUnderTest = {
             "MutantInjectionArtifacts",
             //"org.apache.tools.ant",
-            "org.apache.bcel",
-            //"org.jfree",
+            //"org.apache.bcel",
+            //"org.jgrapht",
+            "org.jfree",
             //"com.google.test",
             "TestArtifacts"};
+
+    static String resultRootFolder = "/tmp/jMint/testartifacts";
 
 }

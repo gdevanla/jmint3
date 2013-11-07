@@ -1,22 +1,44 @@
 package jmint.mutants.Inheritance;
 
-import jmint.BaseMutantInjector;
-import jmint.MutantHeader;
-import jmint.SUtil;
-import jmint.UseDefChain;
+import jmint.*;
 import jmint.mutants.MutantsCode;
 import soot.SootClass;
 import soot.SootMethod;
+import soot.SootMethodRef;
 import soot.Unit;
 import soot.jimple.*;
-import soot.jimple.internal.JInstanceFieldRef;
+import soot.jimple.internal.JInvokeStmt;
+import soot.jimple.internal.JSpecialInvokeExpr;
 import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
+
+import java.util.ArrayList;
 
 public class IPC extends BaseMutantInjector {
     public IPC(UseDefChain udChain) {
         super(udChain);
     }
+
+    public static void writeMutantClass(MutantHeader h){
+        Pair<Stmt, SootMethod> f =  (Pair<Stmt, SootMethod>)h.originalDefStmt;
+
+        //not checking for null, this method will error out
+        SootMethodRef methodRef = SUtil.getDefaultConstructor(f.getO2().getDeclaringClass().getSuperclass()).makeRef();
+        //specialinvoke this.<MutantInjectionArtifacts.IPC.Base: void <init>(java.lang.String)>("Test");
+        JSpecialInvokeExpr expr = new JSpecialInvokeExpr(f.getO2().getActiveBody().getThisLocal(),  methodRef, new ArrayList());
+        JInvokeStmt newStmt = new JInvokeStmt(expr);
+
+        try
+        {
+            f.getO2().getActiveBody().getUnits().swapWith(f.getO1(),newStmt);
+            MutantGenerator.write(f.getO2().getDeclaringClass(), MutantsCode.IPC);
+        }
+        finally {
+            f.getO2().getActiveBody().getUnits().swapWith(newStmt, f.getO1());
+        }
+
+    }
+
 
     @Override
     public SootClass generateMutant(NewExpr expr, Pair<Stmt, Host> parent) {
@@ -48,6 +70,7 @@ public class IPC extends BaseMutantInjector {
                     new Pair<Stmt, Host>((InvokeStmt)constructorCall, initMethod),
                     MutantsCode.IPC, constructorCall.toString());
             if (!allMutants.containsKey(header.getKey())){
+                writeMutantClass(header);
                 allMutants.put(header.getKey(), header);
             }
         }

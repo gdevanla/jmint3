@@ -6,9 +6,7 @@ package MutantInjectionArtifacts.ISK;
 
 class Base
 {
-
     public int basex = (int) Math.random();
-
 }
 
 public class ISK2 extends MutantInjectionArtifacts.ISK.Base
@@ -18,7 +16,7 @@ public class ISK2 extends MutantInjectionArtifacts.ISK.Base
 
     public  int getSomeInstanceVar()
     {
-        int zz = super.basex;
+        int zz = basex; //super.basex;
         return zz;
     }
 

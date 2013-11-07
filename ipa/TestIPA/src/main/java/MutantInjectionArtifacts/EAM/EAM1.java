@@ -14,4 +14,11 @@ public class EAM1
         System.out.println( zz );
     }
 
+    public void F2(){
+        //NOTE: This method not supported by jMint yet, since it calls interfaceinvoke
+        BaseInterface t1_02 = new BaseEAM();
+        int zz = t1_02.getSomeVariable2();
+        System.out.println( zz );
+    }
+
 }

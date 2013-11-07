@@ -7,6 +7,7 @@ package MutantInjectionArtifacts.IPC;
 class Base
 {
     public Base (){
+        System.out.println("Default constructor called");
 
     }
 

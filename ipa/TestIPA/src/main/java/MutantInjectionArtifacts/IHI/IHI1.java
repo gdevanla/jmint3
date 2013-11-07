@@ -25,7 +25,7 @@ public class IHI1 extends MutantInjectionArtifacts.IHI.IHIParent1
     {
         MutantInjectionArtifacts.IHI.IHDUnRelatedClass c = new MutantInjectionArtifacts.IHI.IHDUnRelatedClass();
         int y = c.y;
-        int z = (new MutantInjectionArtifacts.IHI.B()).x;
+        int z = (new MutantInjectionArtifacts.IHI.B()).bx;
         MutantInjectionArtifacts.IHI.IHI2 t1_02 = new MutantInjectionArtifacts.IHI.IHI2();
         t1_02.useLocalVariable( this.xx + z );
     }

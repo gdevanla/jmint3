@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import soot.*;
 import soot.jimple.*;
 import soot.jimple.internal.JAssignStmt;
+import soot.jimple.internal.JInterfaceInvokeExpr;
+import soot.jimple.internal.JVirtualInvokeExpr;
 import soot.tagkit.Host;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.scalar.Pair;
@@ -42,6 +44,7 @@ public class EAM extends BaseMutantInjector {
           for(Unit u:units){
               MutantHeader header = new MutantHeader(udChain, parent, new Pair<Stmt, Host>((Stmt)u, udChain.getUseMethod()), MutantsCode.EAM);
               if (!allMutants.containsKey(header.getKey())){
+                  generateMutant(header);
                   allMutants.put(header.getKey(), header);
               }
           }
@@ -49,6 +52,49 @@ public class EAM extends BaseMutantInjector {
       }
       return null;
     }
+
+
+    public void generateMutant(MutantHeader h){
+        Pair<Stmt,SootMethod> origStmt = (Pair<Stmt, SootMethod>)h.originalDefStmt;
+
+        List<SootMethod> availMethods = SUtil.getAlternateGetterMethods(udChain.getDefMethod().getDeclaringClass(), udChain.getDefMethod());
+
+        SootClass klass = SUtil.getResolvedClass(udChain.getUseMethod().getDeclaringClass().getName());
+
+        PatchingChain<Unit> units = udChain.getUseMethod().getActiveBody().getUnits();
+
+        if (!(h.originalDefStmt.getO1() instanceof JAssignStmt)){
+            logger.warn("Not Supported : {} not instance of JAssignStmt" , h.originalDefStmt.getO1().toString());
+        }
+
+        JAssignStmt stmt = (JAssignStmt)h.originalDefStmt.getO1();
+
+        InvokeExpr originalExpr = stmt.getInvokeExpr();
+
+        for (SootMethod m: availMethods){
+
+            InvokeExpr newExpr = null;
+
+            if (originalExpr instanceof VirtualInvokeExpr){
+                newExpr = new JVirtualInvokeExpr(((VirtualInvokeExpr) originalExpr).getBase(),
+                        m.makeRef(), new ArrayList());
+            }
+            else if (originalExpr instanceof InterfaceInvokeExpr){
+                new JInterfaceInvokeExpr(((InterfaceInvokeExpr) originalExpr).getBase(), m.makeRef(),
+                        new ArrayList());
+            }
+
+            assert(newExpr != null);
+            JAssignStmt newStmt = new JAssignStmt(stmt.getLeftOp(), newExpr);
+            units.swapWith(stmt, newStmt);
+            MutantGenerator.writeJimple(klass, MutantsCode.EAM);
+            MutantGenerator.writeClass(klass, MutantsCode.EAM);
+            units.swapWith(newStmt, stmt);
+
+        }
+
+    }
+
 
     public Set<Unit> findStatementsInvokingGetter(SootMethod getterMethod){
         Set<Unit> mutableUnits = new HashSet<Unit>();
@@ -82,7 +128,6 @@ public class EAM extends BaseMutantInjector {
 
                                 SUtil.isThisMethodInvoked((JAssignStmt) def, getterMethod) &&
                                 SUtil.areOtherGetterMethodsAvailable(getterMethod.getDeclaringClass(), getterMethod)) {
-
 
                             if (! mutableUnits.contains(def)){
                                 mutableUnits.add(def);
@@ -155,6 +200,12 @@ public class EAM extends BaseMutantInjector {
         return String.format(mutantLog, udChain.getDefMethod().getDeclaringClass().getName(),
                 MutantsCode.EAM, 0, udChain.getDefStmt().getTag("LineNumberTag"), getMutantString());
     }
+
+
+
+
+
+
 
 
 
