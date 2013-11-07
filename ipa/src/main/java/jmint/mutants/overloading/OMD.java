@@ -2,11 +2,10 @@ package jmint.mutants.overloading;
 
 import jmint.*;
 import jmint.mutants.MutantsCode;
-import soot.SootClass;
-import soot.SootMethod;
-import soot.Unit;
+import soot.*;
 import soot.jimple.*;
-import soot.jimple.internal.JInstanceFieldRef;
+import soot.jimple.internal.*;
+import soot.shimple.internal.SValueUnitPair;
 import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
 
@@ -17,6 +16,69 @@ import java.util.Set;
 public class OMD extends BaseMutantInjector {
     public OMD(UseDefChain udChain) {
         super(udChain);
+    }
+
+    public List<Local> createLocals(SootMethod m){
+        List<Local> locals = new ArrayList<Local>();
+        int i=0;
+        for(Type t:m.getParameterTypes()){
+            locals.add(new JimpleLocal( "mutant_local0" + i ,t));
+            i++;
+        }
+        return locals;
+    }
+
+    public void writeMutants(MutantHeader h){
+        Pair<Stmt, SootMethod> origStmt = (Pair<Stmt, SootMethod>)h.originalDefStmt;
+
+        List<SootMethod> alternateMethods = SUtil.alternateMethodsForOMD(origStmt.getO2());
+        SootMethod currentMethod = origStmt.getO2();
+        //currentMethod.getActiveBody().getP
+
+        for (SootMethod m:alternateMethods){
+
+            List<Local> paramLocals = null;
+            List<Local> newLocals = new ArrayList<Local>();
+            List<Unit> newStmts = new ArrayList<Unit>();
+
+            try {
+                paramLocals = createLocals(m);
+                newLocals.addAll(paramLocals);
+
+               // newLocals.add(ll);
+                //currentMethod.getActiveBody().getLocals().add(ll);
+                for (int i=0; i < currentMethod.getParameterCount(); i++){
+                    newStmts.add(new JAssignStmt(newLocals.get(i),
+                            new JCastExpr((JimpleLocal)currentMethod.getActiveBody().getParameterLocal(i), paramLocals.get(i).getType())));
+
+                }
+
+                //create invoke expr with locals
+                JVirtualInvokeExpr invokeExpr = new JVirtualInvokeExpr(currentMethod.getActiveBody().getThisLocal(), m.makeRef(), paramLocals);
+                if ( m.getReturnType() instanceof VoidType){
+                    newStmts.add(new JInvokeStmt(invokeExpr));
+                }
+                else
+                {
+                    JimpleLocal return_value = new JimpleLocal("mutant_local_returntype", m.getReturnType());
+                    newLocals.add(return_value);
+                    newStmts.add(new JAssignStmt(return_value, invokeExpr));
+                    newStmts.add(new JReturnStmt(return_value));
+                }
+
+                currentMethod.getActiveBody().getLocals().addAll(newLocals);
+                currentMethod.getActiveBody().getUnits().insertBefore(newStmts, SUtil.getFirstNonIdentityStmt(currentMethod));
+                MutantGenerator.write(currentMethod.getDeclaringClass(), MutantsCode.OMD);
+            }
+            finally {
+                currentMethod.getActiveBody().getUnits().removeAll(newStmts);
+                currentMethod.getActiveBody().getLocals().removeAll(newLocals);
+            }
+           // break;
+
+        }
+
+
     }
 
     @Override
@@ -30,7 +92,6 @@ public class OMD extends BaseMutantInjector {
         //we only want OMD on def stmt classes
         if ( ! method.getDeclaringClass().equals(udChain.defMethod.getDeclaringClass())){ return null;}
 
-
         List<MutantInfo> mutants = new ArrayList<MutantInfo>();
         if (SUtil.isAlternateMethodAvailForOMD(method)){
 
@@ -43,6 +104,7 @@ public class OMD extends BaseMutantInjector {
 
             );
             if (!allMutants.containsKey(header.getKey())){
+                writeMutants(header);
                 allMutants.put(header.getKey(), header);
             }
         }

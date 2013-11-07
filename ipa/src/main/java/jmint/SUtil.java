@@ -5,10 +5,7 @@ import com.google.common.collect.ConcurrentHashMultiset;
 import org.slf4j.Logger;
 import soot.*;
 import soot.JastAddJ.PrimitiveType;
-import soot.jimple.InstanceInvokeExpr;
-import soot.jimple.InvokeExpr;
-import soot.jimple.InvokeStmt;
-import soot.jimple.SpecialInvokeExpr;
+import soot.jimple.*;
 import soot.jimple.internal.JAssignStmt;
 import soot.jimple.internal.JVirtualInvokeExpr;
 import soot.tagkit.Tag;
@@ -25,6 +22,22 @@ import com.google.common.collect.HashMultiset;
 public class SUtil {
 
     final static Logger logger = org.slf4j.LoggerFactory.getLogger(SUtil.class);
+
+    public static Unit getFirstNonIdentityStmt(SootMethod m)
+    {
+
+        for (Unit u:m.getActiveBody().getUnits()){
+            if (u instanceof IdentityStmt)
+                continue;
+            return u;
+
+        }
+
+        //is this possible during jimple transform, I doubt
+        return null;
+
+    }
+
 
     public static boolean isTypeIncludedInAnalysis(RefType r){
         for ( String s:Configuration.packageUnderTest){
@@ -526,6 +539,26 @@ public class SUtil {
             }
         }
         return false;
+
+    }
+
+    public static List<SootMethod> alternateMethodsForOMD(SootMethod method) {
+
+        List<SootMethod> methods = new ArrayList<SootMethod>();
+        SootClass klass = method.getDeclaringClass();
+
+        List<Type> types = method.getParameterTypes();
+
+        for (SootMethod m:klass.getMethods()){
+            if (method.equals(m))
+                continue;
+            if (method.getName().equals(m.getName())
+                    && method.getReturnType().toString().equals(m.getReturnType().toString())
+                    && canEachTypeBeUpCast(types, m)) {
+                methods.add(m);
+            }
+        }
+        return methods;
 
     }
 
