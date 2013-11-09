@@ -74,6 +74,8 @@ public class OMD extends BaseMutantInjector {
     public SootClass generateMutant(AssignStmt stmt, Pair<Stmt, Host> parent) {
 
         SootMethod method = (SootMethod)parent.getO2();
+        if (method.isStatic()) {return null;}
+
         if (! SUtil.isClassIncludedInAnalysis(method.getDeclaringClass())){
             return null;
         }

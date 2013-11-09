@@ -184,6 +184,7 @@ public class SUtil {
         for (SootMethod method: methods){
             if (method.getParameterCount() == 0 &&
                     method.getName().startsWith("get")
+                    && !method.isStatic()
                     && !method.getName().equals(excludeMethod.getName()) && !method.isAbstract()
                     && method.getReturnType().toString().equals(excludeMethod.getReturnType().toString())){
                 return true;
@@ -198,7 +199,7 @@ public class SUtil {
 
         for (SootMethod method: declaringClass.getMethods()){
             if (method.getParameterCount() == 0 &&
-                    method.getName().startsWith("get")
+                    method.getName().startsWith("get")  && !method.isStatic()
                     && !method.getName().equals(excludeMethod.getName()) && !method.isAbstract()
                     && method.getReturnType().toString().equals(excludeMethod.getReturnType().toString())){
                 availMethods.add(method);
@@ -339,6 +340,7 @@ public class SUtil {
             if ( !m.equals(method)
                     && m.getReturnType().equals(method.getReturnType())
                     && m.getName().equals(method.getName())
+                    && !m.isStatic()
                     && isTypeListASubset(origTypes, types, false)){
                 logger.debug("Overloaded method=" + m + "can be substituted for " + method);
                 methods.add(m);
@@ -497,7 +499,7 @@ public class SUtil {
         Set<Type> types = new HashSet<Type>();
 
         for (SootField f:klass.getFields()){
-            if (filterByAnalyzedPackage && !SUtil.isTypeIncludedInAnalysis(f.getType())) continue;
+            if (filterByAnalyzedPackage && !SUtil.isTypeIncludedInAnalysis(f.getType()) && !f.isStatic()) continue;
             types.add(f.getType());
         }
 

@@ -30,11 +30,13 @@ public class EAM extends BaseMutantInjector {
     public SootClass generateMutant(AssignStmt stmt, Pair<Stmt, Host> parent) {
 
      SootMethod method = (SootMethod)parent.getO2();
+
+     if (method.isStatic()) {return null;}
      if (! SUtil.isClassIncludedInAnalysis(method.getDeclaringClass())){
          return null;
-        }
+     }
 
-        List<MutantInfo> mutants = new ArrayList<MutantInfo>();
+      List<MutantInfo> mutants = new ArrayList<MutantInfo>();
       if ( method.getName().matches("get.*")){
           Set<Unit> units = findStatementsInvokingGetter(method);
 
@@ -56,6 +58,7 @@ public class EAM extends BaseMutantInjector {
 
     public void generateMutant(MutantHeader h){
         Pair<Stmt,SootMethod> origStmt = (Pair<Stmt, SootMethod>)h.originalDefStmt;
+        if (origStmt.getO2().isStatic()) { return;}
 
         List<SootMethod> availMethods = SUtil.getAlternateGetterMethods(udChain.getDefMethod().getDeclaringClass(), udChain.getDefMethod());
 
@@ -82,6 +85,10 @@ public class EAM extends BaseMutantInjector {
             else if (originalExpr instanceof InterfaceInvokeExpr){
                 new JInterfaceInvokeExpr(((InterfaceInvokeExpr) originalExpr).getBase(), m.makeRef(),
                         new ArrayList());
+            }
+            else
+            {
+                continue;
             }
 
             assert(newExpr != null);

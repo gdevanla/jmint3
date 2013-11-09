@@ -26,12 +26,13 @@ public class ISK extends BaseMutantInjector {
         super(udChain);
     }
 
-        @Override
+    @Override
     public SootClass generateMutant(InstanceFieldRef fieldRef, Pair<Stmt, Host> parent) {
 
         Value base = fieldRef.getBase();
         SootField field = fieldRef.getField();
         SootMethod parentMethod = (SootMethod)parent.getO2();
+        if (parentMethod.isStatic()) { return null;}
 
         if (!((SootMethod) parent.getO2()).getDeclaringClass().hasSuperclass()){
             return null;

@@ -23,6 +23,7 @@ public class PRV extends BaseMutantInjector {
     public void writeMutant(MutantHeader h){
         Pair<Stmt, SootMethod> origStmt = (Pair<Stmt, SootMethod>) h.originalDefStmt;
 
+
         Value variable = ((AssignStmt)origStmt.getO1()).getLeftOp();
 
         SootClass klass = origStmt.getO2().getDeclaringClass();
@@ -31,10 +32,13 @@ public class PRV extends BaseMutantInjector {
 
         for (SootField f: klass.getFields() ){
             if ( f.equals(variable)) { continue;}
+            if ( f.isStatic() ) {continue;}
             if (f.getType().equals(variable.getType())){
 
                 Local newLocal = new JimpleLocal("mutant_local", f.getType());
                 origStmt.getO2().getActiveBody().getLocals().addLast(newLocal);
+                System.out.println("Orig Stmt=" + origStmt + "f=" + f);
+
                 JInstanceFieldRef newInstanceFieldRef = new JInstanceFieldRef(origStmt.getO2().getActiveBody().getThisLocal(),
                         f.makeRef());
                 JAssignStmt initLocalAssignStmt = new JAssignStmt(newLocal, newInstanceFieldRef);
@@ -63,6 +67,8 @@ public class PRV extends BaseMutantInjector {
     public SootClass generateMutant(AssignStmt stmt, Pair<Stmt, Host> parent) {
 
         SootMethod method = (SootMethod)parent.getO2();
+        if (method.isStatic()) { return null;}
+
         if (! SUtil.isClassIncludedInAnalysis(method.getDeclaringClass())){
             return null;
         }

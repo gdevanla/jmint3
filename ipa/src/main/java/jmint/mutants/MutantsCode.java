@@ -33,25 +33,25 @@ public enum MutantsCode {
                 IOD,
                 //IOP,
                 //IOR,
-                ISK,
+                ISK,   //non-static
                 IPC,
                 //
                 PNC,
                 PMD,
                 //PMD,
                 //PPD,
-                PRV,
+                PRV,    //non-static
                 //
-                OMR,
-                OMD,
+                OMR,    //non-static
+                OMD,    //non-static
                 //OAN,
                 //OAO,
                 //JDC,
                 //JSC,
-                JTI,
-                JTD,
+                JTI,   //non-static
+                JTD,   //non-static
                 JID,
-                EAM,
+                EAM,   //non-static
                 //EMM,
                 //EOA,
                 //EOC

@@ -43,6 +43,13 @@ public class OMR extends BaseMutantInjector {
                 }
 
                 //create invoke expr with locals
+                try{
+                    Object o = currentMethod.getActiveBody().getThisLocal();
+                }
+                catch(Exception ex)
+                {
+                    ex.printStackTrace();
+                }
                 JVirtualInvokeExpr invokeExpr = new JVirtualInvokeExpr(currentMethod.getActiveBody().getThisLocal(), m.makeRef(), paramLocals);
                 if ( m.getReturnType() instanceof VoidType){
                     newStmts.add(new JInvokeStmt(invokeExpr));
@@ -88,6 +95,8 @@ public class OMR extends BaseMutantInjector {
         if (! SUtil.isClassIncludedInAnalysis(method.getDeclaringClass())){
             return null;
         }
+
+        if (method.isStatic()) {return null;} //we are not dealing with static methods right now.
 
         //we only want OMD on def stmt classes
         if ( ! method.getDeclaringClass().equals(udChain.defMethod.getDeclaringClass())){ return null;}

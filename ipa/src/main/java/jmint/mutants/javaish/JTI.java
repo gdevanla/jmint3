@@ -33,20 +33,26 @@ public class JTI extends BaseMutantInjector {
     }
 
     public void writeMutantForRightOp(MutantHeader h){
-        Pair<Stmt, SootMethod> origStmt = (Pair<Stmt, SootMethod>) h.originalDefStmt;
+        try{
+            Pair<Stmt, SootMethod> origStmt = (Pair<Stmt, SootMethod>) h.originalDefStmt;
 
-        List<JimpleLocal> locals = gatherUsedLocals(((JAssignStmt)origStmt.getO1()).getRightOp());
-        for ( Local l:locals){
-            JAssignStmt newAssignStmt = new JAssignStmt(l,
-                    new JInstanceFieldRef(origStmt.getO2().getActiveBody().getThisLocal(),
-                            origStmt.getO2().getDeclaringClass().getFieldByName(l.getName()).makeRef()));
-            try{
-                origStmt.getO2().getActiveBody().getUnits().insertBefore(newAssignStmt, origStmt.getO1());
-                MutantGenerator.write(origStmt.getO2().getDeclaringClass(), MutantsCode.JTI);
+            List<JimpleLocal> locals = gatherUsedLocals(((JAssignStmt)origStmt.getO1()).getRightOp());
+            for ( Local l:locals){
+                if (!isMatchingInstanceAvailable((JimpleLocal)l, origStmt.getO2())) { continue;}
+                JAssignStmt newAssignStmt = new JAssignStmt(l,
+                        new JInstanceFieldRef(origStmt.getO2().getActiveBody().getThisLocal(),
+                                origStmt.getO2().getDeclaringClass().getFieldByName(l.getName()).makeRef()));
+                try{
+                    origStmt.getO2().getActiveBody().getUnits().insertBefore(newAssignStmt, origStmt.getO1());
+                    MutantGenerator.write(origStmt.getO2().getDeclaringClass(), MutantsCode.JTI);
+                }
+                finally {
+                    origStmt.getO2().getActiveBody().getUnits().remove(newAssignStmt);
+                }
             }
-               finally {
-                origStmt.getO2().getActiveBody().getUnits().remove(newAssignStmt);
-            }
+        }
+        catch (Exception ex)  {
+            logger.debug("Mutant Generation-Errors={}:{}", ex.toString(), ex.getStackTrace() );
         }
     }
 
@@ -96,6 +102,8 @@ public class JTI extends BaseMutantInjector {
     public SootClass generateMutant(AssignStmt stmt, Pair<Stmt, Host> parent){
 
         SootMethod method = (SootMethod)parent.getO2();
+
+        if (method.isStatic()) { return null;} //nothing to do here.
 
         //locals on right of assign stmt
         List<JimpleLocal> locals = filterByReplacebleLocals(
