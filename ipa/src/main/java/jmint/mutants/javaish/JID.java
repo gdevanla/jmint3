@@ -1,9 +1,6 @@
 package jmint.mutants.javaish;
 
-import jmint.BaseMutantInjector;
-import jmint.MutantHeader;
-import jmint.SUtil;
-import jmint.UseDefChain;
+import jmint.*;
 import jmint.mutants.MutantsCode;
 import org.slf4j.Logger;
 import soot.*;
@@ -21,12 +18,34 @@ public class JID extends BaseMutantInjector {
 
     final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+    public void writeMutant(InstanceFieldRef fieldRef, MutantHeader h){
+
+        //Here we don't use origStmt during swapping since it points to declaration statement
+        //that is outside the <init> methods.
+        //Pair<Stmt, SootMethod> origStmt = (Pair<Stmt, SootMethod>) h.originalDefStmt;
+
+        //get all init statements and create mutants by removing them.
+        for(Pair<Stmt, SootMethod> initStmt: getUnitsInitializing(fieldRef)){
+            if (reallyInit(initStmt)){
+                Unit anchor = initStmt.getO2().getActiveBody().getUnits().getSuccOf(initStmt.getO1());
+                try{
+                    initStmt.getO2().getActiveBody().getUnits().remove(initStmt.getO1());
+                    MutantGenerator.write(initStmt.getO2().getDeclaringClass(), MutantsCode.JID);
+                }
+                finally{
+                    initStmt.getO2().getActiveBody().getUnits().insertBefore(initStmt.getO1(), anchor);
+                }
+
+            }
+        }
+
+    }
 
     public JID(UseDefChain udChain) {
         super(udChain);
     }
 
-    private String getText(Pair<Stmt, Host> p){
+    private String getText(Pair<Stmt, SootMethod> p){
         return p.getO1().getFieldRef().getField().getDeclaration();
     }
 
@@ -34,14 +53,15 @@ public class JID extends BaseMutantInjector {
     public SootClass generateMutant(InstanceFieldRef fieldRef, Pair<Stmt, Host> parent){
 
         //TODO: does this work for superclasses?
-        Set<Pair<Stmt, Host>> initStmts = getUnitsInitializing(fieldRef);
+        Set<Pair<Stmt, SootMethod>> initStmts = getUnitsInitializing(fieldRef);
 
-        for(Pair<Stmt, Host> initStmt: initStmts){
+        for(Pair<Stmt, SootMethod> initStmt: initStmts){
 
             if (reallyInit(initStmt)){
                 MutantHeader header = new MutantHeader(udChain,parent, initStmt,
                         MutantsCode.JID, getText(initStmt));
                 if (!allMutants.containsKey(header.getKey())){
+                   writeMutant(fieldRef, header);
                     allMutants.put(header.getKey(), header);
                 }
             }
@@ -50,7 +70,7 @@ public class JID extends BaseMutantInjector {
         return null;
     }
 
-    private boolean reallyInit(Pair<Stmt, Host> initStmt) {
+    private boolean reallyInit(Pair<Stmt, SootMethod> initStmt) {
         String lineNoOfInit = SUtil.getTagOrDefaultValue(initStmt.getO1().getTag("LineNumberTag"), "9999");
         String lineNoOfInitMethod = SUtil.getTagOrDefaultValue(((SootMethod)initStmt.getO2()).getTag("LineNumberTag"), "-1");
 
@@ -61,9 +81,9 @@ public class JID extends BaseMutantInjector {
 
     }
 
-    public Set<Pair<Stmt,Host>> getUnitsInitializing(InstanceFieldRef fieldRef){
+    public Set<Pair<Stmt,SootMethod>> getUnitsInitializing(InstanceFieldRef fieldRef){
 
-        Set<Pair<Stmt, Host>> units = new HashSet<Pair<Stmt,Host>>();
+        Set<Pair<Stmt, SootMethod>> units = new HashSet<Pair<Stmt,SootMethod>>();
 
         Set<SootMethod> specialUnits = getSpecialInit(fieldRef.getField().getDeclaringClass());
         if (specialUnits  == null)
@@ -75,7 +95,7 @@ public class JID extends BaseMutantInjector {
                 logger.debug("Active body not present for " + specialInit.getSubSignature());
                 continue;
             }
-            Pair<Stmt, Host> lastInitStmt = null;
+            Pair<Stmt, SootMethod> lastInitStmt = null;
             for (Unit u: specialInit.getActiveBody().getUnits()){
                 if (u instanceof AssignStmt){
                     java.util.List<ValueBox> defBoxes = u.getDefBoxes();
@@ -85,7 +105,7 @@ public class JID extends BaseMutantInjector {
                             fieldRef.getField().equals(((JInstanceFieldRef)definedValue).getField())){
                         //we continue doing this since we want to find the last assignment statement
                         //that will override all other statements.
-                        units.add(new Pair<Stmt,Host>((Stmt)u, specialInit));
+                        units.add(new Pair<Stmt,SootMethod>((Stmt)u, specialInit));
                         break; //the first initialization is the one defined outside the function if any.
                     }
                 }

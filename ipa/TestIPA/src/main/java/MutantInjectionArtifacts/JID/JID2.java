@@ -7,7 +7,7 @@ package MutantInjectionArtifacts.JID;
 public class JID2
 {
 
-    public int instancevar = (int) Math.random();
+    public int instancevar = (int) (((Math.random())*2000)+1);
 
     public static int staticVar;
 
@@ -17,7 +17,7 @@ public class JID2
 
     public JID2( int x )
     {
-        instancevar = (int) Math.random() + 1;
+        instancevar = (int) ((Math.random() + 1)  * 10);
     }
 
     public  int getSomeInstanceVar()

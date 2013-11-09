@@ -24,7 +24,7 @@ public class JID1
 
     public  void F1()
     {
-        MutantInjectionArtifacts.JID.JID2 t1_02 = new MutantInjectionArtifacts.JID.JID2();
+        MutantInjectionArtifacts.JID.JID2 t1_02 = new MutantInjectionArtifacts.JID.JID2(11);
         int zz = t1_02.getSomeInstanceVar();
         System.out.println( zz );
     }
