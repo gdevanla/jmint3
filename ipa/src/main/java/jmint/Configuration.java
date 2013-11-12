@@ -12,9 +12,9 @@ public final class Configuration {
     static String sourceFolder = "";
     static String[] packageUnderTest = {
             "MutantInjectionArtifacts",
-            "org.apache.tools.ant",
+            //"org.apache.tools.ant",
             //"org.apache.bcel",
-            //"org.jgrapht",
+            "org.jgrapht",
             //"org.jfree",
             //"com.google.test",
             "TestArtifacts"};

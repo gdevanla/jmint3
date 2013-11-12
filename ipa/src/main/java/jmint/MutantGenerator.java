@@ -1,5 +1,6 @@
 package jmint;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.StringType;
 import jmint.IMutantInjector;
 import jmint.UseDefChain;
 import jmint.mutants.MutantsCode;
@@ -8,6 +9,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import soot.*;
 import soot.jimple.*;
+import soot.jimple.internal.JimpleLocal;
 import soot.options.Options;
 import soot.toolkits.scalar.Pair;
 import soot.util.EscapedWriter;
@@ -85,7 +87,19 @@ public class MutantGenerator {
 
     }
 
-    public static void write(SootClass c, MutantsCode code){
+
+
+    private static Local addTmpString(Body body)
+    {
+        Local tmpString = Jimple.v().newLocal("jMintInstrumentString", RefType.v("java.lang.String"));
+        body.getLocals().add(tmpString);
+        return tmpString;
+    }
+
+
+   /* public static void write(SootClass c, MutantsCode code){
+        //TODO: lazy hack. This instrumentation should be somewhere in BaseMutantInjector
+
         write(c, code, Options.v().output_format_class);
         write(c, code, Options.v().output_format_jimple);
 
@@ -97,9 +111,9 @@ public class MutantGenerator {
 
     public static void writeJimple(SootClass c, MutantsCode code){
         write(c, code, Options.v().output_format_jimple);
-    }
+    }*/
 
-    public static void write(SootClass c, MutantsCode code,  int format) {
+    public static void write(SootClass c, MutantsCode code,  int format,  String destFolder) {
 
         OutputStream streamOut = null;
         PrintWriter writerOut = null;
@@ -110,7 +124,8 @@ public class MutantGenerator {
 
         try {
             //new File("/tmp/" + fileName ).getParentFile().mkdirs();
-            streamOut = new FileOutputStream(FilenameUtils.concat(makeAndGetLocation(c, code, format), fileName));
+            streamOut = new FileOutputStream(FilenameUtils.concat(destFolder, fileName));
+
 
             if(format == Options.output_format_class) {
                 streamOut = new JasminOutputStream(streamOut);

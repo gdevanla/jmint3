@@ -16,11 +16,11 @@ public class IHD extends BaseMutantInjector {
         super(udChain);
     }
 
-    public static void writeMutantClass(MutantHeader h){
+    public void writeMutantClass(MutantHeader h){
         Pair<SootField, SootClass> f =  (Pair<SootField, SootClass>)h.originalDefStmt;
 
         f.getO2().removeField(f.getO1());
-        MutantGenerator.write(f.getO2(), MutantsCode.IHD);
+        writeMutants(f.getO2(), MutantsCode.IHD);
         f.getO2().addField(f.getO1());
     }
 
@@ -55,7 +55,7 @@ public class IHD extends BaseMutantInjector {
                         //superKlass + " as " + superKlass.getField(field.getSubSignature()).getSignature() + ", isPublic=" +
                         //superKlass.getField(field.getSubSignature()).isPublic());
                 if (!allMutants.containsKey(header.getKey())){
-                    IHD.writeMutantClass(header);
+                    writeMutantClass(header);
                     allMutants.put(header.getKey(), header);
                 }
             }

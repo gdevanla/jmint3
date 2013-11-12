@@ -78,7 +78,7 @@ public class PNC extends BaseMutantInjector {
                origStmt.getO2().getActiveBody().getUnits().swapWith(origStmt.getO1(), newStmt);
                origStmt.getO2().getActiveBody().getUnits().swapWith(oldSpecialInvokeStmt, newSpecialInvokStmt);
 
-               MutantGenerator.write(origStmt.getO2().getDeclaringClass(), MutantsCode.PNC);
+               writeMutants(origStmt.getO2().getDeclaringClass(), MutantsCode.PNC);
            }
            finally {
                origStmt.getO2().getActiveBody().getUnits().swapWith(newStmt, origStmt.getO1());

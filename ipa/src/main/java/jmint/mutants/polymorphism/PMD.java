@@ -59,7 +59,7 @@ public class PMD extends BaseMutantInjector {
                 }
             }
 
-            MutantGenerator.write(origStmt.getO2().getDeclaringClass(), MutantsCode.PMD);
+            writeMutants(origStmt.getO2().getDeclaringClass(), MutantsCode.PMD);
         }
         finally {
             for (Local l:changedLocals){

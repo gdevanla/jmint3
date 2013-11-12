@@ -93,10 +93,15 @@ public class EAM extends BaseMutantInjector {
 
             assert(newExpr != null);
             JAssignStmt newStmt = new JAssignStmt(stmt.getLeftOp(), newExpr);
-            units.swapWith(stmt, newStmt);
-            MutantGenerator.writeJimple(klass, MutantsCode.EAM);
-            MutantGenerator.writeClass(klass, MutantsCode.EAM);
-            units.swapWith(newStmt, stmt);
+            try{
+                units.swapWith(stmt, newStmt);
+                writeMutants(klass, MutantsCode.EAM);
+
+            }
+            finally
+            {
+                units.swapWith(newStmt, stmt);
+            }
 
         }
 

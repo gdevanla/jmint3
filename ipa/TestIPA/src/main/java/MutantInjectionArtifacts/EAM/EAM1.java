@@ -19,6 +19,9 @@ public class EAM1
         BaseInterface t1_02 = new BaseEAM();
         int zz = t1_02.getSomeVariable2();
         System.out.println( zz );
+
+        String message = "Test message";
+        System.out.println(message);
     }
 
 }

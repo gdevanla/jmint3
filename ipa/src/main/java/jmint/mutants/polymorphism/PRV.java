@@ -51,7 +51,7 @@ public class PRV extends BaseMutantInjector {
                             .insertBefore(initLocalAssignStmt, origStmt.getO1());
 
                     origStmt.getO2().getActiveBody().getUnits().swapWith(origStmt.getO1(), newAssignStmt);
-                    MutantGenerator.write(klass, MutantsCode.PRV);
+                    writeMutants(klass, MutantsCode.PRV);
                 }
                 finally {
                     origStmt.getO2().getActiveBody().getLocals().remove(newLocal);

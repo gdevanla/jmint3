@@ -17,19 +17,21 @@ import jmint.mutants.progmistakes.EAM;
 import jmint.mutants.progmistakes.EMM;
 import jmint.mutants.progmistakes.EOA;
 import jmint.mutants.progmistakes.EOC;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.LoggerFactory;
 import soot.SootClass;
 import soot.jimple.*;
+import soot.options.Options;
 import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
 import soot.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.slf4j.Logger;
+
+import static jmint.MutantGenerator.makeAndGetLocation;
+import static jmint.MutantGenerator.write;
 
 
 /* This class just fills in the boiler plate code that the child classes
@@ -276,4 +278,251 @@ public class BaseMutantInjector implements IMutantInjector {
         }
 
         }
+
+    private Local addPrintStreamRef(String name, Body body)
+    {
+        Local tmpRef = Jimple.v().newLocal(name, RefType.v("java.io.PrintStream"));
+        //body.getLocals().add(tmpRef);
+        return tmpRef;
     }
+
+    private static Local addTmpString(String name, Body body)
+    {
+        Local tmpString = Jimple.v().newLocal(name, RefType.v("java.lang.String"));
+        //body.getLocals().add(tmpString);
+        return tmpString;
+    }
+
+    //this version also instruments def statements,
+    /*public void writeMutants(SootClass mutantDefKlass, MutantsCode c){
+
+        String jimpleLocation = makeAndGetLocation(mutantDefKlass, c,  Options.v().output_format_jimple);
+        String classLocation = makeAndGetLocation(mutantDefKlass, c,  Options.v().output_format_class);
+
+        //this kind of duplication needed for cases when def and use classes and method are the same objects.
+        //save the nested if conditions by assuming they are could be different classes.
+        HashMap<String, Local> newLocals = new HashMap<String, Local>();
+
+        //separate local for each system.io. make it easier to remove
+        newLocals.put("$jmint_def_print", addPrintStreamRef("$jmint_def_print", udChain.defMethod.getActiveBody()));
+        newLocals.put("$jmint_use_print", addPrintStreamRef("$jmint_use_print", udChain.useMethod.getActiveBody()));
+
+        newLocals.put("$jmint_use_start", addTmpString("$jmint_use_start", udChain.useMethod.getActiveBody()));
+        newLocals.put("$jmint_def_start", addTmpString("$jmint_def_start", udChain.defMethod.getActiveBody()));
+        newLocals.put("$jmint_use_end", addTmpString("$jmint_use_end", udChain.useMethod.getActiveBody()));
+        newLocals.put("$jmint_def_end", addTmpString("$jmint_def_end", udChain.defMethod.getActiveBody()));
+
+        //create strings to print
+        String template = "jMint: %s %s for Mutant = %s";
+        HashMap<String, Unit> newUnits = new HashMap<String, Unit>();
+
+
+        newUnits.put("def_system_io_assign", Jimple.v().newAssignStmt(
+                newLocals.get("$jmint_def_print"),
+                Jimple.v().newStaticFieldRef(
+                Scene.v().getField("<java.lang.System: java.io.PrintStream out>").makeRef())));
+
+        newUnits.put("use_system_io_assign", Jimple.v().newAssignStmt(
+                newLocals.get("$jmint_use_print"),
+                Jimple.v().newStaticFieldRef(
+                        Scene.v().getField("<java.lang.System: java.io.PrintStream out>").makeRef())));
+
+
+        newUnits.put("use_start_assign", Jimple.v().newAssignStmt(newLocals.get("$jmint_use_start"),
+                StringConstant.v(String.format(template, "use", "start", c.toString()))));
+        newUnits.put("use_end_assign", Jimple.v().newAssignStmt(newLocals.get("$jmint_use_end"),
+                StringConstant.v(String.format(template, "use", "end", c.toString()))));
+        newUnits.put("def_start_assign", Jimple.v().newAssignStmt(newLocals.get("$jmint_def_start"),
+                StringConstant.v(String.format(template, "def", "start", c.toString()))));
+        newUnits.put("def_end_assign", Jimple.v().newAssignStmt(newLocals.get("$jmint_def_end"),
+                StringConstant.v(String.format(template, "def", "end", c.toString()))));
+
+        SootMethod println = Scene.v().getSootClass("java.io.PrintStream").getMethod("void println(java.lang.String)");
+
+        //create invoke statements
+        newUnits.put("def_print_start",
+                Jimple.v().newInvokeStmt(
+                        Jimple.v().newVirtualInvokeExpr(newLocals.get("$jmint_def_print"),
+                                println.makeRef(), newLocals.get("$jmint_def_start"))));
+        newUnits.put("def_print_end",
+                Jimple.v().newInvokeStmt(
+                        Jimple.v().newVirtualInvokeExpr(newLocals.get("$jmint_def_print"),
+                                println.makeRef(), newLocals.get("$jmint_def_end"))));
+
+        newUnits.put("use_print_start",
+                Jimple.v().newInvokeStmt(
+                        Jimple.v().newVirtualInvokeExpr(newLocals.get("$jmint_use_print"),
+                                println.makeRef(), newLocals.get("$jmint_use_start"))));
+
+        newUnits.put("use_print_end",
+                Jimple.v().newInvokeStmt(
+                        Jimple.v().newVirtualInvokeExpr(newLocals.get("$jmint_use_print"),
+                                println.makeRef(), newLocals.get("$jmint_use_end"))));
+
+
+        try {
+            //we add all locals, just easy to delete.
+            udChain.defMethod.getActiveBody().getLocals().addAll(newLocals.values());
+            if (!udChain.defMethod.equals(udChain.useMethod)){
+                udChain.useMethod.getActiveBody().getLocals().addAll(newLocals.values());
+            }
+
+            //before def
+
+            udChain.defMethod.getActiveBody().getUnits().insertBefore(newUnits.get("def_system_io_assign"), udChain.defStmt);
+
+            udChain.defMethod.getActiveBody().getUnits().insertBefore(newUnits.get("def_start_assign"), udChain.defStmt);
+            udChain.defMethod.getActiveBody().getUnits().insertBefore(newUnits.get("def_print_start"), udChain.defStmt);
+            //after def
+            udChain.defMethod.getActiveBody().getUnits().insertAfter(newUnits.get("def_print_end"), udChain.defStmt);
+            udChain.defMethod.getActiveBody().getUnits().insertAfter(newUnits.get("def_end_assign"), udChain.defStmt);
+
+            Unit location = udChain.useUnit;
+            if (udChain.useUnit instanceof IdentityStmt){
+                location = SUtil.getFirstNonIdentityStmt(udChain.useMethod);
+            }
+            //before use
+            udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_system_io_assign"), location);
+
+            udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_start_assign"), location);
+            udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_print_start"), location);
+            //after use
+            udChain.useMethod.getActiveBody().getUnits().insertAfter(newUnits.get("use_print_end"), location);
+            udChain.useMethod.getActiveBody().getUnits().insertAfter(newUnits.get("use_end_assign"), location);
+
+            MutantGenerator.write(udChain.defMethod.getDeclaringClass(), c,
+                    Options.v().output_format_jimple, jimpleLocation);
+            MutantGenerator.write(udChain.defMethod.getDeclaringClass(), c,
+                    Options.v().output_format_class, classLocation);
+
+            if (!udChain.getDefMethod().getDeclaringClass().equals(udChain.useMethod.getDeclaringClass())){
+                MutantGenerator.write(udChain.useMethod.getDeclaringClass(), c,
+                        Options.v().output_format_jimple, jimpleLocation);
+                MutantGenerator.write(udChain.useMethod.getDeclaringClass(), c,
+                        Options.v().output_format_class, classLocation);
+            }
+        }
+        finally
+        {
+            udChain.defMethod.getActiveBody().getLocals().removeAll(newLocals.values());
+            if (!udChain.defMethod.equals(udChain.getUseMethod())){
+                 udChain.useMethod.getActiveBody().getLocals().removeAll(newLocals.values());
+            }
+
+            udChain.defMethod.getActiveBody().getUnits().remove(newUnits.get("def_system_io_assign"));
+            udChain.defMethod.getActiveBody().getUnits().remove(newUnits.get("def_start_assign"));
+            udChain.defMethod.getActiveBody().getUnits().remove(newUnits.get("def_print_start"));
+            udChain.defMethod.getActiveBody().getUnits().remove(newUnits.get("def_end_assign"));
+            udChain.defMethod.getActiveBody().getUnits().remove(newUnits.get("def_print_end"));
+
+            udChain.useMethod.getActiveBody().getUnits().remove(newUnits.get("use_system_io_assign"));
+            udChain.useMethod.getActiveBody().getUnits().remove(newUnits.get("use_start_assign"));
+            udChain.useMethod.getActiveBody().getUnits().remove(newUnits.get("use_print_start"));
+            udChain.useMethod.getActiveBody().getUnits().remove(newUnits.get("use_end_assign"));
+            udChain.useMethod.getActiveBody().getUnits().remove(newUnits.get("use_print_end"));
+
+        }
+
+        if (! (mutantDefKlass.equals(udChain.defMethod.getDeclaringClass())
+             || mutantDefKlass.equals(udChain.useMethod.getDeclaringClass()))){
+
+            MutantGenerator.write(mutantDefKlass, c,
+                    Options.v().output_format_jimple, jimpleLocation);
+            MutantGenerator.write(mutantDefKlass, c,
+                    Options.v().output_format_class, classLocation);
+        }
+
+    }  */
+
+
+    public void writeMutants(SootClass mutantDefKlass, MutantsCode c){
+
+        String jimpleLocation = makeAndGetLocation(mutantDefKlass, c,  Options.v().output_format_jimple);
+        String classLocation = makeAndGetLocation(mutantDefKlass, c,  Options.v().output_format_class);
+
+        //this kind of duplication needed for cases when def and use classes and method are the same objects.
+        //save the nested if conditions by assuming they are could be different classes.
+        HashMap<String, Local> newLocals = new HashMap<String, Local>();
+
+        newLocals.put("$jmint_use_print", addPrintStreamRef("$jmint_use_print", udChain.useMethod.getActiveBody()));
+        newLocals.put("$jmint_use_start", addTmpString("$jmint_use_start", udChain.useMethod.getActiveBody()));
+        newLocals.put("$jmint_use_end", addTmpString("$jmint_use_end", udChain.useMethod.getActiveBody()));
+
+        //create strings to print
+        String template = "jMint: %s %s for Mutant = %s";
+        HashMap<String, Unit> newUnits = new HashMap<String, Unit>();
+        newUnits.put("use_system_io_assign", Jimple.v().newAssignStmt(
+                newLocals.get("$jmint_use_print"),
+                Jimple.v().newStaticFieldRef(
+                        Scene.v().getField("<java.lang.System: java.io.PrintStream out>").makeRef())));
+
+        newUnits.put("use_start_assign", Jimple.v().newAssignStmt(newLocals.get("$jmint_use_start"),
+                StringConstant.v(String.format(template, "use", "start", c.toString()))));
+        newUnits.put("use_end_assign", Jimple.v().newAssignStmt(newLocals.get("$jmint_use_end"),
+                StringConstant.v(String.format(template, "use", "end", c.toString()))));
+
+        SootMethod println = Scene.v().getSootClass("java.io.PrintStream").getMethod("void println(java.lang.String)");
+
+        newUnits.put("use_print_start",
+                Jimple.v().newInvokeStmt(
+                        Jimple.v().newVirtualInvokeExpr(newLocals.get("$jmint_use_print"),
+                                println.makeRef(), newLocals.get("$jmint_use_start"))));
+
+        newUnits.put("use_print_end",
+                Jimple.v().newInvokeStmt(
+                        Jimple.v().newVirtualInvokeExpr(newLocals.get("$jmint_use_print"),
+                                println.makeRef(), newLocals.get("$jmint_use_end"))));
+
+
+        try {
+            //we add all locals, just easy to delete.
+            udChain.useMethod.getActiveBody().getLocals().addAll(newLocals.values());
+
+            Unit location = udChain.useUnit;
+            if (udChain.useUnit instanceof IdentityStmt){
+                location = SUtil.getFirstNonIdentityStmt(udChain.useMethod);
+            }
+            //before use
+            udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_system_io_assign"), location);
+
+            udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_start_assign"), location);
+            udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_print_start"), location);
+            //after use
+            udChain.useMethod.getActiveBody().getUnits().insertAfter(newUnits.get("use_print_end"), location);
+            udChain.useMethod.getActiveBody().getUnits().insertAfter(newUnits.get("use_end_assign"), location);
+
+            MutantGenerator.write(udChain.useMethod.getDeclaringClass(), c,
+                    Options.v().output_format_jimple, jimpleLocation);
+            MutantGenerator.write(udChain.useMethod.getDeclaringClass(), c,
+                    Options.v().output_format_class, classLocation);
+        }
+        finally
+        {
+            udChain.useMethod.getActiveBody().getLocals().removeAll(newLocals.values());
+
+            udChain.useMethod.getActiveBody().getUnits().remove(newUnits.get("use_system_io_assign"));
+            udChain.useMethod.getActiveBody().getUnits().remove(newUnits.get("use_start_assign"));
+            udChain.useMethod.getActiveBody().getUnits().remove(newUnits.get("use_print_start"));
+            udChain.useMethod.getActiveBody().getUnits().remove(newUnits.get("use_end_assign"));
+            udChain.useMethod.getActiveBody().getUnits().remove(newUnits.get("use_print_end"));
+
+        }
+
+        if (!mutantDefKlass.equals(udChain.useMethod.getDeclaringClass())){
+            MutantGenerator.write(mutantDefKlass, c,
+                    Options.v().output_format_jimple, jimpleLocation);
+            MutantGenerator.write(mutantDefKlass, c,
+                    Options.v().output_format_class, classLocation);
+        }
+
+    }
+
+
+}
+
+
+
+
+
+
+

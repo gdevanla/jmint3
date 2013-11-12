@@ -57,7 +57,7 @@ public class OMD extends BaseMutantInjector {
 
                 currentMethod.getActiveBody().getLocals().addAll(newLocals);
                 currentMethod.getActiveBody().getUnits().insertBefore(newStmts, SUtil.getFirstNonIdentityStmt(currentMethod));
-                MutantGenerator.write(currentMethod.getDeclaringClass(), MutantsCode.OMD);
+                writeMutants(currentMethod.getDeclaringClass(), MutantsCode.OMD);
             }
             finally {
                 currentMethod.getActiveBody().getUnits().removeAll(newStmts);

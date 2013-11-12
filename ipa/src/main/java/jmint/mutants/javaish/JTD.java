@@ -31,7 +31,7 @@ public class JTD extends BaseMutantInjector {
         try
         {
             origStmt.getO2().getActiveBody().getUnits().swapWith(origStmt.getO1(), newAssignStmt);
-            MutantGenerator.write(origStmt.getO2().getDeclaringClass(), MutantsCode.JTD);
+            writeMutants(origStmt.getO2().getDeclaringClass(), MutantsCode.JTD);
         }
         finally {
             origStmt.getO2().getActiveBody().getUnits().swapWith(newAssignStmt, origStmt.getO1());

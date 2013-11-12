@@ -30,7 +30,7 @@ public class JID extends BaseMutantInjector {
                 Unit anchor = initStmt.getO2().getActiveBody().getUnits().getSuccOf(initStmt.getO1());
                 try{
                     initStmt.getO2().getActiveBody().getUnits().remove(initStmt.getO1());
-                    MutantGenerator.write(initStmt.getO2().getDeclaringClass(), MutantsCode.JID);
+                    writeMutants(initStmt.getO2().getDeclaringClass(), MutantsCode.JID);
                 }
                 finally{
                     initStmt.getO2().getActiveBody().getUnits().insertBefore(initStmt.getO1(), anchor);

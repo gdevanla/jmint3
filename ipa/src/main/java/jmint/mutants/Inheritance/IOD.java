@@ -21,12 +21,12 @@ public class IOD extends BaseMutantInjector {
         super(udChain);
     }
 
-    public static void writeMutantClass(MutantHeader h){
+    public void writeMutantClass(MutantHeader h){
         Pair<SootMethod, SootClass> f =  (Pair<SootMethod, SootClass>)h.originalDefStmt;
 
         try{
             f.getO2().removeMethod(f.getO1());
-            MutantGenerator.write(f.getO2(), MutantsCode.IOD);
+            writeMutants(f.getO2(), MutantsCode.IOD);
         }
         finally {
             f.getO2().addMethod(f.getO1());

@@ -19,7 +19,7 @@ public class IPC extends BaseMutantInjector {
         super(udChain);
     }
 
-    public static void writeMutantClass(MutantHeader h){
+    public void writeMutantClass(MutantHeader h){
         Pair<Stmt, SootMethod> f =  (Pair<Stmt, SootMethod>)h.originalDefStmt;
 
         //not checking for null, this method will error out
@@ -31,7 +31,7 @@ public class IPC extends BaseMutantInjector {
         try
         {
             f.getO2().getActiveBody().getUnits().swapWith(f.getO1(),newStmt);
-            MutantGenerator.write(f.getO2().getDeclaringClass(), MutantsCode.IPC);
+            writeMutants(f.getO2().getDeclaringClass(), MutantsCode.IPC);
         }
         finally {
             f.getO2().getActiveBody().getUnits().swapWith(newStmt, f.getO1());

@@ -22,7 +22,7 @@ public class IHI extends BaseMutantInjector {
         super(udChain);
     }
 
-    public static void writeMutantClass(InstanceFieldRef fieldRef, MutantHeader h){
+    public  void writeMutantClass(InstanceFieldRef fieldRef, MutantHeader h){
         Pair<SootField, SootClass> f =  (Pair<SootField, SootClass>)h.originalDefStmt;
 
         System.out.println("Over here" + fieldRef.getField().getDeclaringClass());
@@ -33,7 +33,7 @@ public class IHI extends BaseMutantInjector {
         SootClass klass = SUtil.getResolvedClass(fieldRef.getBase().getType().toString());
         try {
             klass.addField(field);
-            MutantGenerator.write(f.getO2(), MutantsCode.IHI);
+            writeMutants(f.getO2(), MutantsCode.IHI);
         }
         finally{
             klass.removeField(field);

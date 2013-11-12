@@ -64,7 +64,7 @@ public class OMR extends BaseMutantInjector {
 
                 currentMethod.getActiveBody().getLocals().addAll(newLocals);
                 currentMethod.getActiveBody().getUnits().insertBefore(newStmts, SUtil.getFirstNonIdentityStmt(currentMethod));
-                MutantGenerator.write(currentMethod.getDeclaringClass(), MutantsCode.OMR);
+                writeMutants(currentMethod.getDeclaringClass(), MutantsCode.OMR);
             }
             finally {
                 currentMethod.getActiveBody().getUnits().removeAll(newStmts);

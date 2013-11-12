@@ -44,7 +44,7 @@ public class JTI extends BaseMutantInjector {
                                 origStmt.getO2().getDeclaringClass().getFieldByName(l.getName()).makeRef()));
                 try{
                     origStmt.getO2().getActiveBody().getUnits().insertBefore(newAssignStmt, origStmt.getO1());
-                    MutantGenerator.write(origStmt.getO2().getDeclaringClass(), MutantsCode.JTI);
+                    writeMutants(origStmt.getO2().getDeclaringClass(), MutantsCode.JTI);
                 }
                 finally {
                     origStmt.getO2().getActiveBody().getUnits().remove(newAssignStmt);
@@ -76,7 +76,7 @@ public class JTI extends BaseMutantInjector {
             origStmt.getO2().getActiveBody().getLocals().add(tempLocal);
             origStmt.getO2().getActiveBody().getUnits().insertBefore(tempAssignStmt, origStmt.getO1());
             origStmt.getO2().getActiveBody().getUnits().swapWith(origStmt.getO1(), newAssignStmt);
-            MutantGenerator.write(origStmt.getO2().getDeclaringClass(), MutantsCode.JTI);
+            writeMutants(origStmt.getO2().getDeclaringClass(), MutantsCode.JTI);
         }
         finally {
             origStmt.getO2().getActiveBody().getUnits().swapWith(newAssignStmt, origStmt.getO1());
