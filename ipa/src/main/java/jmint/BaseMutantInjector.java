@@ -483,18 +483,25 @@ public class BaseMutantInjector implements IMutantInjector {
                 location = SUtil.getFirstNonIdentityStmt(udChain.useMethod);
             }
             //before use
-            udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_system_io_assign"), location);
+            try {
 
-            udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_start_assign"), location);
-            udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_print_start"), location);
-            //after use
-            udChain.useMethod.getActiveBody().getUnits().insertAfter(newUnits.get("use_print_end"), location);
-            udChain.useMethod.getActiveBody().getUnits().insertAfter(newUnits.get("use_end_assign"), location);
+                logger.debug("Inserting for Use Location = {}, useUnit = {}", location, udChain.useUnit);
+                udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_system_io_assign"), location);
 
-            MutantGenerator.write(udChain.useMethod.getDeclaringClass(), c,
-                    Options.v().output_format_jimple, jimpleLocation);
-            MutantGenerator.write(udChain.useMethod.getDeclaringClass(), c,
-                    Options.v().output_format_class, classLocation);
+                udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_start_assign"), location);
+                udChain.useMethod.getActiveBody().getUnits().insertBefore(newUnits.get("use_print_start"), location);
+                //after use
+                udChain.useMethod.getActiveBody().getUnits().insertAfter(newUnits.get("use_print_end"), location);
+                udChain.useMethod.getActiveBody().getUnits().insertAfter(newUnits.get("use_end_assign"), location);
+
+                MutantGenerator.write(udChain.useMethod.getDeclaringClass(), c,
+                        Options.v().output_format_jimple, jimpleLocation);
+                MutantGenerator.write(udChain.useMethod.getDeclaringClass(), c,
+                        Options.v().output_format_class, classLocation);
+            }
+            catch (Exception ex){
+                logger.debug("Error writing UseDef instrumentation={}  = {} : {}", udChain.useUnit, ex.getMessage(), ex.getStackTrace());
+            }
         }
         finally
         {
@@ -508,7 +515,8 @@ public class BaseMutantInjector implements IMutantInjector {
 
         }
 
-        if (!mutantDefKlass.equals(udChain.useMethod.getDeclaringClass())){
+        if (!udChain.useMethod.isDeclared() ||
+                !mutantDefKlass.equals(udChain.useMethod.getDeclaringClass())){
             MutantGenerator.write(mutantDefKlass, c,
                     Options.v().output_format_jimple, jimpleLocation);
             MutantGenerator.write(mutantDefKlass, c,

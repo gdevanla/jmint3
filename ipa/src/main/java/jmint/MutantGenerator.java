@@ -124,7 +124,7 @@ public class MutantGenerator {
 
         try {
             //new File("/tmp/" + fileName ).getParentFile().mkdirs();
-            streamOut = new FileOutputStream(FilenameUtils.concat(destFolder, fileName));
+            streamOut = new FileOutputStream(FilenameUtils.concat(destFolder, c.getPackageName() + "." + fileName));
 
 
             if(format == Options.output_format_class) {

@@ -3,15 +3,20 @@
 
 package MutantInjectionArtifacts.EAM;
 
-
 public class EAM1
 {
-
     public  void F1()
     {
         MutantInjectionArtifacts.EAM.EAM2 t1_02 = new MutantInjectionArtifacts.EAM.EAM2();
         int zz = t1_02.getVariable();
-        System.out.println( zz );
+        if ( zz > 10){
+            System.out.println("less than");
+        }
+        else
+        {
+            System.out.print("greater than");
+        }
+        //System.out.println( zz );
     }
 
     public void F2(){
@@ -20,8 +25,8 @@ public class EAM1
         int zz = t1_02.getSomeVariable2();
         System.out.println( zz );
 
-        String message = "Test message";
-        System.out.println(message);
+        //String message = "Test message";
+        //System.out.println(message);
     }
 
 }

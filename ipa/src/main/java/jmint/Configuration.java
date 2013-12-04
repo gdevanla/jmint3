@@ -14,9 +14,14 @@ public final class Configuration {
             "MutantInjectionArtifacts",
             //"org.apache.tools.ant",
             //"org.apache.bcel",
-            "org.jgrapht",
+            //"org.jgrapht",
             //"org.jfree",
             //"com.google.test",
+            "com.mongodb",
+            //"com.github",
+            //"com.sampullara",
+            //"com.twitter",
+            //"mustachejava",
             "TestArtifacts"};
 
     static String resultRootFolder = "/tmp/jMint/testartifacts";

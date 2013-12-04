@@ -371,7 +371,8 @@ public class SUtil {
 
     public static Set<SootClass> getSubClassesWithDefaultConstructor(Type type) {
         Set<SootClass> classes =  new HashSet<SootClass>();
-        Collection<SootClass> subClasses = Scene.v().getFastHierarchy().
+
+        Collection<SootClass> subClasses = Scene.v().getOrMakeFastHierarchy().
                 getSubclassesOf(SUtil.getResolvedClass(type.toString()));
 
         //check if atleast one subClass has a default constructor

@@ -664,7 +664,6 @@ public class TestMutationInjection {
         //appSourcePath = "/tmp/bcel/target/classes";
         appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/myprojects/jmint/subject_apps/bcel/target/classes";
 
-
         final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
 
         Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
@@ -723,6 +722,38 @@ public class TestMutationInjection {
 
     }
 
+    @Test
+    public void TestMongoDB(){
+
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/myprojects/jMint/subject_apps/mongo-java-driver/target/classes";
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
+
+    @Test
+    public void TestMustache(){
+
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/myprojects/jMint/subject_apps/mustache.java/target/classes";
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
+
+
+
 
     //@Ignore("Subject app")
     @Test
@@ -739,7 +770,6 @@ public class TestMutationInjection {
         generateMutants("", new String[]{}, null, x);
 
     }
-
 
 
     //@Test
