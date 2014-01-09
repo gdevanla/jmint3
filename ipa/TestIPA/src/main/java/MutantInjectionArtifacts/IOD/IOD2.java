@@ -11,6 +11,10 @@ class Base
         return (int) Math.random();
     }
 
+    protected int getVariableForParam(int x){
+        return (int) Math.random();
+    }
+
 }
 
 public class IOD2 extends MutantInjectionArtifacts.IOD.Base
@@ -28,6 +32,10 @@ public class IOD2 extends MutantInjectionArtifacts.IOD.Base
     protected  int getVariable()
     {
         return (int) Math.random();
+    }
+
+    protected int getVariableForParam(int x){
+        return x + (int) Math.random();
     }
 
 }

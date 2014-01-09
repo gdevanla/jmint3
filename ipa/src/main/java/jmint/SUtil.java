@@ -31,7 +31,6 @@ public class SUtil {
             if (u instanceof IdentityStmt)
                 continue;
             return u;
-
         }
 
         //is this possible during jimple transform, I doubt

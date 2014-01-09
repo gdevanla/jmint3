@@ -18,7 +18,7 @@ public class OMR2
         return (int) Math.random() + x;
     }
 
-    public  int getVariable( int x1, java.lang.String s )
+    public  int getVariable(int x1, java.lang.String s )
     {
         System.out.println("getVariable with (int, String) called");
         return (int) Math.random();

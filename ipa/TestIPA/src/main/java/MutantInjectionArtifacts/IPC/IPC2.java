@@ -31,6 +31,15 @@ public class IPC2 extends MutantInjectionArtifacts.IPC.Base
         instancevar = (int) Math.random() + 1;
     }
 
+
+    public IPC2()
+    {
+        super( "Test" );
+        instancevar = (int) Math.random() + 1;
+    }
+
+
+
     public  int getSomeInstanceVar()
     {
         int zz = this.instancevar;

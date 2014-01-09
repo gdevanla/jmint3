@@ -581,7 +581,7 @@ public class TestMutationInjection {
         generateMutants("MutantInjectionArtifacts.PNC.PNCTest1", sootAppFiles, null,x);
         assertEquals(1, BaseMutantInjector.allMutants.size());
 
-        assertEquals("Pair $r0 = new MutantInjectionArtifacts.PNC.PNC3,<MutantInjectionArtifacts.PNC.PNC1: void F1()>",
+        assertEquals("Pair $r0 = new MutantInjectionArtifacts.PNC.Base,<MutantInjectionArtifacts.PNC.PNC1: void F1()>",
                 BaseMutantInjector.allMutants.get(BaseMutantInjector.allMutants.keySet().iterator().next()).originalDefStmt.toString());
 
     }
@@ -751,6 +751,53 @@ public class TestMutationInjection {
         generateMutants("", new String[]{}, null, x);
 
     }
+
+    @Test
+    public void TestYAMLParser()       {
+
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/fsf/snakeyaml/target/classes";
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
+
+    @Test
+    public void TestJConsole() {
+
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/bacterio/jconsole/classes/";
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
+
+    @Test
+    public void TestJacksum() {
+
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/bacterio/JackSum/target/classes/";
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
+
+
 
 
 

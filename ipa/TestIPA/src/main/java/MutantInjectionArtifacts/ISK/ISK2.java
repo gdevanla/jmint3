@@ -16,7 +16,7 @@ public class ISK2 extends MutantInjectionArtifacts.ISK.Base
 
     public  int getSomeInstanceVar()
     {
-        int zz = basex; //super.basex;
+        int zz = super.basex;
         return zz;
     }
 

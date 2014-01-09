@@ -22,6 +22,9 @@ public final class Configuration {
             //"com.sampullara",
             //"com.twitter",
             //"mustachejava",
+           //"org.yaml",
+            "org.jconsole",
+            //"jonelo.jacksum",
             "TestArtifacts"};
 
     static String resultRootFolder = "/tmp/jMint/testartifacts";
