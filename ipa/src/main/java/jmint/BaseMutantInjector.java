@@ -498,6 +498,10 @@ public class BaseMutantInjector implements IMutantInjector {
                         Options.v().output_format_jimple, jimpleLocation);
                 MutantGenerator.write(udChain.useMethod.getDeclaringClass(), c,
                         Options.v().output_format_class, classLocation);
+
+                //temporary
+                //log properties of use-def chain for which mutants were created.
+                udChain.printInfo();
             }
             catch (Exception ex){
                 logger.debug("Error writing UseDef instrumentation={}  = {} : {}", udChain.useUnit, ex.getMessage(), ex.getStackTrace());
@@ -521,7 +525,12 @@ public class BaseMutantInjector implements IMutantInjector {
                     Options.v().output_format_jimple, jimpleLocation);
             MutantGenerator.write(mutantDefKlass, c,
                     Options.v().output_format_class, classLocation);
+
+
         }
+
+
+
 
     }
 

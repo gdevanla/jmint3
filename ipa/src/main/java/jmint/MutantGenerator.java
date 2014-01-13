@@ -42,7 +42,9 @@ public class MutantGenerator {
 
     public void generate() {
         for (BaseMutantInjector injector:injectors) {
-            injector.generate(injector.udChain);
+            //if (injector.udChain.allUsesOfUseValue.size() == 1) {
+                injector.generate(injector.udChain);
+            //}
         }
     }
 

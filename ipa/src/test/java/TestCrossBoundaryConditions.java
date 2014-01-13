@@ -35,7 +35,7 @@ public class TestCrossBoundaryConditions {
         Options.v().set_whole_program(true);
         Options.v().set_output_format(Options.output_format_J);
         Options.v().setPhaseOption("jb", "use-original-names");
-        Options.v().set_main_class(String.format(mainClass, testNum, testNum));
+        //Options.v().set_main_class(String.format(mainClass, testNum, testNum));
 
         String[] files = new String[numTestClasses+1];
         files[0] = String.format(mainClass, testNum, testNum);
@@ -56,16 +56,17 @@ public class TestCrossBoundaryConditions {
 
         PackManager.v().getPack("wjtp").add(new Transform("wjtp.ifds", new SceneTransformer() {
             protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
-                IFDSTabulationProblem<Unit,?,SootMethod,InterproceduralCFG<Unit,SootMethod>> problem = new IFDSReachingDefinitions(new JimpleBasedInterproceduralCFG());
+                IFDSTabulationProblem<Unit,?,SootMethod,InterproceduralCFG<Unit,SootMethod>> problem =
+                        new IFDSReachingDefinitions(new JimpleBasedInterproceduralCFG());
                 @SuppressWarnings({ "rawtypes", "unchecked" })
                 final CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>> solver = new CustomIFDSSolver(problem, true);
 
                 solver.solve();
                 solverRef.add(solver);
                 //solver.printFilteredResults();
-
             }
         }));
+
         soot.Main.main(sootArgs);
         G.reset();
 

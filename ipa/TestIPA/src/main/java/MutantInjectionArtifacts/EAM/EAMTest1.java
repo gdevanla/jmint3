@@ -10,6 +10,7 @@ public class EAMTest1 {
         EAM1 t = new EAM1();
         t.F1();
         t.F2();
-        System.out.println("Hi");
+        //System.out.println("Hi");
+
     }
 }

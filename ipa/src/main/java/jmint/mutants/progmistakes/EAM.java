@@ -7,6 +7,7 @@ import soot.*;
 import soot.jimple.*;
 import soot.jimple.internal.JAssignStmt;
 import soot.jimple.internal.JInterfaceInvokeExpr;
+import soot.jimple.internal.JSpecialInvokeExpr;
 import soot.jimple.internal.JVirtualInvokeExpr;
 import soot.tagkit.Host;
 import soot.toolkits.graph.ExceptionalUnitGraph;
@@ -83,11 +84,15 @@ public class EAM extends BaseMutantInjector {
                         m.makeRef(), new ArrayList());
             }
             else if (originalExpr instanceof InterfaceInvokeExpr){
-                new JInterfaceInvokeExpr(((InterfaceInvokeExpr) originalExpr).getBase(), m.makeRef(),
+                newExpr = new JInterfaceInvokeExpr(((InterfaceInvokeExpr) originalExpr).getBase(), m.makeRef(),
                         new ArrayList());
+            }
+            else if (originalExpr instanceof SpecialInvokeExpr){
+                newExpr = new JSpecialInvokeExpr((Local)((SpecialInvokeExpr) originalExpr).getBase(), m.makeRef(), new ArrayList());
             }
             else
             {
+                logger.debug("Info: Ignoring EAM since the exper was a SpecialInvoke");
                 continue;
             }
 

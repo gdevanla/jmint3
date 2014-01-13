@@ -5,10 +5,16 @@ import heros.IFDSTabulationProblem;
 import heros.InterproceduralCFG;
 import org.slf4j.Logger;
 import soot.*;
+import soot.jimple.IdentityStmt;
+import soot.jimple.ParameterRef;
 import soot.jimple.internal.JInstanceFieldRef;
+import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.scalar.Pair;
 import soot.jimple.DefinitionStmt;
 import soot.jimple.toolkits.ide.JimpleIFDSSolver;
+import soot.toolkits.scalar.SimpleLocalDefs;
+import soot.toolkits.scalar.SimpleLocalUses;
+import soot.toolkits.scalar.UnitValueBoxPair;
 import sun.jvm.hotspot.oops.Klass;
 
 import java.util.*;
@@ -34,7 +40,38 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
     public void solve() {
         super.solve();
         saveResults();
+        rankResults();
+       // printRank();
     }
+
+
+    private void rankResults() {
+        for (UseDefChain udChain:udChains){
+            Unit useUnit = udChain.getUseUnit();
+
+            ExceptionalUnitGraph unitGraph = new ExceptionalUnitGraph(SUtil.getResolvedMethod(
+                    udChain.getUseMethod()).getActiveBody());
+            SimpleLocalDefs localDefs = new SimpleLocalDefs(unitGraph);
+            SimpleLocalUses localUses = new SimpleLocalUses(unitGraph, localDefs);
+
+            List<Unit> defsOfLocal = new ArrayList<Unit>();
+            if (udChain.useValue instanceof ParameterRef){
+                defsOfLocal.add(useUnit);
+            }
+            else
+            {
+                defsOfLocal = localDefs.getDefsOfAt((Local)udChain.useValue, udChain.useUnit);
+            }
+
+            for (Unit defUnit: defsOfLocal){
+                List unitValuePairs = localUses.getUsesOf(defUnit);
+                for (Object o:unitValuePairs){
+                    udChain.allUsesOfUseValue.add((UnitValueBoxPair)o);
+                }
+            }
+        }
+    }
+
 
     public boolean isCrossBoundaryDefUse(DefinitionStmt defStmt, SootMethod useMethod){
 
@@ -124,6 +161,10 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
     }
 
     private Set getDefStmtMethodPairs(DefinitionStmt def) {
+
+        //This method may be collecting more defs that we need. For
+        //now it will still work since we only use OO mutants and
+        //duplicate mutants are filtered away at a later point.
         Map cols = val.row(def);
         Set<Pair<Pair<Value, Set<DefinitionStmt>>, SootMethod>> l =
                 new HashSet<Pair<Pair<Value, Set<DefinitionStmt>>, SootMethod>>();

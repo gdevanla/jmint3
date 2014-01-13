@@ -1,6 +1,7 @@
 import heros.IFDSTabulationProblem;
 import heros.InterproceduralCFG;
 import jmint.*;
+import jmint.mutants.CustomIFDSReachingDefinition;
 import jmint.mutants.Inheritance.IHD;
 import jmint.mutants.Inheritance.IHI;
 import jmint.mutants.Inheritance.IOD;
@@ -93,6 +94,8 @@ public class TestMutationInjection {
 
     private Transform getTransformForJMint(final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef,
                                            final MutantsCode[] mutants){
+
+
         Transform x = (new Transform("wjtp.iodinjector", new SceneTransformer() {
             protected void internalTransform(String phaseName, @SuppressWarnings("rawtypes") Map options) {
                 IFDSTabulationProblem<Unit,?,SootMethod,InterproceduralCFG<Unit,SootMethod>> problem = new IFDSReachingDefinitions(new JimpleBasedInterproceduralCFG());
@@ -118,6 +121,11 @@ public class TestMutationInjection {
                 MutantGenerator generator = new MutantGenerator(injectors);
                 generator.generate();
                 injectors.get(0).printMutantKeys();
+
+                logger.debug("***Report***");
+                for (UseDefChain udChain:solver.udChains){
+                    logger.debug( "Uses = {}, Score = {}", udChain.allUsesOfUseValue.size() , udChain.score());
+                }
 
             }
         }));
@@ -153,8 +161,16 @@ public class TestMutationInjection {
 
         setSootOptions();
         if (!mainClass.equals("")){
-            Options.v().set_main_class(mainClass);
+           Options.v().set_main_class(mainClass);
         }
+        //Scene.v().setEntryPoints();
+        /*soot.Main.v().autoSetOptions();
+        SootClass c = Scene.v().forceResolve("MutantInjectionArtifacts.EAM.EAM1", SootClass.BODIES);
+        List l = new ArrayList<SootMethod>();
+        l.add(c.getMethodByName("F1"));
+        Scene.v().setEntryPoints(l);
+        Scene.v().loadNecessaryClasses();
+        */
 
         PackManager.v().getPack("wjtp").add(transformCallBack);
         if ( sootAppFiles.length == 0){
@@ -164,6 +180,7 @@ public class TestMutationInjection {
         else
         {
             soot.Main.main(sootAppFiles);
+            //PackManager.v().runPacks();
         }
 
         G.reset();
@@ -798,7 +815,51 @@ public class TestMutationInjection {
     }
 
 
+    @Test
+    public void TestScribe() {
 
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/fsf/fusion/scribe-java/target/classes";
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
+
+    @Test
+    public void TestTwillio() {
+
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/fsf/fusion/twilio-java/target/classes";
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
+
+
+    @Test
+    public void TestsTT4J() {
+
+        //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
+        //appSourcePath = "/tmp/bcel/target/classes";
+        appSourcePath = "/Users/gdevanla/fsf/tt4j/org.annolab.tt4j/target/classes";
+
+        final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
+
+        Transform x = getTransformForJMint(solverRef, //new MutantsCode[]{MutantsCode.EAM} );
+                MutantsCode.getAllMutantCodes());
+        generateMutants("", new String[]{}, null, x);
+
+    }
 
 
 

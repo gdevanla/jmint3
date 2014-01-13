@@ -1,13 +1,14 @@
 package jmint;
 
 import org.slf4j.Logger;
+import soot.SootClass;
 import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
-import soot.jimple.DefinitionStmt;
-import soot.jimple.Stmt;
+import soot.jimple.*;
 import soot.tagkit.Host;
 import soot.toolkits.scalar.Pair;
+import soot.toolkits.scalar.UnitValueBoxPair;
 
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +27,8 @@ public class UseDefChain {
     final public DefinitionStmt defStmt;
 
     final public Set<Pair<Pair<Value,Set<DefinitionStmt>>,SootMethod>> allReachingDefs;
+    final public Set<UnitValueBoxPair> allUsesOfUseValue = new HashSet<UnitValueBoxPair>();
+
 
     public UseDefChain(SootMethod useMethod, Unit useUnit, Value useValue,
                        SootMethod defMethod, DefinitionStmt defStmt,
@@ -69,8 +72,8 @@ public class UseDefChain {
     public DefinitionStmt getDefStmt() { return defStmt; }
 
     public void printInfo(){
-       logger.debug(String.format("UseMethod: %s, UseUnit: %s, UseValue:%s,\n DefMethod: %s, DefStmt :%s",
-               useMethod, useUnit, useValue, defMethod, defStmt));
+       logger.debug(String.format("UseMethod: %s, UseUnit: %s, UseValue:%s , Count-Uses :%d, \n DefMethod: %s, DefStmt :%s",
+               useMethod, useUnit, useValue,  allUsesOfUseValue.size(), defMethod, defStmt));
        //logger.debug("All reaching Defs=");
        for (Pair<Pair<Value, Set<DefinitionStmt>>, SootMethod> p:allReachingDefs){
             logger.debug("{}", p.getO1().getO2());
@@ -80,5 +83,31 @@ public class UseDefChain {
     public static void printInfo(List<UseDefChain> useDefChains){
         for (UseDefChain ud:useDefChains){ ud.printInfo();}
     }
+
+
+    public int score() {
+
+        int s = 0;
+        for (UnitValueBoxPair uvpair:allUsesOfUseValue) {
+            Unit u =uvpair.getUnit();
+            if ( u instanceof IfStmt){
+                s = s + 3;
+            }
+            else if (u instanceof InvokeStmt){
+                SootClass c = ((InvokeStmt) u).getInvokeExpr().getMethod().getDeclaringClass();
+                if (!c.equals(useMethod.getClass())){
+                    s = s + 3;
+                }
+            }
+            else
+            {
+                s = s + 1;
+            }
+        }
+
+        return s;
+    }
+
+
 
 }
