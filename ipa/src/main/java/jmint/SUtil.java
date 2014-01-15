@@ -1,10 +1,8 @@
 package jmint;
 
 
-import com.google.common.collect.ConcurrentHashMultiset;
 import org.slf4j.Logger;
 import soot.*;
-import soot.JastAddJ.PrimitiveType;
 import soot.jimple.*;
 import soot.jimple.internal.JAssignStmt;
 import soot.jimple.internal.JVirtualInvokeExpr;
@@ -19,6 +17,11 @@ import java.util.*;
 
 import com.google.common.collect.Multiset;
 import com.google.common.collect.HashMultiset;
+
+
+/* TODO: This util file was put together as a prototype. Many of the work these functions
+perform can be better replaced with some Soot calls
+ */
 
 public class SUtil {
 
@@ -52,7 +55,7 @@ public class SUtil {
     }
 
     public static boolean isClassIncludedInAnalysis(SootClass r){
-        for ( String s:Configuration.packageUnderTest){
+        for ( String s:Configuration.getPackageUnderTest()){
             if (r.getPackageName().startsWith(s)){
                 return true;
             }
