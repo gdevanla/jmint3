@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import soot.*;
+import soot.jimple.IdentityStmt;
 import soot.jimple.Jimple;
 import soot.jimple.Stmt;
 import soot.jimple.internal.JimpleLocal;
@@ -125,6 +126,29 @@ public class TestMutationInjection {
                 logger.debug("***Report***");
                 for (UseDefChain udChain:solver.udChains){
                     logger.debug( "Uses = {}, Score = {}", udChain.allUsesOfUseValue.size() , udChain.score());
+                }
+
+                System.out.println("Total UDChains = " + solver.udChains.size());
+                for (UseDefChain udchain:solver.udChains){
+                    String type = (udchain.useUnit instanceof IdentityStmt)? "parameter":"return";
+                    System.out.println("Length= " + type + " : " + udchain.pathLength);
+                }
+
+                //generate report
+                SortedMap<Integer, Integer> grp =  new TreeMap<Integer, Integer>();
+                for(UseDefChain udChain:solver.udChains){
+                    if ( grp.containsKey(udChain.pathLength) ){
+                        grp.put(udChain.pathLength, grp.get(udChain.pathLength)+1);
+                    }
+                    else
+                    {
+                        grp.put(udChain.pathLength, 1);
+                    }
+                }
+
+                System.out.println("Printing histogram of ud-chain lengths");
+                for (Integer key:grp.keySet()){
+                    System.out.println(key + ", " + grp.get(key));
                 }
 
             }
@@ -789,7 +813,7 @@ public class TestMutationInjection {
 
         //appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/mujava/mujava_bcel/classes";
         //appSourcePath = "/tmp/bcel/target/classes";
-        appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/bacterio/jconsole/classes/";
+        appSourcePath = "/Users/gdevanla/Dropbox/private/se_research/stage/bacterio/jconsole/target/classes/";
 
         final ArrayList<CustomIFDSSolver<?,InterproceduralCFG<Unit,SootMethod>>> solverRef = new ArrayList<CustomIFDSSolver<?, InterproceduralCFG<Unit, SootMethod>>>();
 

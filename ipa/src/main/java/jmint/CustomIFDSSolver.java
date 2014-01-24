@@ -5,12 +5,11 @@ import heros.IFDSTabulationProblem;
 import heros.InterproceduralCFG;
 import org.slf4j.Logger;
 import soot.*;
-import soot.jimple.IdentityStmt;
-import soot.jimple.ParameterRef;
+import soot.jimple.*;
+import soot.jimple.internal.JAssignStmt;
 import soot.jimple.internal.JInstanceFieldRef;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.scalar.Pair;
-import soot.jimple.DefinitionStmt;
 import soot.jimple.toolkits.ide.JimpleIFDSSolver;
 import soot.toolkits.scalar.SimpleLocalDefs;
 import soot.toolkits.scalar.SimpleLocalUses;
@@ -41,34 +40,14 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
         super.solve();
         saveResults();
         rankResults();
+        //reportOnLengthOfEachUDChain();
        // printRank();
     }
 
 
     private void rankResults() {
         for (UseDefChain udChain:udChains){
-            Unit useUnit = udChain.getUseUnit();
 
-            ExceptionalUnitGraph unitGraph = new ExceptionalUnitGraph(SUtil.getResolvedMethod(
-                    udChain.getUseMethod()).getActiveBody());
-            SimpleLocalDefs localDefs = new SimpleLocalDefs(unitGraph);
-            SimpleLocalUses localUses = new SimpleLocalUses(unitGraph, localDefs);
-
-            List<Unit> defsOfLocal = new ArrayList<Unit>();
-            if (udChain.useValue instanceof ParameterRef){
-                defsOfLocal.add(useUnit);
-            }
-            else
-            {
-                defsOfLocal = localDefs.getDefsOfAt((Local)udChain.useValue, udChain.useUnit);
-            }
-
-            for (Unit defUnit: defsOfLocal){
-                List unitValuePairs = localUses.getUsesOf(defUnit);
-                for (Object o:unitValuePairs){
-                    udChain.allUsesOfUseValue.add((UnitValueBoxPair)o);
-                }
-            }
         }
     }
 
@@ -110,27 +89,11 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
             if (!SUtil.isClassIncludedInAnalysis(method.getDeclaringClass()))
                 continue;
 
-/*
-            if (! method.getDeclaringClass().getPackageName().contains("TestArtifact")
-                    && !method.getDeclaringClass().getPackageName().contains("MutantInjection")
-                    //&& !method.getDeclaringClass().getPackageName().contains("org.apache.bcel")
-                    //&& !method.getDeclaringClass().getPackageName().contains("org.apache.tools.ant")
-                    //&& !method.getDeclaringClass().getPackageName().contains("org.jfree")
-                      &&  !method.getDeclaringClass().getPackageName().contains("com.google.test")
-                    )
-                continue;
-*/
+            Value v = (columnKey.getO1() instanceof EquivalentValue)?
+                    ((EquivalentValue)columnKey.getO1()).getDeepestValue():columnKey.getO1();
 
             for(ValueBox b:unit.getUseBoxes()){
-                //logger.debug("Use Boxes = " +  b.getValue() + ":" + unit);
-
-                Value v = (columnKey.getO1() instanceof EquivalentValue)?
-                        ((EquivalentValue)columnKey.getO1()).getDeepestValue():columnKey.getO1();
-
-                //logger.debug(b.getValue() + "," + columnKey.getO1() + "," + columnKey.getO2() + "," + unit);
-
                 if (v.equivTo(b.getValue())){
-
                     for (DefinitionStmt def:defs){
                         SootMethod defMethod = (SootMethod)icfg.getMethodOf(def);
                         if ( isCrossBoundaryDefUse(def,method) ){
@@ -243,5 +206,11 @@ public class CustomIFDSSolver<D,  I extends InterproceduralCFG<Unit, SootMethod>
 
 
     }
+
+
+
+
+
+
 }
 

@@ -519,15 +519,20 @@ public class BaseMutantInjector implements IMutantInjector {
 
         }
 
+        try
+        {
         if (!udChain.useMethod.isDeclared() ||
                 !mutantDefKlass.equals(udChain.useMethod.getDeclaringClass())){
             MutantGenerator.write(mutantDefKlass, c,
                     Options.v().output_format_jimple, jimpleLocation);
             MutantGenerator.write(mutantDefKlass, c,
                     Options.v().output_format_class, classLocation);
-
-
         }
+        }
+        catch (Exception ex){
+            logger.debug("Error writing UseDef instrumentation={}  = {} : {}", udChain.useUnit, ex.getMessage(), ex.getStackTrace());
+        }
+
 
 
 

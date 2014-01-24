@@ -10,6 +10,13 @@ public class EAM1
         MutantInjectionArtifacts.EAM.EAM2 t1_02 = new MutantInjectionArtifacts.EAM.EAM2();
         int zz = t1_02.getVariable();
 
+        System.out.println("Random statements");
+        System.out.println("Random statements");
+        System.out.println("Random statements");
+        System.out.println("Random statements");
+        System.out.println("Random statements");
+
+
         if ( zz > 10){
             System.out.println("less than");
             //System.out.println(zz);

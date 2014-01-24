@@ -3,7 +3,6 @@
 
 package MutantInjectionArtifacts.PRV;
 
-
 public class PRV2
 {
 

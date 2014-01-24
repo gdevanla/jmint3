@@ -3,6 +3,7 @@ package jmint;
 
 import org.slf4j.Logger;
 import soot.*;
+import soot.JastAddJ.AssignShiftExpr;
 import soot.jimple.*;
 import soot.jimple.internal.JAssignStmt;
 import soot.jimple.internal.JVirtualInvokeExpr;
@@ -11,6 +12,8 @@ import soot.tagkit.Tag;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.scalar.Pair;
 import soot.toolkits.scalar.SimpleLocalDefs;
+import soot.toolkits.scalar.SimpleLocalUses;
+import soot.toolkits.scalar.UnitValueBoxPair;
 import soot.util.Chain;
 
 import java.util.*;
@@ -680,6 +683,97 @@ public class SUtil {
             i++;
         }
         return locals;
+    }
+
+    public static List<Unit> getUseUnitsInvokingMethodForADef(SootMethod m, Unit defStmt, SootMethod defMethod){
+
+        List<Unit> units = new ArrayList<Unit>();
+
+        ExceptionalUnitGraph unitGraph = new ExceptionalUnitGraph(SUtil.getResolvedMethod(
+                defMethod).getActiveBody());
+        SimpleLocalDefs localDefs = new SimpleLocalDefs(unitGraph);
+        SimpleLocalUses localUses = new SimpleLocalUses(unitGraph, localDefs);
+
+        localUses.getUsesOf(defStmt);
+        for (Object o:localUses.getUsesOf(defStmt)){
+            Unit useUnit = ((UnitValueBoxPair)o).unit;
+
+            if (doesUnitInvokeMethod(useUnit, m)){
+                units.add(useUnit);
+            }
+        }
+        return units;
+
+    }
+
+
+    public static List<Unit> getDefUnitsInvokingMethodForAUse(SootMethod m, Unit useStmt, SootMethod useMethod, Local useValue){
+
+        List<Unit> units = new ArrayList<Unit>();
+
+        ExceptionalUnitGraph unitGraph = new ExceptionalUnitGraph(SUtil.getResolvedMethod(
+                useMethod).getActiveBody());
+        SimpleLocalDefs localDefs = new SimpleLocalDefs(unitGraph);
+        //SimpleLocalUses localUses = new SimpleLocalUses(unitGraph, localDefs);
+
+        for (Unit defUnit:localDefs.getDefsOfAt(useValue, useStmt)){
+            if (doesUnitInvokeMethod(defUnit, m)){
+                units.add(defUnit);
+            }
+        }
+        return units;
+
+    }
+
+
+
+
+
+
+    public static List<Unit> getUsesOfDef(SootMethod m, Unit defStmt){
+
+        List<Unit> units = new ArrayList<Unit>();
+
+        ExceptionalUnitGraph unitGraph = new ExceptionalUnitGraph(SUtil.getResolvedMethod(
+                m).getActiveBody());
+        SimpleLocalDefs localDefs = new SimpleLocalDefs(unitGraph);
+        SimpleLocalUses localUses = new SimpleLocalUses(unitGraph, localDefs);
+
+        localUses.getUsesOf(defStmt);
+        for (Object o:localUses.getUsesOf(defStmt)){
+            Unit useUnit = ((UnitValueBoxPair)o).unit;
+            units.add(useUnit);
+        }
+        return units;
+    }
+
+    public static InvokeExpr getInvokeExpr(AssignStmt stmt, SootMethod m){
+
+        InvokeExpr expr = null;
+        for(ValueBox b:stmt.getUseBoxes()){
+            if (b.getValue() instanceof InvokeExpr
+                    && ((InvokeExpr) b.getValue()).getMethod().equals(m)){
+                return (InvokeExpr)b.getValue();
+            }
+        }
+
+        return expr;
+
+    }
+
+    public static boolean doesUnitInvokeMethod(Unit u, SootMethod m){
+
+        if (u instanceof InvokeStmt){
+            InvokeExpr is = ((InvokeStmt) u).getInvokeExpr();
+            if (is.getMethod().equals(m)){
+                return true;
+            }
+        }
+        else if ( (u instanceof AssignStmt) &&
+            getInvokeExpr((AssignStmt)u, m) != null) {
+                return true;
+            }
+        return false;
     }
 }
 

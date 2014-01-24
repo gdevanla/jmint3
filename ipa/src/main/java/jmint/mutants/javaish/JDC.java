@@ -15,7 +15,6 @@ public class JDC extends BaseMutantInjector {
 
     final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-
     public JDC(UseDefChain udChain) {
         super(udChain);
     }

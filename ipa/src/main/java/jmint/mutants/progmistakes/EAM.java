@@ -125,9 +125,6 @@ public class EAM extends BaseMutantInjector {
         PatchingChain<Unit> units = SUtil.getResolvedMethod(
                 udChain.getUseMethod()).getActiveBody().getUnits();
 
-        PatchingChain<Unit> units2 = SUtil.getResolvedMethod(
-                udChain.getUseMethod()).getActiveBody().getUnits();
-
         SimpleLocalDefs localDefs = new SimpleLocalDefs(
                 new ExceptionalUnitGraph(SUtil.getResolvedMethod(
                         udChain.getUseMethod()).getActiveBody()));
@@ -135,7 +132,7 @@ public class EAM extends BaseMutantInjector {
         //Soot JimpleLocal.equals method is not implemented, and I got grief with this.
         //Plus LocalDefs does not work well with Units since Units does not implement hashCode.
         for (Unit u:units){
-            // I hope this is not bad. Unit.equals Soot is mysteriously missing
+            // Unit.equals is not there! so this jumping through hoops
             if ( SUtil.AreTheseObjectEqualAsStrings(u, udChain.useUnit)
                 && SUtil.DoesUnitUseThisLocalAsString(u, l)){
                 Local equivLocal = SUtil.getEquivalentLocal(u, l);
